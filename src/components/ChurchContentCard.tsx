@@ -1,7 +1,7 @@
 import { Card } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
-import { Music, Clock, ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 
 interface Song {
   title: string;

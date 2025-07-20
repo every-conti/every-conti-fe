@@ -1,9 +1,10 @@
 import { ChevronRight } from "lucide-react";
-import Header from "../components/Header";
-import HeroSection from "../components/HeroSection";
-import ChurchContentCard from "../components/ChurchContentCard";
-import { Button } from "../components/ui/button";
-import NewWorshipCard from "../components/NewWorshipCard";
+import ChurchContentCard from "../../components/ChurchContentCard";
+import NewWorshipCard from "../../components/NewWorshipCard";
+import Header from "src/components/common/Header";
+import HeroSection from "src/components/HeroSection";
+import { Button } from "src/components/ui/button";
+import Footer from "src/components/common/Footer";
 
 export default function App() {
   // 샘플 데이터
@@ -132,15 +133,7 @@ export default function App() {
         </div>
       </section>
 
-      {/* 푸터 */}
-      <footer className="bg-gray-100 py-8 px-6">
-        <div className="max-w-6xl mx-auto text-center">
-          <p className="text-gray-500 text-sm mb-2">
-            © 2024 찬양콘티. All Rights Reserved.
-          </p>
-          <p className="text-gray-400 text-xs">문의: contact@praiseconti.com</p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

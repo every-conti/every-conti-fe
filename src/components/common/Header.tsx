@@ -1,5 +1,5 @@
-import { Button } from "./ui/button";
-import { Search, Music, Users, Heart } from "lucide-react";
+import { Music } from "lucide-react";
+import { Button } from "src/components/ui/button";
 
 export default function Header() {
   return (
