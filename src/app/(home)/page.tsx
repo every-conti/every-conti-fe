@@ -1,10 +1,12 @@
+"use client";
+
 import { ChevronRight } from "lucide-react";
-import ChurchContentCard from "../../components/ChurchContentCard";
-import NewWorshipCard from "../../components/NewWorshipCard";
-import Header from "src/components/common/Header";
-import HeroSection from "src/components/HeroSection";
+import ChurchContentCard from "src/components/home/ChurchContentCard";
+import HeroSection from "src/components/home/HeroSection";
 import { Button } from "src/components/ui/button";
-import Footer from "src/components/common/Footer";
+import Footer from "src/components/common/footer/Footer";
+import NewWorshipCard from "src/components/common/NewWorshipCard";
+import { useState } from "react";
 
 export default function App() {
   // 샘플 데이터
@@ -82,9 +84,10 @@ export default function App() {
     },
   ];
 
+  const [currentPage, setCurrentPage] = useState<string>("home");
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
+    <>
       <HeroSection />
 
       {/* 주요 찬양팀 콘티 섹션 */}
@@ -134,6 +137,6 @@ export default function App() {
       </section>
 
       <Footer />
-    </div>
+    </>
   );
 }

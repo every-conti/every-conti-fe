@@ -1,5 +1,5 @@
-import { Card } from "./ui/card";
-import { Badge } from "./ui/badge";
+import { Card } from "src/components/ui/card";
+import { Badge } from "src/components/ui/badge";
 import { Play, Clock } from "lucide-react";
 import { ImageWithFallback } from "./ImageWithFallback";
 
