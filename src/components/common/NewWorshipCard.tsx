@@ -5,17 +5,17 @@ import { ImageWithFallback } from "./ImageWithFallback";
 
 interface NewWorshipCardProps {
   title: string;
-  artist: string;
+  praiseTeam: string;
   duration: string;
-  views: string;
+  songType: string;
   thumbnail: string;
 }
 
 export default function NewWorshipCard({
   title,
-  artist,
+  praiseTeam,
   duration,
-  views,
+  songType,
   thumbnail,
 }: NewWorshipCardProps) {
   return (
@@ -38,8 +38,8 @@ export default function NewWorshipCard({
       </div>
       <div className="p-4">
         <h4 className="text-sm mb-1 line-clamp-2">{title}</h4>
-        <p className="text-xs text-gray-500 mb-1">{artist}</p>
-        <p className="text-xs text-gray-400">{views}</p>
+        <p className="text-xs text-gray-500 mb-1">{praiseTeam}</p>
+        <p className="text-xs text-gray-400">{songType}</p>
       </div>
     </Card>
   );
