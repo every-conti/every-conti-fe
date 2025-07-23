@@ -1,11 +1,13 @@
 "use client";
-import { Music, Plus } from "lucide-react";
+import { LogOut, Music, Plus } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { Button } from "src/components/ui/button";
+import { useAuthStore } from "src/store/useAuthStore";
 
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
+  const { user, clearUser } = useAuthStore();
 
   const navItems = [
     { label: "찬양 검색", path: "/search" },
@@ -44,7 +46,7 @@ export default function Header() {
           ))}
         </nav>
 
-        {/* 버튼들 */}
+        {/* 유저 상태별 버튼 */}
         <div className="flex items-center space-x-3">
           <Button
             variant="outline"
@@ -54,19 +56,40 @@ export default function Header() {
             <Plus className="w-4 h-4 mr-2" />
             콘티 생성
           </Button>
-          <Button
-            variant="ghost"
-            className="text-gray-600"
-            onClick={() => router.push("/login")}
-          >
-            로그인
-          </Button>
-          <Button
-            onClick={() => router.push("/signup")}
-            className="bg-blue-600 hover:bg-blue-700"
-          >
-            회원가입
-          </Button>
+
+          {user ? (
+            <>
+              <span className="text-sm text-gray-700 hidden md:inline">
+                {user.nickname}님
+              </span>
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  clearUser();
+                  router.push("/");
+                }}
+              >
+                <LogOut className="w-4 h-4 mr-1" />
+                로그아웃
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                variant="ghost"
+                className="text-gray-600"
+                onClick={() => router.push("/login")}
+              >
+                로그인
+              </Button>
+              <Button
+                onClick={() => router.push("/signup")}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                회원가입
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </header>
