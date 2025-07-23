@@ -33,17 +33,10 @@ export default function Login() {
     setError("");
 
     try {
-      const res = await apiRequestPost(
-        "/auth/login",
-        formData,
-        null,
-        false,
-        false
-      );
+      const res = await apiRequestPost("/auth/login", formData, false);
       if (res) {
         if (res?.accessToken) {
           useAuthStore.getState().setAccessToken(res.accessToken);
-          console.log(useAuthStore.getState().getAccessToken());
           useAuthStore.getState().setUser(res.user);
           useAuthStore.getState().fetchUser();
           router.push("/");

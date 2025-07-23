@@ -18,8 +18,8 @@ interface FetchOptions {
 export const apiRequestPost = async (
   path: string,
   data: any,
-  accessToken: string | null,
   useCache: boolean,
+  accessToken?: string | null,
   isSSG?: boolean
 ) => {
   const controller = new AbortController();

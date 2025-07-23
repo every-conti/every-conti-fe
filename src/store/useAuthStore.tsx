@@ -1,4 +1,6 @@
 import { apiRequestGet } from "src/api/apiRequestGet";
+import { apiRequestPost } from "src/api/apiRequestPost";
+import AccessTokenDto from "src/dto/auth/access-token.dto";
 import UserDto from "src/dto/user/user.dto";
 import { create } from "zustand";
 
@@ -8,7 +10,7 @@ interface AuthStore {
   accessToken: string | null;
 
   setUser: (user: UserDto) => void;
-  clearUser: () => void;
+  logout: () => void;
   fetchUser: () => Promise<void>;
 
   setAccessToken: (token: string) => void;
@@ -23,19 +25,43 @@ export const useAuthStore = create<AuthStore>((set) => ({
   accessToken: null,
 
   setUser: (user) => set({ user }),
-  clearUser: () => set({ user: null, accessToken: null }),
+  logout: async () => {
+    set({ loading: true });
+
+    const accessToken = useAuthStore.getState().accessToken;
+    if (!accessToken) {
+      set({ user: null, accessToken: null });
+      return;
+    }
+    await apiRequestPost("/auth/logout", null, true, accessToken);
+    set({ user: null, accessToken: null });
+
+    set({ loading: false });
+  },
 
   fetchUser: async () => {
     set({ loading: true });
-    if (!useAuthStore.getState().accessToken) return;
+    try {
+      const data: AccessTokenDto = await apiRequestGet("/auth/token", true);
+      if (!data || !data.accessToken) {
+        set({ user: null, accessToken: null });
+        set({ loading: false });
+        return;
+      }
+      set({ accessToken: data.accessToken });
+    } catch (err) {
+      set({ user: null, accessToken: null });
+      set({ loading: false });
+      return;
+    }
 
     try {
+      const accessToken = useAuthStore.getState().accessToken;
       const data: UserDto = await apiRequestGet(
         "/member/me",
-        useAuthStore.getState().accessToken,
-        false
+        true,
+        accessToken
       );
-      console.log(data);
       set({ user: data });
     } catch (err) {
       set({ user: null });

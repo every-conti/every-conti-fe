@@ -1,13 +1,15 @@
 "use client";
 import { LogOut, Music, Plus } from "lucide-react";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { Button } from "src/components/ui/button";
 import { useAuthStore } from "src/store/useAuthStore";
+import loadingIcon from "src/assets/loading.gif";
 
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, clearUser } = useAuthStore();
+  const { user, loading, logout } = useAuthStore();
 
   const navItems = [
     { label: "찬양 검색", path: "/search" },
@@ -57,7 +59,9 @@ export default function Header() {
             콘티 생성
           </Button>
 
-          {user ? (
+          {loading ? (
+            <Image src={loadingIcon} alt="로딩 중" width={24} height={24} />
+          ) : user ? (
             <>
               <span className="text-sm text-gray-700 hidden md:inline">
                 {user.nickname}님
@@ -65,7 +69,7 @@ export default function Header() {
               <Button
                 variant="ghost"
                 onClick={() => {
-                  clearUser();
+                  logout();
                   router.push("/");
                 }}
               >
