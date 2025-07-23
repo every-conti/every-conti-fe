@@ -1,14 +1,16 @@
-"use client";
-
 import { ChevronRight } from "lucide-react";
 import ChurchContentCard from "src/components/home/ChurchContentCard";
 import HeroSection from "src/components/home/HeroSection";
 import { Button } from "src/components/ui/button";
 import Footer from "src/components/common/footer/Footer";
 import NewWorshipCard from "src/components/common/NewWorshipCard";
-import { useState } from "react";
+import { fetchFamousPraiseTeams } from "src/api/home";
+import FamousContiDto from "src/dto/home/famous-conti.dto";
 
-export default function App() {
+export default async function App() {
+  const famousPraiseTeams: FamousContiDto[] = await fetchFamousPraiseTeams();
+  console.log(famousPraiseTeams);
+
   // 샘플 데이터
   const churchContents = [
     {
@@ -84,8 +86,6 @@ export default function App() {
     },
   ];
 
-  const [currentPage, setCurrentPage] = useState<string>("home");
-
   return (
     <>
       <HeroSection />
@@ -98,13 +98,22 @@ export default function App() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {churchContents.map((content, index) => (
+            {/* {churchContents.map((content, index) => (
               <ChurchContentCard
                 key={index}
                 churchName={content.churchName}
                 date={content.date}
                 songs={content.songs}
                 icon={content.icon}
+              />
+            ))} */}
+            {famousPraiseTeams.map((content, index) => (
+              <ChurchContentCard
+                key={index}
+                churchName={content.praiseTeam.praiseTeamName}
+                date={content.conti.date}
+                icon={content.praiseTeam.previewImage}
+                songs={content.conti.songs}
               />
             ))}
           </div>

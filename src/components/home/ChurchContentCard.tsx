@@ -2,16 +2,12 @@ import { Card } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { ChevronRight } from "lucide-react";
-
-interface Song {
-  title: string;
-  key: string;
-}
+import SongSimpleDto from "src/dto/home/song-simple.dto";
 
 interface ChurchContentCardProps {
   churchName: string;
   date: string;
-  songs: Song[];
+  songs: SongSimpleDto[];
   icon: string;
 }
 
@@ -38,11 +34,13 @@ export default function ChurchContentCard({
           <div key={index} className="flex items-center justify-between py-1">
             <div className="flex items-center space-x-2">
               <span className="text-sm text-gray-600">{index + 1}.</span>
-              <span className="text-sm">{song.title}</span>
+              <span className="text-sm">{song.songName}</span>
             </div>
-            <Badge variant="secondary" className="text-xs">
-              {song.key} Key
-            </Badge>
+            {song.songKey && (
+              <Badge variant="secondary" className="text-xs">
+                {song.songKey} Key
+              </Badge>
+            )}
           </div>
         ))}
       </div>
