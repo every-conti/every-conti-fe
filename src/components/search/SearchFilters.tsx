@@ -11,48 +11,53 @@ import {
   SelectValue,
 } from "src/components/ui/select";
 import { Search, Filter, X } from "lucide-react";
+import { SongTypeTypes } from "src/types/song/song-type.types";
+import { SongKeyTypes } from "src/types/song/song-key.types";
+import { SearchPropertiesDto } from "src/dto/search/search-properties.dto";
+import PraiseTeamDto from "src/dto/common/praise-team.dto";
 
 interface SearchFiltersProps {
-  searchTerm: string;
+  searchProperties: SearchPropertiesDto;
+  searchTerm: string | null;
   setSearchTerm: (term: string) => void;
-  selectedKey: string;
-  setSelectedKey: (key: string) => void;
-  selectedGenre: string;
-  setSelectedGenre: (genre: string) => void;
-  selectedArtist: string;
-  setSelectedArtist: (artist: string) => void;
+  selectedKey: SongKeyTypes | null;
+  setSelectedKey: (key: SongKeyTypes | null) => void;
+  selectedSongType: SongTypeTypes | null;
+  setSelectedSongType: (type: SongTypeTypes | null) => void;
+  selectedPraiseTeam: PraiseTeamDto | null;
+  setSelectedPraiseTeam: (team: PraiseTeamDto | null) => void;
 }
 
 export default function SearchFilters({
+  searchProperties,
   searchTerm,
   setSearchTerm,
   selectedKey,
   setSelectedKey,
-  selectedGenre,
-  setSelectedGenre,
-  selectedArtist,
-  setSelectedArtist,
+  selectedSongType,
+  setSelectedSongType,
+  selectedPraiseTeam,
+  setSelectedPraiseTeam,
 }: SearchFiltersProps) {
-  const keys = ["전체", "C", "D", "E", "F", "G", "A", "B"];
-  const genres = ["전체", "워십", "찬양", "CCM", "복음성가", "어린이찬양"];
-  const artists = [
-    "전체",
-    "마커스워십",
-    "어노인팅",
-    "제이어스",
-    "디사이플스",
-    "청년부",
-  ];
+  const keys = searchProperties.songKeys;
+  const songTypes = searchProperties.songTypes;
+  const praiseTeams = searchProperties.praiseTeams;
+  const bibles = searchProperties.bibles;
+  const songThemes = searchProperties.songThemes.map(
+    (theme) => theme.songThemeName
+  );
+  const songTempos = searchProperties.songTempos;
+  const seasons = searchProperties.seasons.map((season) => season.seasonName);
 
   const hasActiveFilters =
-    selectedKey !== "전체" ||
-    selectedGenre !== "전체" ||
-    selectedArtist !== "전체";
+    selectedKey !== null ||
+    selectedSongType !== null ||
+    selectedPraiseTeam !== null;
 
   const clearFilters = () => {
-    setSelectedKey("전체");
-    setSelectedGenre("전체");
-    setSelectedArtist("전체");
+    setSelectedKey(null);
+    setSelectedSongType(null);
+    setSelectedPraiseTeam(null);
   };
 
   return (
@@ -63,7 +68,7 @@ export default function SearchFilters({
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
           <Input
             placeholder="찬양 제목이나 아티스트를 검색하세요..."
-            value={searchTerm}
+            value={searchTerm || ""}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10 py-3 text-base"
           />
@@ -76,7 +81,12 @@ export default function SearchFilters({
             <span className="text-sm text-gray-600">필터:</span>
           </div>
 
-          <Select value={selectedKey} onValueChange={setSelectedKey}>
+          <Select
+            value={selectedKey ? selectedKey : "전체"}
+            onValueChange={(value) =>
+              setSelectedKey(value === "전체" ? null : (value as SongKeyTypes))
+            }
+          >
             <SelectTrigger className="w-32">
               <SelectValue placeholder="키 선택" />
             </SelectTrigger>
@@ -89,27 +99,45 @@ export default function SearchFilters({
             </SelectContent>
           </Select>
 
-          <Select value={selectedGenre} onValueChange={setSelectedGenre}>
+          <Select
+            value={selectedSongType ? selectedSongType : "전체"}
+            onValueChange={(value) =>
+              setSelectedSongType(
+                value === "전체" ? null : (value as SongTypeTypes)
+              )
+            }
+          >
             <SelectTrigger className="w-36">
               <SelectValue placeholder="장르 선택" />
             </SelectTrigger>
             <SelectContent>
-              {genres.map((genre) => (
-                <SelectItem key={genre} value={genre}>
-                  {genre}
+              {songTypes.map((type) => (
+                <SelectItem key={type} value={type}>
+                  {type}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
 
-          <Select value={selectedArtist} onValueChange={setSelectedArtist}>
+          <Select
+            value={selectedPraiseTeam ? selectedPraiseTeam.id : "전체"}
+            onValueChange={(value) =>
+              setSelectedPraiseTeam(
+                value === "전체"
+                  ? null
+                  : (praiseTeams.find(
+                      (team) => team.id === value
+                    ) as PraiseTeamDto)
+              )
+            }
+          >
             <SelectTrigger className="w-36">
               <SelectValue placeholder="아티스트 선택" />
             </SelectTrigger>
             <SelectContent>
-              {artists.map((artist) => (
-                <SelectItem key={artist} value={artist}>
-                  {artist}
+              {praiseTeams.map((team: PraiseTeamDto) => (
+                <SelectItem key={team.id} value={team.id}>
+                  {team.praiseTeamName}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -131,25 +159,25 @@ export default function SearchFilters({
         {/* 활성 필터 표시 */}
         {hasActiveFilters && (
           <div className="flex flex-wrap gap-2">
-            {selectedKey !== "전체" && (
+            {selectedKey !== null && (
               <Badge variant="secondary" className="bg-blue-100 text-blue-800">
                 키: {selectedKey}
               </Badge>
             )}
-            {selectedGenre !== "전체" && (
+            {selectedSongType !== null && (
               <Badge
                 variant="secondary"
                 className="bg-green-100 text-green-800"
               >
-                장르: {selectedGenre}
+                장르: {selectedSongType}
               </Badge>
             )}
-            {selectedArtist !== "전체" && (
+            {selectedPraiseTeam !== null && (
               <Badge
                 variant="secondary"
                 className="bg-purple-100 text-purple-800"
               >
-                아티스트: {selectedArtist}
+                아티스트: {selectedPraiseTeam?.praiseTeamName}
               </Badge>
             )}
           </div>

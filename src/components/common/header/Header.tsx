@@ -1,9 +1,10 @@
 "use client";
-import { LogOut, Music, Plus } from "lucide-react";
+import { LogOut, Plus } from "lucide-react";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { Button } from "src/components/ui/button";
 import { useAuthStore } from "src/store/useAuthStore";
+import logo from "src/assets/logo.png";
 import loadingIcon from "src/assets/loading.gif";
 
 export default function Header() {
@@ -27,8 +28,9 @@ export default function Header() {
           className="flex items-center space-x-2 cursor-pointer"
           onClick={() => router.push("/")}
         >
-          <Music className="w-6 h-6 text-blue-600" />
-          <span className="text-xl text-blue-600">찬양콘티</span>
+          <Image src={logo} alt="로고" width={140} height={40} />
+          {/* <Music className="w-6 h-6 text-blue-600" />
+          <span className="text-xl text-blue-600">찬양콘티</span> */}
         </div>
 
         {/* 네비게이션 */}

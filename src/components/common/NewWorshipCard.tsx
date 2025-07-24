@@ -2,6 +2,7 @@ import { Card } from "src/components/ui/card";
 import { Badge } from "src/components/ui/badge";
 import { Play, Clock } from "lucide-react";
 import { ImageWithFallback } from "./ImageWithFallback";
+import parseSongDuration from "src/utils/parseSongDuration";
 
 interface NewWorshipCardProps {
   title: string;
@@ -33,7 +34,8 @@ export default function NewWorshipCard({
         </div>
         <Badge className="absolute bottom-2 right-2 bg-black/70 text-white text-xs">
           <Clock className="w-3 h-3 mr-1" />
-          {duration}
+          {/* {parseSongDuration(duration)} */}
+          {duration ? parseSongDuration(duration) : "00:00"}
         </Badge>
       </div>
       <div className="p-4">

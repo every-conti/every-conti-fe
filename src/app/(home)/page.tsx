@@ -2,7 +2,6 @@ import { ChevronRight } from "lucide-react";
 import ChurchContentCard from "src/components/home/ChurchContentCard";
 import HeroSection from "src/components/home/HeroSection";
 import { Button } from "src/components/ui/button";
-import Footer from "src/components/common/footer/Footer";
 import NewWorshipCard from "src/components/common/NewWorshipCard";
 import { fetchFamousPraiseTeams, fetchLastSongs } from "src/api/home";
 import FamousContiDto from "src/dto/home/famous-conti.dto";
@@ -53,18 +52,14 @@ export default async function App() {
                 key={index}
                 title={song.songName}
                 praiseTeam={song.praiseTeam.praiseTeamName}
-                duration={`${Math.floor(song.duration / 60)}:${
-                  song.duration % 60
-                }`}
+                duration={song.duration}
                 songType={song.songType}
-                thumbnail={song.praiseTeam.previewImage}
+                thumbnail={song.thumbnail}
               />
             ))}
           </div>
         </div>
       </section>
-
-      <Footer />
     </>
   );
 }
