@@ -1,11 +1,23 @@
 "use client";
 
-import { useState } from "react";
-import { useSearchPropertiesQuery, useSearchSongQuery } from "src/api/search";
+import { useEffect, useState } from "react";
+import {
+  fetchBibleChapter,
+  fetchBibleVerse,
+  useSearchPropertiesQuery,
+  useSearchSongQuery,
+} from "src/api/search";
+import LoadingSpinner from "src/components/common/LoadingSpinner";
 import SearchFilters from "src/components/search/SearchFilters";
 import WorshipSearchCard from "src/components/search/WorshipSearchCard";
+import BibleChapterDto from "src/dto/common/bible-chapter.dto";
+import BibleVerseDto from "src/dto/common/bible-verse.dto";
+import BibleDto from "src/dto/common/bible.dto";
 import PraiseTeamDto from "src/dto/common/praise-team.dto";
+import SongSeasonDto from "src/dto/common/song-season.dto";
+import SongThemeDto from "src/dto/common/song-theme.dto";
 import { SongKeyTypes } from "src/types/song/song-key.types";
+import { SongTempoTypes } from "src/types/song/song-tempo.types";
 import { SongTypeTypes } from "src/types/song/song-type.types";
 
 export default function SearchDetail() {
@@ -15,6 +27,22 @@ export default function SearchDetail() {
     useState<SongTypeTypes | null>(null);
   const [selectedPraiseTeam, setSelectedPraiseTeam] =
     useState<PraiseTeamDto | null>(null);
+  const [selectedThemes, setSelectedThemes] = useState<SongThemeDto[] | null>(
+    null
+  );
+  const [selectedTempo, setSelectedTempo] = useState<SongTempoTypes | null>(
+    null
+  );
+  const [selectedSeason, setSelectedSeason] = useState<SongSeasonDto | null>(
+    null
+  );
+  const [selectedDuration, setSelectedDuration] = useState<number | null>(null);
+  const [selectedBible, setSelectedBible] = useState<BibleDto | null>(null);
+  const [selectedBibleChapter, setSelectedBibleChapter] =
+    useState<BibleChapterDto | null>(null);
+  const [selectedBibleVerse, setSelectedBibleVerse] =
+    useState<BibleVerseDto | null>(null);
+  const [offset, setOffset] = useState<number>(0);
 
   const {
     data: searchProperties,
@@ -27,10 +55,21 @@ export default function SearchDetail() {
     isError: isErrorSongs,
   } = useSearchSongQuery({
     text: searchTerm === null ? undefined : searchTerm,
-    songKey: selectedKey === null ? undefined : selectedKey,
     songType: selectedSongType === null ? undefined : selectedSongType,
     praiseTeamId:
       selectedPraiseTeam === null ? undefined : selectedPraiseTeam.id,
+    tempo: selectedTempo === null ? undefined : selectedTempo,
+    seasonId: selectedSeason === null ? undefined : selectedSeason.id,
+    duration: selectedDuration === null ? undefined : selectedDuration,
+    bibleId: selectedBible === null ? undefined : selectedBible.id,
+    bibleChapterId:
+      selectedBibleChapter === null ? undefined : selectedBibleChapter.id,
+    bibleVerseId:
+      selectedBibleVerse === null ? undefined : selectedBibleVerse.id,
+    songKey: selectedKey === null ? undefined : selectedKey,
+    themeIds:
+      selectedThemes === null ? undefined : selectedThemes.map((t) => t.id),
+    offset: offset,
   });
 
   const [currentPage, setCurrentPage] = useState<string>("search");
@@ -41,7 +80,7 @@ export default function SearchDetail() {
         <div className="max-w-6xl mx-auto">
           <h1 className="text-3xl text-gray-800 mb-2">찬양 검색</h1>
           <p className="text-gray-600">
-            원하는 찬양을 키, 장르, 아티스트별로 찾아보세요
+            원하는 찬양을 키, 장르, 찬양팀별로 찾아보세요
           </p>
         </div>
       </div>
@@ -58,6 +97,20 @@ export default function SearchDetail() {
           setSelectedSongType={setSelectedSongType}
           selectedPraiseTeam={selectedPraiseTeam}
           setSelectedPraiseTeam={setSelectedPraiseTeam}
+          selectedThemes={selectedThemes}
+          setSelectedThemes={setSelectedThemes}
+          selectedTempo={selectedTempo}
+          setSelectedTempo={setSelectedTempo}
+          selectedSeason={selectedSeason}
+          setSelectedSeason={setSelectedSeason}
+          selectedDuration={selectedDuration}
+          setSelectedDuration={setSelectedDuration}
+          selectedBible={selectedBible}
+          setSelectedBible={setSelectedBible}
+          selectedBibleChapter={selectedBibleChapter}
+          setSelectedBibleChapter={setSelectedBibleChapter}
+          selectedBibleVerse={selectedBibleVerse}
+          setSelectedBibleVerse={setSelectedBibleVerse}
         />
       )}
 
@@ -71,16 +124,22 @@ export default function SearchDetail() {
             </p>
           </div>
 
-          <div className="space-y-4">
-            {worshipSongs.map((song) => (
-              <WorshipSearchCard key={song.id} {...song} />
-            ))}
-          </div>
-
-          {worshipSongs.length === 0 && (
+          {isLoadingSongs ? (
+            <LoadingSpinner />
+          ) : isErrorSongs ? (
+            <div className="text-red-500 text-center py-8">
+              <p>검색 중 오류가 발생했습니다. 다시 시도해주세요.</p>
+            </div>
+          ) : worshipSongs.length === 0 ? (
             <div className="text-center py-16">
               <p className="text-gray-500 text-lg mb-2">검색 결과가 없습니다</p>
               <p className="text-gray-400">다른 검색어나 필터를 시도해보세요</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {worshipSongs.map((song) => (
+                <WorshipSearchCard key={song.id} {...song} />
+              ))}
             </div>
           )}
         </div>

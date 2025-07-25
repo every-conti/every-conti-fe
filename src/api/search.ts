@@ -3,6 +3,8 @@ import { apiRequestGet } from "./apiRequestGet";
 import { SearchPropertiesDto } from "src/dto/search/search-properties.dto";
 import { SongDetailDto } from "src/dto/search/song-detail.dto";
 import { SearchSongQueriesDto } from "src/dto/search/request/search-song-queries.dto";
+import BibleChapterDto from "src/dto/common/bible-chapter.dto";
+import BibleVerseDto from "src/dto/common/bible-verse.dto";
 
 export function useSearchSongQuery(params: SearchSongQueriesDto) {
   const queryString = buildQueryParams(params);
@@ -46,4 +48,20 @@ const buildQueryParams = (params: SearchSongQueriesDto) => {
   }
 
   return searchParams.toString();
+};
+
+export const fetchBibleChapter = async (bibleId: string) => {
+  const data: BibleChapterDto[] = await apiRequestGet(
+    `/bible/${bibleId}/chapters`,
+    true
+  );
+  return data;
+};
+
+export const fetchBibleVerse = async (bibleChapterId: string) => {
+  const data: BibleVerseDto[] = await apiRequestGet(
+    `/bible/${bibleChapterId}/verses`,
+    true
+  );
+  return data;
 };

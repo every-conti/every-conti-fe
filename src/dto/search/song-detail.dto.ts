@@ -19,7 +19,7 @@ export interface SongDetailDto {
   tempo: SongTempoTypes;
   season: string | null;
   songKey: SongKeyTypes;
-  duration: string;
+  duration: number;
   bible: BibleDto | null;
   bibleChapter: string | null;
   bibleVerse: string | null;
