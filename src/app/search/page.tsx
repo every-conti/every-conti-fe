@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useDebounce } from "use-debounce";
+import { useInView } from "react-intersection-observer";
 import {
-  fetchBibleChapter,
-  fetchBibleVerse,
   useSearchPropertiesQuery,
-  useSearchSongQuery,
+  useInfiniteSearchSongQuery,
 } from "src/api/search";
 import LoadingSpinner from "src/components/common/LoadingSpinner";
 import SearchFilters from "src/components/search/SearchFilters";
@@ -22,6 +22,7 @@ import { SongTypeTypes } from "src/types/song/song-type.types";
 
 export default function SearchDetail() {
   const [searchTerm, setSearchTerm] = useState<string | null>(null);
+  const [debouncedSearchTerm] = useDebounce(searchTerm, 400);
   const [selectedKey, setSelectedKey] = useState<SongKeyTypes | null>(null);
   const [selectedSongType, setSelectedSongType] =
     useState<SongTypeTypes | null>(null);
@@ -42,37 +43,46 @@ export default function SearchDetail() {
     useState<BibleChapterDto | null>(null);
   const [selectedBibleVerse, setSelectedBibleVerse] =
     useState<BibleVerseDto | null>(null);
-  const [offset, setOffset] = useState<number>(0);
+
+  const { data: searchProperties } = useSearchPropertiesQuery();
 
   const {
-    data: searchProperties,
-    isLoading: isLoadingOptions,
-    isError: isErrorOptions,
-  } = useSearchPropertiesQuery();
-  const {
-    data: worshipSongs = [],
-    isLoading: isLoadingSongs,
-    isError: isErrorSongs,
-  } = useSearchSongQuery({
-    text: searchTerm === null ? undefined : searchTerm,
-    songType: selectedSongType === null ? undefined : selectedSongType,
-    praiseTeamId:
-      selectedPraiseTeam === null ? undefined : selectedPraiseTeam.id,
-    tempo: selectedTempo === null ? undefined : selectedTempo,
-    seasonId: selectedSeason === null ? undefined : selectedSeason.id,
-    duration: selectedDuration === null ? undefined : selectedDuration,
-    bibleId: selectedBible === null ? undefined : selectedBible.id,
-    bibleChapterId:
-      selectedBibleChapter === null ? undefined : selectedBibleChapter.id,
-    bibleVerseId:
-      selectedBibleVerse === null ? undefined : selectedBibleVerse.id,
-    songKey: selectedKey === null ? undefined : selectedKey,
-    themeIds:
-      selectedThemes === null ? undefined : selectedThemes.map((t) => t.id),
-    offset: offset,
-  });
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    isError,
+  } = useInfiniteSearchSongQuery(
+    {
+      text: debouncedSearchTerm ?? undefined,
+      songType: selectedSongType ?? undefined,
+      praiseTeamId: selectedPraiseTeam?.id,
+      tempo: selectedTempo ?? undefined,
+      seasonId: selectedSeason?.id,
+      duration: selectedDuration ?? undefined,
+      bibleId: selectedBible?.id,
+      bibleChapterId: selectedBibleChapter?.id,
+      bibleVerseId: selectedBibleVerse?.id,
+      songKey: selectedKey ?? undefined,
+      themeIds: selectedThemes?.map((t) => t.id),
+    },
+    {
+      getNextPageParam: (lastPage: { nextOffset: number | null }) =>
+        lastPage.nextOffset ?? undefined,
+    }
+  );
 
-  const [currentPage, setCurrentPage] = useState<string>("search");
+  const { ref, inView } = useInView({ threshold: 1 });
+
+  const songs = data?.pages.flatMap((page) => page.items) ?? [];
+
+  // fetch next page when last item is in view
+  useEffect(() => {
+    if (inView && hasNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, fetchNextPage]);
 
   return (
     <>
@@ -85,7 +95,6 @@ export default function SearchDetail() {
         </div>
       </div>
 
-      {/* 검색 필터 */}
       {searchProperties && (
         <SearchFilters
           searchProperties={searchProperties}
@@ -114,32 +123,41 @@ export default function SearchDetail() {
         />
       )}
 
-      {/* 검색 결과 */}
       <div className="flex-1 py-8 px-6">
         <div className="max-w-6xl mx-auto">
-          <div className="mb-6">
+          {/* <div className="mb-6">
             <p className="text-gray-600">
-              총 <span className="text-blue-600">{worshipSongs.length}</span>
-              개의 찬양을 찾았습니다
+              총 <span className="text-blue-600">{songs.length}</span>개의
+              찬양을 찾았습니다
             </p>
-          </div>
+          </div> */}
 
-          {isLoadingSongs ? (
+          {isLoading ? (
             <LoadingSpinner />
-          ) : isErrorSongs ? (
+          ) : isError ? (
             <div className="text-red-500 text-center py-8">
               <p>검색 중 오류가 발생했습니다. 다시 시도해주세요.</p>
             </div>
-          ) : worshipSongs.length === 0 ? (
+          ) : songs.length === 0 ? (
             <div className="text-center py-16">
               <p className="text-gray-500 text-lg mb-2">검색 결과가 없습니다</p>
               <p className="text-gray-400">다른 검색어나 필터를 시도해보세요</p>
             </div>
           ) : (
             <div className="space-y-4">
-              {worshipSongs.map((song) => (
-                <WorshipSearchCard key={song.id} {...song} />
+              {songs.map((song, idx) => (
+                <div key={song.id}>
+                  <WorshipSearchCard {...song} />
+                </div>
               ))}
+
+              <div ref={ref} />
+
+              {isFetchingNextPage && (
+                <div className="text-center py-4">
+                  <LoadingSpinner />
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -14,5 +14,5 @@ export interface SearchSongQueriesDto {
   bibleId?: string;
   bibleChapterId?: string;
   bibleVerseId?: string;
-  offset?: number;
+  offset?: number | null;
 }

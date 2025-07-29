@@ -4,7 +4,7 @@ import { Input } from "../ui/input";
 
 export default function HeroSection() {
   return (
-    <section className="bg-gradient-to-b from-blue-50 to-white py-16 px-6">
+    <section className="bg-gradient-to-b from-sky-50 to-white py-16 px-6">
       <div className="max-w-4xl mx-auto text-center">
         <h1 className="text-4xl mb-4 text-gray-800">당신을 위한 찬양 콘티</h1>
         <p className="text-lg text-gray-600 mb-8">
@@ -20,12 +20,12 @@ export default function HeroSection() {
                 // value={searchTerm}
                 // onChange={(e) => setSearchTerm(e.target.value)}
                 // onKeyPress={handleKeyPress}
-                className="pl-10 py-3 text-base bg-white border-gray-300 focus:border-blue-500"
+                className="pl-10 py-3 text-base bg-white border-gray-300 focus:border-sky-500"
               />
             </div>
             <Button
               // onClick={onSearch}
-              className="bg-blue-600 hover:bg-blue-700 px-6"
+              className="bg-sky-500 hover:bg-sky-600 px-6"
             >
               검색
             </Button>

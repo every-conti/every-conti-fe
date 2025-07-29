@@ -1,23 +1,52 @@
-import { useQuery, UseQueryOptions } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useQuery,
+  UseQueryOptions,
+} from "@tanstack/react-query";
 import { apiRequestGet } from "./apiRequestGet";
 import { SearchPropertiesDto } from "src/dto/search/search-properties.dto";
-import { SongDetailDto } from "src/dto/search/song-detail.dto";
 import { SearchSongQueriesDto } from "src/dto/search/request/search-song-queries.dto";
 import BibleChapterDto from "src/dto/common/bible-chapter.dto";
 import BibleVerseDto from "src/dto/common/bible-verse.dto";
+import { InfiniteSongSearchDto } from "src/dto/search/infinite-song-search.dto";
 
-export function useSearchSongQuery(params: SearchSongQueriesDto) {
-  const queryString = buildQueryParams(params);
-
-  return useQuery<SongDetailDto[]>({
-    queryKey: ["worshipSongs", queryString],
+export const useInfiniteSearchSongQuery = (
+  params: SearchSongQueriesDto,
+  options = {}
+) => {
+  const { data, isLoading, ...rest } = useInfiniteQuery<InfiniteSongSearchDto>({
+    queryKey: ["searchSongs", params],
     queryFn: async () => {
-      return apiRequestGet(`/song/search?${queryString}`, false);
+      const res: InfiniteSongSearchDto = await apiRequestGet(
+        `/song/search?${buildQueryParams({ ...params })}`,
+        true
+      );
+      return res;
     },
-    enabled: true,
-    staleTime: 60 * 1000,
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => lastPage?.nextOffset ?? undefined,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
-}
+  return {
+    data,
+    isLoading,
+    ...rest,
+  };
+};
+
+const buildQueryParams = (params: SearchSongQueriesDto) => {
+  const searchParams = new URLSearchParams();
+
+  for (const [key, value] of Object.entries(params)) {
+    console.log(`Building query param: ${key} = ${value}`);
+    if (value && value !== "전체") {
+      searchParams.set(key, value as string);
+    }
+  }
+
+  return searchParams.toString();
+};
 
 export const fetchSearchProperties = async () => {
   const data: SearchPropertiesDto = await apiRequestGet(
@@ -37,18 +66,6 @@ export function useSearchPropertiesQuery() {
     refetchOnWindowFocus: false, // 창 포커스해도 재요청 안 함
   } as UseQueryOptions<SearchPropertiesDto>);
 }
-
-const buildQueryParams = (params: SearchSongQueriesDto) => {
-  const searchParams = new URLSearchParams();
-
-  for (const [key, value] of Object.entries(params)) {
-    if (value && value !== "전체") {
-      searchParams.set(key, value as string);
-    }
-  }
-
-  return searchParams.toString();
-};
 
 export const fetchBibleChapter = async (bibleId: string) => {
   const data: BibleChapterDto[] = await apiRequestGet(
