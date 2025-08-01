@@ -2,12 +2,12 @@ import { Card } from "src/components/ui/card";
 import { Badge } from "src/components/ui/badge";
 import { Play, Clock } from "lucide-react";
 import { ImageWithFallback } from "./ImageWithFallback";
-import parseSongDuration from "src/utils/parseSongDuration";
+import {parseSongDuration} from "src/utils/parseSongDuration";
 
 interface NewWorshipCardProps {
   title: string;
   praiseTeam: string;
-  duration: string;
+  duration: number;
   songType: string;
   thumbnail: string;
 }

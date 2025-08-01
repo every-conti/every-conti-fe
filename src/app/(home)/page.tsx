@@ -3,7 +3,7 @@ import ChurchContentCard from "src/components/home/ChurchContentCard";
 import HeroSection from "src/components/home/HeroSection";
 import { Button } from "src/components/ui/button";
 import NewWorshipCard from "src/components/common/NewWorshipCard";
-import { fetchFamousPraiseTeams, fetchLastSongs } from "src/api/home";
+import { fetchFamousPraiseTeams, fetchLastSongs } from "src/app/api/home";
 import FamousContiDto from "src/dto/home/famous-conti.dto";
 import SongLastsDto from "src/dto/home/song-lasts.dto";
 

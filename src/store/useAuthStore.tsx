@@ -1,5 +1,5 @@
-import { apiRequestGet } from "src/api/apiRequestGet";
-import { apiRequestPost } from "src/api/apiRequestPost";
+import { apiRequestGet } from "src/app/api/apiRequestGet";
+import { apiRequestPost } from "src/app/api/apiRequestPost";
 import AccessTokenDto from "src/dto/auth/access-token.dto";
 import UserDto from "src/dto/user/user.dto";
 import { create } from "zustand";

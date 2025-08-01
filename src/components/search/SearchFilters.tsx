@@ -29,7 +29,7 @@ import SearchableSelect from "./SearchableSelect";
 import MultiSelect from "./MultiSelect";
 import BibleChapterDto from "src/dto/common/bible-chapter.dto";
 import BibleVerseDto from "src/dto/common/bible-verse.dto";
-import { fetchBibleChapter, fetchBibleVerse } from "src/api/search";
+import { fetchBibleChapter, fetchBibleVerse } from "src/app/api/song";
 interface SearchFiltersProps {
   searchProperties: SearchPropertiesDto;
   searchTerm: string | null;

@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 import { useDebounce } from "use-debounce";
 import { useInView } from "react-intersection-observer";
 import {
-  useSearchPropertiesQuery,
+  useSongPropertiesQuery,
   useInfiniteSearchSongQuery,
-} from "src/api/search";
+} from "src/app/api/song";
 import LoadingSpinner from "src/components/common/LoadingSpinner";
 import SearchFilters from "src/components/search/SearchFilters";
 import WorshipSearchCard from "src/components/search/WorshipSearchCard";
@@ -42,7 +42,7 @@ export default function SearchDetail() {
   const [selectedBibleVerse, setSelectedBibleVerse] =
     useState<BibleVerseDto | null>(null);
 
-  const { data: searchProperties } = useSearchPropertiesQuery();
+  const { data: searchProperties } = useSongPropertiesQuery();
 
   const {
     data,

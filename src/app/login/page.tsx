@@ -14,7 +14,7 @@ import { Alert, AlertDescription } from "src/components/ui/alert";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { Button } from "src/components/ui/button";
 import { useRouter } from "next/navigation";
-import { apiRequestPost } from "src/api/apiRequestPost";
+import { apiRequestPost } from "src/app/api/apiRequestPost";
 import { useAuthStore } from "src/store/useAuthStore";
 
 export default function Login() {

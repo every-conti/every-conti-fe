@@ -4,7 +4,7 @@ import { Badge } from "src/components/ui/badge";
 import { Button } from "src/components/ui/button";
 import { ImageWithFallback } from "../common/ImageWithFallback";
 import { SongDetailDto } from "src/dto/search/song-detail.dto";
-import parseSongDuration from "src/utils/parseSongDuration";
+import {parseSongDuration} from "src/utils/parseSongDuration";
 import { SongKeyKorean } from "src/types/song/song-key.types";
 import { SongTempoKorean } from "src/types/song/song-tempo.types";
 
