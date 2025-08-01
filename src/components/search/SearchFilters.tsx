@@ -30,7 +30,6 @@ import MultiSelect from "./MultiSelect";
 import BibleChapterDto from "src/dto/common/bible-chapter.dto";
 import BibleVerseDto from "src/dto/common/bible-verse.dto";
 import { fetchBibleChapter, fetchBibleVerse } from "src/api/search";
-
 interface SearchFiltersProps {
   searchProperties: SearchPropertiesDto;
   searchTerm: string | null;
@@ -41,8 +40,8 @@ interface SearchFiltersProps {
   setSelectedSongType: (type: SongTypeTypes | null) => void;
   selectedPraiseTeam: PraiseTeamDto | null;
   setSelectedPraiseTeam: (team: PraiseTeamDto | null) => void;
-  selectedThemes: SongThemeDto[] | null;
-  setSelectedThemes: (themes: SongThemeDto[] | null) => void;
+  selectedThemes: SongThemeDto[];
+  setSelectedThemes: (themes: SongThemeDto[]) => void;
   selectedTempo: SongTempoTypes | null;
   setSelectedTempo: (tempo: SongTempoTypes | null) => void;
   selectedSeason: SongSeasonDto | null;
@@ -56,6 +55,16 @@ interface SearchFiltersProps {
   selectedBibleVerse: BibleVerseDto | null;
   setSelectedBibleVerse: (verse: BibleVerseDto | null) => void;
 }
+
+const DEFAULTS = {
+  songType: "장르 선택",
+  songKey: "키 선택",
+  songTempo: "템포 선택",
+  songSeason: "절기 선택",
+  songBible: "성경 선택",
+  songBibleChapter: "장 선택",
+  songBibleVerse: "절 선택",
+};
 
 export default function SearchFilters({
   searchProperties,
@@ -83,6 +92,27 @@ export default function SearchFilters({
   setSelectedBibleVerse,
 }: SearchFiltersProps) {
   const [filterOpen, setFilterOpen] = useState(false);
+  const [openSelectId, setOpenSelectId] = useState<string | null>(null);
+
+  // useEffect(() => {
+  //   const handleClickOutside = (event: MouseEvent) => {
+  //     const allDropdowns = document.querySelectorAll("button");
+  //     console.log(allDropdowns);
+  //     const clickedInsideSome = Array.from(allDropdowns).some((el) =>
+  //       el.contains(event.target as Node)
+  //     );
+  //     if (!clickedInsideSome) {
+  //       setOpenSelectId(null);
+  //     }
+  //   };
+
+  //   document.addEventListener("mousedown", handleClickOutside);
+  //   return () => document.removeEventListener("mousedown", handleClickOutside);
+  // }, []);
+
+  // useEffect(() => {
+  //   console.log("openSelectId", openSelectId);
+  // }, [openSelectId]);
 
   const keys = searchProperties.songKeys;
   const songTypes = searchProperties.songTypes;
@@ -110,7 +140,7 @@ export default function SearchFilters({
     setSelectedKey(null);
     setSelectedSongType(null);
     setSelectedPraiseTeam(null);
-    setSelectedThemes(null);
+    setSelectedThemes([]);
     setSelectedTempo(null);
     setSelectedSeason(null);
     setSelectedBible(null);
@@ -179,6 +209,10 @@ export default function SearchFilters({
           {filterOpen && (
             <>
               <Select
+                open={openSelectId === "songType"}
+                onOpenChange={(isOpen) =>
+                  setOpenSelectId(isOpen ? "songType" : null)
+                }
                 value={selectedSongType ? selectedSongType : "장르 선택"}
                 onValueChange={(value) =>
                   setSelectedSongType(
@@ -222,6 +256,11 @@ export default function SearchFilters({
               />
 
               <MultiSelect
+                open={openSelectId === "songThemes"}
+                onOpenChange={(isOpen) => {
+                  console.log("isOpen", isOpen);
+                  setOpenSelectId(isOpen ? "songThemes" : null);
+                }}
                 options={songThemes.map((t) => ({
                   id: t.id,
                   label: t.themeName,
@@ -241,7 +280,7 @@ export default function SearchFilters({
                       ? songThemes.filter((theme) =>
                           selectedOptions.some((opt) => opt.id === theme.id)
                         )
-                      : null;
+                      : [];
                   setSelectedThemes(selectedDtos);
                 }}
               />
@@ -254,18 +293,24 @@ export default function SearchFilters({
             {/* 필터 옵션 */}
             <div className="flex flex-wrap gap-4 items-center">
               <Select
-                value={selectedTempo ? selectedTempo : "템포 선택"}
+                open={openSelectId === "songTempo"}
+                onOpenChange={(isOpen) => {
+                  setOpenSelectId(isOpen ? "songTempo" : null);
+                }}
+                value={selectedTempo ? selectedTempo : DEFAULTS.songTempo}
                 onValueChange={(value) =>
                   setSelectedTempo(
-                    value === "템포 선택" ? null : (value as SongTempoTypes)
+                    value === DEFAULTS.songTempo
+                      ? null
+                      : (value as SongTempoTypes)
                   )
                 }
               >
                 <SelectTrigger className="w-36">
-                  <SelectValue placeholder="템포 선택" />
+                  <SelectValue placeholder={DEFAULTS.songTempo} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="템포 선택">템포 선택</SelectItem>
+                  <SelectItem value={DEFAULTS.songTempo}>템포 선택</SelectItem>
                   {songTempos.map((tempo) => (
                     <SelectItem key={tempo} value={tempo}>
                       {SongTempoKorean[tempo]}
@@ -275,18 +320,22 @@ export default function SearchFilters({
               </Select>
 
               <Select
-                value={selectedKey ? selectedKey : "키 선택"}
+                open={openSelectId === "songKey"}
+                onOpenChange={(isOpen) =>
+                  setOpenSelectId(isOpen ? "songKey" : null)
+                }
+                value={selectedKey ? selectedKey : DEFAULTS.songKey}
                 onValueChange={(value) =>
                   setSelectedKey(
-                    value === "키 선택" ? null : (value as SongKeyTypes)
+                    value === DEFAULTS.songKey ? null : (value as SongKeyTypes)
                   )
                 }
               >
                 <SelectTrigger className="w-32">
-                  <SelectValue placeholder="키 선택" />
+                  <SelectValue placeholder={DEFAULTS.songKey} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="키 선택">키 선택</SelectItem>
+                  <SelectItem value={DEFAULTS.songKey}>키 선택</SelectItem>
                   {keys.map((key) => (
                     <SelectItem key={key} value={key}>
                       {SongKeyKorean[key]}
@@ -296,10 +345,14 @@ export default function SearchFilters({
               </Select>
 
               <Select
-                value={selectedSeason ? selectedSeason.id : "절기 선택"}
+                open={openSelectId === "songSeason"}
+                onOpenChange={(isOpen) =>
+                  setOpenSelectId(isOpen ? "songSeason" : null)
+                }
+                value={selectedSeason ? selectedSeason.id : DEFAULTS.songSeason}
                 onValueChange={(value) =>
                   setSelectedSeason(
-                    value === "절기 선택"
+                    value === DEFAULTS.songSeason
                       ? null
                       : (seasons.find(
                           (season) => season.id === value
@@ -308,10 +361,12 @@ export default function SearchFilters({
                 }
               >
                 <SelectTrigger className="w-36">
-                  <SelectValue placeholder="절기 선택" />
+                  <SelectValue placeholder={DEFAULTS.songSeason} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="절기 선택">절기 선택</SelectItem>
+                  <SelectItem value={DEFAULTS.songSeason}>
+                    {DEFAULTS.songSeason}
+                  </SelectItem>
                   {seasons.map((season) => (
                     <SelectItem key={season.id} value={season.id}>
                       {season.seasonName}
@@ -321,20 +376,24 @@ export default function SearchFilters({
               </Select>
 
               <Select
-                value={selectedBible ? selectedBible.id : "성경 선택"}
+                open={openSelectId === "songBible"}
+                onOpenChange={(isOpen) =>
+                  setOpenSelectId(isOpen ? "songBible" : null)
+                }
+                value={selectedBible ? selectedBible.id : DEFAULTS.songBible}
                 onValueChange={(value) =>
                   setSelectedBible(
-                    value === "성경 선택"
+                    value === DEFAULTS.songBible
                       ? null
                       : (bibles.find((bible) => bible.id === value) as BibleDto)
                   )
                 }
               >
                 <SelectTrigger className="w-36">
-                  <SelectValue placeholder="성경 선택" />
+                  <SelectValue placeholder={DEFAULTS.songBible} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="성경 선택">성경 선택</SelectItem>
+                  <SelectItem value={DEFAULTS.songBible}>성경 선택</SelectItem>
                   {bibles.map((b) => (
                     <SelectItem key={b.id} value={b.id}>
                       {b.bibleKoName}
@@ -345,12 +404,18 @@ export default function SearchFilters({
 
               {selectedBible && (
                 <Select
+                  open={openSelectId === "songBibleChapter"}
+                  onOpenChange={(isOpen) =>
+                    setOpenSelectId(isOpen ? "songBibleChapter" : null)
+                  }
                   value={
-                    selectedBibleChapter ? selectedBibleChapter.id : "장 선택"
+                    selectedBibleChapter
+                      ? selectedBibleChapter.id
+                      : DEFAULTS.songBibleChapter
                   }
                   onValueChange={(value) =>
                     setSelectedBibleChapter(
-                      value === "장 선택"
+                      value === DEFAULTS.songBibleChapter
                         ? null
                         : (chapters.find(
                             (chapter) => chapter.id === value
@@ -362,7 +427,9 @@ export default function SearchFilters({
                     <SelectValue placeholder="장 선택" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="장 선택">장 선택</SelectItem>
+                    <SelectItem value={DEFAULTS.songBibleChapter}>
+                      {DEFAULTS.songBibleChapter}
+                    </SelectItem>
                     {chapters.map((chapter) => (
                       <SelectItem key={chapter.id} value={chapter.id}>
                         {chapter.chapterNum}장
@@ -374,10 +441,18 @@ export default function SearchFilters({
 
               {selectedBibleChapter && (
                 <Select
-                  value={selectedBibleVerse ? selectedBibleVerse.id : "절 선택"}
+                  open={openSelectId === "songBibleVerse"}
+                  onOpenChange={(isOpen) =>
+                    setOpenSelectId(isOpen ? "songBibleVerse" : null)
+                  }
+                  value={
+                    selectedBibleVerse
+                      ? selectedBibleVerse.id
+                      : DEFAULTS.songBibleVerse
+                  }
                   onValueChange={(value) =>
                     setSelectedBibleVerse(
-                      value === "절 선택"
+                      value === DEFAULTS.songBibleVerse
                         ? null
                         : (verses.find(
                             (verse) => verse.id === value
@@ -386,10 +461,12 @@ export default function SearchFilters({
                   }
                 >
                   <SelectTrigger className="w-36">
-                    <SelectValue placeholder="절 선택" />
+                    <SelectValue placeholder={DEFAULTS.songBibleVerse} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="절 선택">절 선택</SelectItem>
+                    <SelectItem value={DEFAULTS.songBibleVerse}>
+                      {DEFAULTS.songBibleVerse}
+                    </SelectItem>
                     {verses.map((verse) => (
                       <SelectItem key={verse.id} value={verse.id}>
                         {verse.verseNum}절
@@ -406,64 +483,112 @@ export default function SearchFilters({
         {hasActiveFilters && (
           <div className="flex flex-wrap gap-2">
             {selectedKey !== null && (
-              <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+              <Badge
+                variant="secondary"
+                className="bg-blue-100 text-blue-800 flex items-center gap-1 cursor-pointer"
+                onClick={() => setSelectedKey(null)}
+              >
                 키: {selectedKey}
+                <X className="w-3 h-3" />
               </Badge>
             )}
+
             {selectedSongType !== null && (
               <Badge
                 variant="secondary"
-                className="bg-green-100 text-green-800"
+                className="bg-green-100 text-green-800 flex items-center gap-1 cursor-pointer"
+                onClick={() => setSelectedSongType(null)}
               >
                 장르: {SongTypeKorean[selectedSongType]}
+                <X className="w-3 h-3 " />
               </Badge>
             )}
+
             {selectedPraiseTeam !== null && (
               <Badge
                 variant="secondary"
-                className="bg-purple-100 text-purple-800"
+                className="bg-purple-100 text-purple-800 flex items-center gap-1 cursor-pointer"
+                onClick={() => setSelectedPraiseTeam(null)}
               >
                 찬양팀: {selectedPraiseTeam?.praiseTeamName}
+                <X className="w-3 h-3" />
               </Badge>
             )}
-            {selectedThemes && selectedThemes.length > 0 && (
-              <div className="flex flex-wrap gap-1">
+
+            {selectedThemes &&
+              selectedThemes.length > 0 &&
+              selectedThemes.map((theme) => (
                 <Badge
+                  key={theme.id}
                   variant="secondary"
-                  className="bg-yellow-100 text-yellow-800"
+                  className="bg-yellow-100 text-yellow-800 flex items-center gap-1 curor-pointer"
+                  onClick={() =>
+                    setSelectedThemes(
+                      selectedThemes.filter((t) => t.id !== theme.id)
+                    )
+                  }
                 >
-                  테마:{" "}
-                  {selectedThemes.map((theme) => theme.themeName).join(", ")}
+                  테마: {theme.themeName}
+                  <X className="w-3 h-3" />
                 </Badge>
-              </div>
-            )}
+              ))}
+
             {selectedTempo !== null && (
               <Badge
                 variant="secondary"
-                className="bg-orange-100 text-orange-800"
+                className="bg-orange-100 text-orange-800 flex items-center gap-1 cursor-pointer"
+                onClick={() => setSelectedTempo(null)}
               >
                 템포: {SongTempoKorean[selectedTempo]}
+                <X className="w-3 h-3" />
               </Badge>
             )}
+
             {selectedSeason !== null && (
-              <Badge variant="secondary" className="bg-teal-100 text-teal-800">
+              <Badge
+                variant="secondary"
+                className="bg-teal-100 text-teal-800 flex items-center gap-1 cursor-pointer"
+                onClick={() => setSelectedSeason(null)}
+              >
                 절기: {selectedSeason.seasonName}
+                <X className="w-3 h-3" />
               </Badge>
             )}
+
             {selectedBible !== null && (
-              <Badge variant="secondary" className="bg-pink-100 text-pink-800">
-                성경: {selectedBible.bibleKoName}{" "}
+              <Badge
+                variant="secondary"
+                className="bg-pink-100 text-pink-800 flex items-center gap-1 cursor-pointer"
+                onClick={() => {
+                  console.log("clear bible filter");
+                  setSelectedBible(null);
+                  setSelectedBibleChapter(null);
+                  setSelectedBibleVerse(null);
+                }}
+              >
+                성경: {selectedBible.bibleKoName}
                 {selectedBibleChapter
-                  ? `${selectedBibleChapter.chapterNum}장`
+                  ? ` ${selectedBibleChapter.chapterNum}장`
                   : ""}
                 {selectedBibleVerse ? ` ${selectedBibleVerse.verseNum}절` : ""}
+                <X className="w-3 h-3" />
               </Badge>
             )}
+
             {selectedDuration !== null && (
-              <Badge variant="secondary" className="bg-gray-100 text-gray-800">
+              <Badge
+                variant="secondary"
+                className="bg-gray-100 text-gray-800 flex items-center gap-1 cursor-pointer"
+                onClick={() => {
+                  console.log("clear duration filter");
+                  setSelectedDuration(null);
+                }}
+              >
                 지속시간: {selectedDuration}분
+                <X className="w-3 h-3" />
               </Badge>
             )}
+
             <Button
               variant="outline"
               size="sm"

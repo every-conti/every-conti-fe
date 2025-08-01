@@ -10,6 +10,8 @@ import { cn } from "src/lib/utils";
 type Option = { id: string; label: string };
 
 interface MultiSelectProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
   options: Option[];
   selected: Option[];
   onChange: (selected: Option[]) => void;
@@ -33,12 +35,15 @@ export default function MultiSelect({
         setOpen(false);
       }
     };
+
     if (open) {
-      document.addEventListener("mousedown", handleClickOutside);
+      // 캡처 단계에서 먼저 감지하게 함
+      document.addEventListener("mousedown", handleClickOutside, true);
       document.body.style.overflow = "hidden";
     }
+
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside, true);
       document.body.style.overflow = "auto";
     };
   }, [open]);

@@ -28,9 +28,7 @@ export default function SearchDetail() {
     useState<SongTypeTypes | null>(null);
   const [selectedPraiseTeam, setSelectedPraiseTeam] =
     useState<PraiseTeamDto | null>(null);
-  const [selectedThemes, setSelectedThemes] = useState<SongThemeDto[] | null>(
-    null
-  );
+  const [selectedThemes, setSelectedThemes] = useState<SongThemeDto[]>([]);
   const [selectedTempo, setSelectedTempo] = useState<SongTempoTypes | null>(
     null
   );
@@ -65,7 +63,8 @@ export default function SearchDetail() {
       bibleChapterId: selectedBibleChapter?.id,
       bibleVerseId: selectedBibleVerse?.id,
       songKey: selectedKey ?? undefined,
-      themeIds: selectedThemes?.map((t) => t.id),
+      themeIds:
+        selectedThemes.length === 0 ? [] : selectedThemes.map((t) => t.id),
     },
     {
       getNextPageParam: (lastPage: { nextOffset: number | null }) =>
