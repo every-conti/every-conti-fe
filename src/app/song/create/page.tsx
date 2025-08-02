@@ -9,20 +9,35 @@ import {Badge} from "src/components/ui/badge";
 import { Textarea } from "src/components/ui/textarea";
 import {Button} from "src/components/ui/button";
 import {Checkbox} from "src/components/ui/checkbox";
-import {useSongPropertiesQuery, useYoutubeVIdCheck} from "src/app/api/song";
+import {fetchBibleChapter, fetchBibleVerse, useSongPropertiesQuery, useYoutubeVIdCheck} from "src/app/api/song";
 import { useDebounce } from "use-debounce";
 import {SongKeyKorean, SongKeyTypes} from "src/types/song/song-key.types";
 import {SongTypeKorean, SongTypeTypes} from "src/types/song/song-type.types";
 import SongThemeDto from "src/dto/common/song-theme.dto";
 import extractYoutubeVideoId from "src/utils/extractYoutubeVideoId";
 import PraiseTeamDto from "src/dto/common/praise-team.dto";
-import {formatYoutubeDuration} from "src/utils/parseSongDuration";
+import {formatYoutubeDuration, parseYoutubeDurationToSeconds} from "src/utils/parseSongDuration";
 import {Switch} from "src/components/ui/switch";
+import extractThemesFromAiCompletion from "src/utils/extractThemesFromAiCompletion";
+import SearchableSelect from "src/components/song/search/SearchableSelect";
+import {CreateSongDto} from "src/dto/song/CreateSongDto";
+import {useAuthStore} from "src/store/useAuthStore";
+import {SongTempoKorean, SongTempoTypes} from "src/types/song/song-tempo.types";
+import SongSeasonDto from "src/dto/common/song-season.dto";
+import BibleDto from "src/dto/common/bible.dto";
+import BibleChapterDto from "src/dto/common/bible-chapter.dto";
+import BibleVerseDto from "src/dto/common/bible-verse.dto";
+import {SONG_SELECT_PLACEHOLDERS} from "src/constant/song-select-placeholders.constant";
+import {YoutubeVideoInfoDto} from "src/dto/song/YoutubeVideoInfoDto";
+import YoutubePreview from "src/components/song/YoutubePreview";
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "src/components/ui/tooltip";
 
 export default function SongCreationPage() {
+    const { user } = useAuthStore();
+
     // 폼 상태
     const [title, setTitle] = useState("");
-    const [praiseTeam, setPraiseTeam] = useState<PraiseTeamDto | undefined>(undefined);
+    const [praiseTeam, setPraiseTeam] = useState<PraiseTeamDto | null>(null);
     const [selectedKey, setSelectedKey] = useState<SongKeyTypes | undefined>(undefined);
     const [selectedType, setSelectedType] = useState<SongTypeTypes | undefined>("CCM");
     const [lyrics, setLyrics] = useState("");
@@ -31,10 +46,27 @@ export default function SongCreationPage() {
 
     const [youtubeLink, setYoutubeLink] = useState("");
     const [debouncedYoutubeLink] = useDebounce(youtubeLink, 400);
-    const [youtubeVideoInfo, setYoutubeVideoInfo] = useState(null);
+    const [youtubeVideoInfo, setYoutubeVideoInfo] = useState<YoutubeVideoInfoDto | null>(null);
 
+    const [isThemeCompleted, setIsThemeCompleted] = useState(false);
+    const [themeSearch, setThemeSearch] = useState("");
     const [themeMode, setThemeMode] = useState<"manual" | "auto">("manual");
     const [isLoadingThemes, setIsLoadingThemes] = useState(false);
+
+    const [selectedTempo, setSelectedTempo] = useState<SongTempoTypes | null>(
+        null
+    );
+    const [selectedSeason, setSelectedSeason] = useState<SongSeasonDto | null>(
+        null
+    );
+    const [selectedBible, setSelectedBible] = useState<BibleDto | null>(null);
+    const [selectedBibleChapter, setSelectedBibleChapter] =
+        useState<BibleChapterDto | null>(null);
+    const [selectedBibleVerse, setSelectedBibleVerse] =
+        useState<BibleVerseDto | null>(null);
+    const [chapters, setChapters] = useState<BibleChapterDto[]>([]);
+    const [verses, setVerses] = useState<BibleVerseDto[]>([]);
+    const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
 
     useEffect(() => {
         if (debouncedYoutubeLink.trim()) {
@@ -60,7 +92,8 @@ export default function SongCreationPage() {
             try {
                 const res = await fetch(`/api/youtube/info?v=${youtubeVId}`);
                 if (!res.ok) throw new Error("유튜브 영상 정보를 가져오지 못했습니다.");
-                const data = await res.json();
+                const data: YoutubeVideoInfoDto = await res.json();
+                setTitle(data.items[0].snippet.title);
                 setYoutubeVideoInfo(data);
             } catch (err) {
                 console.error("유튜브 API 요청 실패:", err);
@@ -80,7 +113,24 @@ export default function SongCreationPage() {
         );
     };
 
+    useEffect(() => {
+        if (!isThemeCompleted) return;
+        setIsThemeCompleted(false);
+    }, [lyrics]);
+
+    const filteredThemes = songProperties?.songThemes.filter((theme) =>
+        theme.themeName.toLowerCase().includes(themeSearch.toLowerCase())
+    );
+
     const handleThemeAutoDetect = async () => {
+        if (isThemeCompleted) return;
+
+        if (!title.trim()) {
+            alert("제목을 먼저 입력해주세요.");
+            setThemeMode("manual");
+            return;
+        }
+
         if (!lyrics.trim()) {
             alert("가사를 먼저 입력해주세요.");
             setThemeMode("manual");
@@ -90,27 +140,23 @@ export default function SongCreationPage() {
         setIsLoadingThemes(true);
 
         try {
-            // const res = await fetch("/api/song/detect-themes", {
-            //     method: "POST",
-            //     headers: { "Content-Type": "application/json" },
-            //     body: JSON.stringify({ lyrics }),
-            // });
-            //
-            // const data = await res.json();
-            //
-            // if (!res.ok || !Array.isArray(data.themes)) {
-            //     throw new Error("테마 분석 실패");
-            // }
-            //
-            // // songProperties.songThemes 중 label로 매칭
-            // const matchedThemes = songProperties?.songThemes.filter(theme =>
-            //     data.themes.includes(theme.themeName)
-            // ) || [];
+            const res = await fetch("/api/openai/analyze/theme", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    themes: songProperties?.songThemes.map(t => t.themeName).join(", "),
+                    title,
+                    lyrics,
+                }),
+            });
+            const data = await res.json();
+            const extractedThemes = extractThemesFromAiCompletion(JSON.stringify(data));
             const matchedThemes = songProperties?.songThemes.filter(theme =>
-                theme.themeName.includes("경배")
+                extractedThemes.includes(theme.themeName)
             ) || [];
 
             setSelectedThemes(matchedThemes);
+            setIsThemeCompleted(true);
         } catch (err) {
             console.error(err);
             alert("AI 테마 분석에 실패했습니다.");
@@ -120,36 +166,92 @@ export default function SongCreationPage() {
         setIsLoadingThemes(false);
     };
 
+    async function getBibleChapter(bibleId: string) {
+        const chapters = await fetchBibleChapter(bibleId);
+        setChapters(chapters || []);
+    }
+    async function getBibleVerse(bibleChapterId: string) {
+        const verses = await fetchBibleVerse(bibleChapterId);
+        setVerses(verses || []);
+    }
 
-    const handleSave = () => {
-        // if (!title.trim() || !artist.trim() || !selectedKey || !selectedType) {
-        //     toast.error("제목, 아티스트, 키, 장르는 필수 입력 항목입니다.");
-        //     return;
-        // }
-        //
-        // // 임시 데이터로 찬양 생성
-        // const newSong = {
-        //     title: title.trim(),
-        //     artist: artist.trim(),
-        //     key: selectedKey,
-        //     genre: selectedType,
-        //     duration: "4:30", // 기본값
-        //     views: "0회",
-        //     likes: "0개",
-        //     thumbnail: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300&h=200&fit=crop",
-        //     themes: selectedThemes
-        // };
-        //
-        // onSongCreate(newSong);
-        //
-        // // 폼 초기화
-        // setTitle("");
-        // setArtist("");
-        // setSelectedKey("");
-        // setSelectedGenre("");
-        // setLyrics("");
-        // setSelectedThemes([]);
-        // setAiPrompt("");
+    useEffect(() => {
+        if (selectedBible == null) {
+            setSelectedBibleChapter(null);
+            setSelectedBibleVerse(null);
+            return;
+        } else {
+            getBibleChapter(selectedBible.id);
+        }
+    }, [selectedBible]);
+
+    useEffect(() => {
+        if (selectedBibleChapter == null) {
+            setSelectedBibleVerse(null);
+            return;
+        } else {
+            getBibleVerse(selectedBibleChapter.id);
+        }
+    }, [selectedBibleChapter]);
+
+    const handleSave = async () => {
+        if (!title.trim()) {
+            alert("제목은 필수입니다.");
+            return;
+        }
+
+        if (!youtubeVId) {
+            alert("유효한 유튜브 링크를 입력해주세요.");
+            return;
+        }
+
+        if (!selectedType) {
+            alert("장르를 선택해주세요.");
+            return;
+        }
+
+        if (!praiseTeam) {
+            alert("찬양팀을 선택해주세요.");
+            return;
+        }
+
+        const newSong: CreateSongDto = {
+            songName: title.trim(),
+            lyrics: lyrics.trim() || undefined,
+            youtubeVId,
+            songType: selectedType,
+            creatorId: user?.id ?? "0",
+            praiseTeamId: praiseTeam.id,
+            thumbnail: `https://img.youtube.com/vi/${youtubeVId}/0.jpg`,
+            themeIds: selectedThemes.map(t => t.id),
+            tempo: undefined,  // 필요 시 상태값에서 가져오기
+            key: selectedKey,
+            duration: youtubeVideoInfo ? parseYoutubeDurationToSeconds(youtubeVideoInfo.items[0].contentDetails.duration) : 0,
+            seasonId: undefined, // 필요 시 상태값에서 추가
+            bibleId: undefined,
+            bibleChapterId: undefined,
+            bibleVerseId: undefined
+        };
+
+        try {
+            const res = await fetch("/api/song", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(newSong)
+            });
+
+            if (!res.ok) {
+                throw new Error("서버 오류");
+            }
+
+            alert("찬양이 성공적으로 등록되었습니다!");
+            // TODO: 이동 or 초기화
+        } catch (err) {
+            console.error(err);
+            alert("찬양 등록 중 오류가 발생했습니다.");
+        }
     };
 
     return (
@@ -164,6 +266,7 @@ export default function SongCreationPage() {
             </div>
         <div className="py-8 px-6">
             <div className="max-w-4xl mx-auto">
+
                 <Card className="p-6">
                     <h3 className="text-xl mb-6 flex items-center gap-2">
                         <Music className="w-5 h-5" />
@@ -174,64 +277,27 @@ export default function SongCreationPage() {
                         {/* 기본 정보 */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm mb-2">제목 *</label>
-                                <Input
-                                    placeholder="찬양 제목을 입력하세요"
-                                    value={title}
-                                    onChange={(e) => setTitle(e.target.value)}
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm mb-2">키 *</label>
-                                <Select value={selectedKey} onValueChange={setSelectedKey}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="키를 선택하세요" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {songProperties?.songKeys.map(key => (
-                                            <SelectItem key={key} value={key}>{SongKeyKorean[key]}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm mb-2">찬양팀 *</label>
-                                <Select value={praiseTeam?.praiseTeamName} onValueChange={setPraiseTeam}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="찬양팀을 선택하세요" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {songProperties?.praiseTeams.map(team => (
-                                            <SelectItem key={team.id} value={team.id}>{team.praiseTeamName}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div>
-                                <label className="block text-sm mb-2">장르 *</label>
-                                <Select value={selectedType} onValueChange={(value) =>
-                                    setSelectedType(
-                                        value ? (value as SongTypeTypes) : undefined
-                                    )
-                                }>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="장르를 선택하세요" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {songProperties?.songTypes.map(genre => (
-                                            <SelectItem key={genre} value={genre}>{SongTypeKorean[genre]}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm mb-2">유튜브 링크 *</label>
+                                <div className="flex items-center justify-between mb-2">
+                                    <label className="block text-sm mr-5">유튜브 링크 *</label>
+                                    {youtubeVId && isYoutubeVIdExist?.data === false && youtubeVideoInfo && (
+                                        <TooltipProvider>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <Button variant="outline" size="sm">
+                                                        🎬 유튜브 미리보기
+                                                    </Button>
+                                                </TooltipTrigger>
+                                                <TooltipContent side="right" className="p-0">
+                                                    <YoutubePreview
+                                                        youtubeVId={youtubeVId}
+                                                        duration={youtubeVideoInfo.items[0].contentDetails.duration }
+                                                    />
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
+                                    )}
+                                </div>
+                                
                                 <Input
                                     placeholder="유튜브 링크를 입력하세요"
                                     value={youtubeLink}
@@ -257,30 +323,87 @@ export default function SongCreationPage() {
                                     </div>
                                 )}
                             </div>
+
                             <div>
-                            {youtubeVId && isYoutubeVIdExist?.data === false && youtubeVideoInfo && (
-                                <div className="col-span-2 mt-4 border rounded-md p-4 flex items-center gap-4 bg-gray-50">
-                                    <img
-                                        src={`https://img.youtube.com/vi/${youtubeVId}/0.jpg`}
-                                        alt="유튜브 썸네일"
-                                        className="w-32 h-20 object-cover rounded-md"
-                                    />
-                                    <div className="flex-1">
-                                        {/*<p className="text-sm font-semibold line-clamp-2">*/}
-                                        {/*    {youtubeVideoInfo.items[0].snippet.title}*/}
-                                        {/*</p>*/}
-                                        <p className="text-xs text-gray-500 mt-1">
-                                            길이: {formatYoutubeDuration(youtubeVideoInfo.items[0].contentDetails.duration)}
-                                        </p>
-                                    </div>
-                                </div>
-                            )}
+                                <label className="block text-sm mb-2">제목 *</label>
+                                <Input
+                                    placeholder="찬양 제목을 입력하세요"
+                                    value={title}
+                                    onChange={(e) => setTitle(e.target.value)}
+                                />
+                            </div>
+
+
+                        </div>
+
+                        {/* 기본 정보 */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm mb-2">찬양팀 *</label>
+                                <SearchableSelect
+                                    options={songProperties ? songProperties.praiseTeams.map((t) => ({
+                                        id: t.id,
+                                        label: t.praiseTeamName,
+                                    })) : []}
+                                    selected={
+                                        praiseTeam
+                                            ? {
+                                                id: praiseTeam.id,
+                                                label: praiseTeam.praiseTeamName,
+                                            }
+                                            : null
+                                    }
+                                    onSelect={(opt) => {
+                                        const team = songProperties?.praiseTeams.find((t) => t.id === opt?.id);
+                                        setPraiseTeam(team ?? null);
+                                    }}
+                                    className="w-full"
+                                    placeholder="찬양팀 선택"
+                                    includeDefaultOption={true}
+                                    defaultLabel="전체"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm mb-2">장르 *</label>
+                                <Select value={selectedType} onValueChange={(value) =>
+                                    setSelectedType(
+                                        value ? (value as SongTypeTypes) : undefined
+                                    )
+                                }>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="장르를 선택하세요" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {songProperties?.songTypes.map(genre => (
+                                            <SelectItem key={genre} value={genre}>{SongTypeKorean[genre]}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             </div>
                         </div>
 
+
                         {/* 가사 입력 */}
                         <div>
-                            <label className="block text-sm mb-2">가사</label>
+                            <div className="flex items-center mb-2">
+                                <label className="block text-sm mr-5">가사</label>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                        if (!title.trim()) {
+                                            alert("제목을 먼저 입력해주세요.");
+                                            return;
+                                        }
+                                        const query = encodeURIComponent(`${title} 가사`);
+                                        window.open(`https://www.google.com/search?q=${query}`, "_blank");
+                                    }}
+                                >
+                                    🔍 가사 검색
+                                </Button>
+                            </div>
                             <Textarea
                                 placeholder="찬양 가사를 입력하세요..."
                                 value={lyrics}
@@ -373,11 +496,23 @@ export default function SongCreationPage() {
                                 </div>
                             ) : (
                                 <>
-                                    <p className="text-sm text-gray-600 mb-2">
-                                        아래에서 직접 테마를 선택하세요
-                                    </p>
+                                    <div className="flex items-center justify-between mb-2 gap-4">
+                                        <p className="text-sm text-gray-600 w-1/2">
+                                            아래에서 직접 테마를 선택하세요 (1개 이상 필수)
+                                        </p>
+                                        <Input
+                                            type="text"
+                                            placeholder="테마 검색"
+                                            value={themeSearch}
+                                            onChange={(e) => setThemeSearch(e.target.value)}
+                                            className="w-1/2"                                        />
+                                    </div>
+
+
+
+
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2 max-h-40 overflow-y-auto border rounded-md p-3">
-                                        {songProperties?.songThemes.map((theme) => (
+                                        {filteredThemes?.map((theme) => (
                                             <div key={theme.id} className="flex items-center space-x-2">
                                                 <Checkbox
                                                     id={theme.id}
@@ -389,6 +524,10 @@ export default function SongCreationPage() {
                                                 </label>
                                             </div>
                                         ))}
+
+                                        {filteredThemes?.length === 0 && (
+                                            <p className="text-sm text-gray-400 col-span-full">검색 결과가 없습니다</p>
+                                        )}
                                     </div>
                                     {selectedThemes.length > 0 && (
                                         <div className="flex flex-wrap gap-1 mt-2">
@@ -409,9 +548,188 @@ export default function SongCreationPage() {
                             )}
                         </div>
                     </div>
+
+                    <div className="flex justify-between items-center mt-8 mb-4">
+                        <h4 className="text-md font-semibold">추가 정보</h4>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setShowAdvancedOptions(!showAdvancedOptions)}
+                        >
+                            {showAdvancedOptions ? "숨기기" : "펼치기"}
+                        </Button>
+                    </div>
+
+                    {showAdvancedOptions && (
+                        <div className="space-y-4">
+                            {/* 템포 선택 */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm mb-2">템포</label>
+                                    <Select
+                                        value={selectedTempo ? selectedTempo : SONG_SELECT_PLACEHOLDERS.songTempo}
+                                        onValueChange={(value) =>
+                                            setSelectedTempo(
+                                                value === SONG_SELECT_PLACEHOLDERS.songTempo ? null : (value as SongTempoTypes)
+                                            )
+                                        }
+                                    >
+                                        <SelectTrigger className="w-36">
+                                            <SelectValue placeholder={SONG_SELECT_PLACEHOLDERS.songTempo} />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value={SONG_SELECT_PLACEHOLDERS.songTempo}>템포 선택</SelectItem>
+                                            {songProperties?.songTempos.map((tempo) => (
+                                                <SelectItem key={tempo} value={tempo}>
+                                                    {SongTempoKorean[tempo]}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+
+                                {/* 시즌 선택 */}
+                                <div>
+                                    <label className="block text-sm mb-2">절기</label>
+                                    <Select
+                                        value={selectedSeason ? selectedSeason.id : SONG_SELECT_PLACEHOLDERS.songSeason}
+                                        onValueChange={(value) =>
+                                            setSelectedSeason(
+                                                value === SONG_SELECT_PLACEHOLDERS.songSeason
+                                                    ? null
+                                                    : (songProperties?.seasons.find((s) => s.id === value) as SongSeasonDto)
+                                            )
+                                        }
+                                    >
+                                        <SelectTrigger className="w-36">
+                                            <SelectValue placeholder={SONG_SELECT_PLACEHOLDERS.songSeason} />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value={SONG_SELECT_PLACEHOLDERS.songSeason}>
+                                                {SONG_SELECT_PLACEHOLDERS.songSeason}
+                                            </SelectItem>
+                                            {songProperties?.seasons.map((season) => (
+                                                <SelectItem key={season.id} value={season.id}>
+                                                    {season.seasonName}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm mb-2">키</label>
+                                    <Select value={selectedKey} onValueChange={setSelectedKey}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="키를 선택하세요" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {songProperties?.songKeys.map(key => (
+                                                <SelectItem key={key} value={key}>{SongKeyKorean[key]}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                <div>
+                                    {/* 성경 선택 */}
+                                    <label className="block text-sm mb-2">성경(장, 절 - 생략 가능)</label>
+                                    <Select
+                                        value={selectedBible ? selectedBible.id : SONG_SELECT_PLACEHOLDERS.songBible}
+                                        onValueChange={(value) =>
+                                            setSelectedBible(
+                                                value === SONG_SELECT_PLACEHOLDERS.songBible
+                                                    ? null
+                                                    : (songProperties?.bibles.find((b) => b.id === value) as BibleDto)
+                                            )
+                                        }
+                                    >
+                                        <SelectTrigger className="w-36">
+                                            <SelectValue placeholder={SONG_SELECT_PLACEHOLDERS.songBible} />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value={SONG_SELECT_PLACEHOLDERS.songBible}>
+                                                성경 선택
+                                            </SelectItem>
+                                            {songProperties?.bibles.map((b) => (
+                                                <SelectItem key={b.id} value={b.id}>
+                                                    {b.bibleKoName}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+
+                                    {/* 성경 장 선택 */}
+                                    {selectedBible && (
+                                        <Select
+                                            value={
+                                                selectedBibleChapter
+                                                    ? selectedBibleChapter.id
+                                                    : SONG_SELECT_PLACEHOLDERS.songBibleChapter
+                                            }
+                                            onValueChange={(value) =>
+                                                setSelectedBibleChapter(
+                                                    value === SONG_SELECT_PLACEHOLDERS.songBibleChapter
+                                                        ? null
+                                                        : (chapters.find((c) => c.id === value) as BibleChapterDto)
+                                                )
+                                            }
+                                        >
+                                            <SelectTrigger className="w-36">
+                                                <SelectValue placeholder="장 선택" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value={SONG_SELECT_PLACEHOLDERS.songBibleChapter}>
+                                                    {SONG_SELECT_PLACEHOLDERS.songBibleChapter}
+                                                </SelectItem>
+                                                {chapters.map((chapter) => (
+                                                    <SelectItem key={chapter.id} value={chapter.id}>
+                                                        {chapter.chapterNum}장
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    )}
+
+                                    {/* 성경 절 선택 */}
+                                    {selectedBibleChapter && (
+                                        <Select
+                                            value={
+                                                selectedBibleVerse
+                                                    ? selectedBibleVerse.id
+                                                    : SONG_SELECT_PLACEHOLDERS.songBibleVerse
+                                            }
+                                            onValueChange={(value) =>
+                                                setSelectedBibleVerse(
+                                                    value === SONG_SELECT_PLACEHOLDERS.songBibleVerse
+                                                        ? null
+                                                        : (verses.find((v) => v.id === value) as BibleVerseDto)
+                                                )
+                                            }
+                                        >
+                                            <SelectTrigger className="w-36">
+                                                <SelectValue placeholder={SONG_SELECT_PLACEHOLDERS.songBibleVerse} />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value={SONG_SELECT_PLACEHOLDERS.songBibleVerse}>
+                                                    {SONG_SELECT_PLACEHOLDERS.songBibleVerse}
+                                                </SelectItem>
+                                                {verses.map((verse) => (
+                                                    <SelectItem key={verse.id} value={verse.id}>
+                                                        {verse.verseNum}절
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </Card>
-
-
 
                 {/* 저장 버튼 */}
                 <div className="flex justify-end space-x-3 mt-8">

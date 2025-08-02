@@ -23,3 +23,11 @@ export function formatYoutubeDuration(isoDuration: string): string {
       ? `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`
       : `${pad(minutes)}:${pad(seconds)}`;
 }
+
+export function parseYoutubeDurationToSeconds(isoDuration: string): number {
+  const match = isoDuration.match(/PT(?:(\d+)M)?(?:(\d+)S)?/);
+  if (!match) return 0;
+  const minutes = parseInt(match[1] || "0", 10);
+  const seconds = parseInt(match[2] || "0", 10);
+  return minutes * 60 + seconds;
+}

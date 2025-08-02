@@ -8,8 +8,8 @@ import {
   useInfiniteSearchSongQuery,
 } from "src/app/api/song";
 import LoadingSpinner from "src/components/common/LoadingSpinner";
-import SearchFilters from "src/components/search/SearchFilters";
-import WorshipSearchCard from "src/components/search/WorshipSearchCard";
+import SearchFilters from "src/components/song/search/SearchFilters";
+import WorshipSearchCard from "src/components/song/search/WorshipSearchCard";
 import BibleChapterDto from "src/dto/common/bible-chapter.dto";
 import BibleVerseDto from "src/dto/common/bible-verse.dto";
 import BibleDto from "src/dto/common/bible.dto";

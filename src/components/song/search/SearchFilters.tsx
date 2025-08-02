@@ -30,6 +30,7 @@ import MultiSelect from "./MultiSelect";
 import BibleChapterDto from "src/dto/common/bible-chapter.dto";
 import BibleVerseDto from "src/dto/common/bible-verse.dto";
 import { fetchBibleChapter, fetchBibleVerse } from "src/app/api/song";
+import {SONG_SELECT_PLACEHOLDERS} from "src/constant/song-select-placeholders.constant";
 interface SearchFiltersProps {
   searchProperties: SearchPropertiesDto;
   searchTerm: string | null;
@@ -55,16 +56,6 @@ interface SearchFiltersProps {
   selectedBibleVerse: BibleVerseDto | null;
   setSelectedBibleVerse: (verse: BibleVerseDto | null) => void;
 }
-
-const DEFAULTS = {
-  songType: "장르 선택",
-  songKey: "키 선택",
-  songTempo: "템포 선택",
-  songSeason: "절기 선택",
-  songBible: "성경 선택",
-  songBibleChapter: "장 선택",
-  songBibleVerse: "절 선택",
-};
 
 export default function SearchFilters({
   searchProperties,
@@ -297,20 +288,20 @@ export default function SearchFilters({
                 onOpenChange={(isOpen) => {
                   setOpenSelectId(isOpen ? "songTempo" : null);
                 }}
-                value={selectedTempo ? selectedTempo : DEFAULTS.songTempo}
+                value={selectedTempo ? selectedTempo : SONG_SELECT_PLACEHOLDERS.songTempo}
                 onValueChange={(value) =>
                   setSelectedTempo(
-                    value === DEFAULTS.songTempo
+                    value === SONG_SELECT_PLACEHOLDERS.songTempo
                       ? null
                       : (value as SongTempoTypes)
                   )
                 }
               >
                 <SelectTrigger className="w-36">
-                  <SelectValue placeholder={DEFAULTS.songTempo} />
+                  <SelectValue placeholder={SONG_SELECT_PLACEHOLDERS.songTempo} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={DEFAULTS.songTempo}>템포 선택</SelectItem>
+                  <SelectItem value={SONG_SELECT_PLACEHOLDERS.songTempo}>템포 선택</SelectItem>
                   {songTempos.map((tempo) => (
                     <SelectItem key={tempo} value={tempo}>
                       {SongTempoKorean[tempo]}
@@ -324,18 +315,18 @@ export default function SearchFilters({
                 onOpenChange={(isOpen) =>
                   setOpenSelectId(isOpen ? "songKey" : null)
                 }
-                value={selectedKey ? selectedKey : DEFAULTS.songKey}
+                value={selectedKey ? selectedKey : SONG_SELECT_PLACEHOLDERS.songKey}
                 onValueChange={(value) =>
                   setSelectedKey(
-                    value === DEFAULTS.songKey ? null : (value as SongKeyTypes)
+                    value === SONG_SELECT_PLACEHOLDERS.songKey ? null : (value as SongKeyTypes)
                   )
                 }
               >
                 <SelectTrigger className="w-32">
-                  <SelectValue placeholder={DEFAULTS.songKey} />
+                  <SelectValue placeholder={SONG_SELECT_PLACEHOLDERS.songKey} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={DEFAULTS.songKey}>키 선택</SelectItem>
+                  <SelectItem value={SONG_SELECT_PLACEHOLDERS.songKey}>키 선택</SelectItem>
                   {keys.map((key) => (
                     <SelectItem key={key} value={key}>
                       {SongKeyKorean[key]}
@@ -349,10 +340,10 @@ export default function SearchFilters({
                 onOpenChange={(isOpen) =>
                   setOpenSelectId(isOpen ? "songSeason" : null)
                 }
-                value={selectedSeason ? selectedSeason.id : DEFAULTS.songSeason}
+                value={selectedSeason ? selectedSeason.id : SONG_SELECT_PLACEHOLDERS.songSeason}
                 onValueChange={(value) =>
                   setSelectedSeason(
-                    value === DEFAULTS.songSeason
+                    value === SONG_SELECT_PLACEHOLDERS.songSeason
                       ? null
                       : (seasons.find(
                           (season) => season.id === value
@@ -361,11 +352,11 @@ export default function SearchFilters({
                 }
               >
                 <SelectTrigger className="w-36">
-                  <SelectValue placeholder={DEFAULTS.songSeason} />
+                  <SelectValue placeholder={SONG_SELECT_PLACEHOLDERS.songSeason} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={DEFAULTS.songSeason}>
-                    {DEFAULTS.songSeason}
+                  <SelectItem value={SONG_SELECT_PLACEHOLDERS.songSeason}>
+                    {SONG_SELECT_PLACEHOLDERS.songSeason}
                   </SelectItem>
                   {seasons.map((season) => (
                     <SelectItem key={season.id} value={season.id}>
@@ -380,20 +371,20 @@ export default function SearchFilters({
                 onOpenChange={(isOpen) =>
                   setOpenSelectId(isOpen ? "songBible" : null)
                 }
-                value={selectedBible ? selectedBible.id : DEFAULTS.songBible}
+                value={selectedBible ? selectedBible.id : SONG_SELECT_PLACEHOLDERS.songBible}
                 onValueChange={(value) =>
                   setSelectedBible(
-                    value === DEFAULTS.songBible
+                    value === SONG_SELECT_PLACEHOLDERS.songBible
                       ? null
                       : (bibles.find((bible) => bible.id === value) as BibleDto)
                   )
                 }
               >
                 <SelectTrigger className="w-36">
-                  <SelectValue placeholder={DEFAULTS.songBible} />
+                  <SelectValue placeholder={SONG_SELECT_PLACEHOLDERS.songBible} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={DEFAULTS.songBible}>성경 선택</SelectItem>
+                  <SelectItem value={SONG_SELECT_PLACEHOLDERS.songBible}>성경 선택</SelectItem>
                   {bibles.map((b) => (
                     <SelectItem key={b.id} value={b.id}>
                       {b.bibleKoName}
@@ -411,11 +402,11 @@ export default function SearchFilters({
                   value={
                     selectedBibleChapter
                       ? selectedBibleChapter.id
-                      : DEFAULTS.songBibleChapter
+                      : SONG_SELECT_PLACEHOLDERS.songBibleChapter
                   }
                   onValueChange={(value) =>
                     setSelectedBibleChapter(
-                      value === DEFAULTS.songBibleChapter
+                      value === SONG_SELECT_PLACEHOLDERS.songBibleChapter
                         ? null
                         : (chapters.find(
                             (chapter) => chapter.id === value
@@ -427,8 +418,8 @@ export default function SearchFilters({
                     <SelectValue placeholder="장 선택" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value={DEFAULTS.songBibleChapter}>
-                      {DEFAULTS.songBibleChapter}
+                    <SelectItem value={SONG_SELECT_PLACEHOLDERS.songBibleChapter}>
+                      {SONG_SELECT_PLACEHOLDERS.songBibleChapter}
                     </SelectItem>
                     {chapters.map((chapter) => (
                       <SelectItem key={chapter.id} value={chapter.id}>
@@ -448,11 +439,11 @@ export default function SearchFilters({
                   value={
                     selectedBibleVerse
                       ? selectedBibleVerse.id
-                      : DEFAULTS.songBibleVerse
+                      : SONG_SELECT_PLACEHOLDERS.songBibleVerse
                   }
                   onValueChange={(value) =>
                     setSelectedBibleVerse(
-                      value === DEFAULTS.songBibleVerse
+                      value === SONG_SELECT_PLACEHOLDERS.songBibleVerse
                         ? null
                         : (verses.find(
                             (verse) => verse.id === value
@@ -461,11 +452,11 @@ export default function SearchFilters({
                   }
                 >
                   <SelectTrigger className="w-36">
-                    <SelectValue placeholder={DEFAULTS.songBibleVerse} />
+                    <SelectValue placeholder={SONG_SELECT_PLACEHOLDERS.songBibleVerse} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value={DEFAULTS.songBibleVerse}>
-                      {DEFAULTS.songBibleVerse}
+                    <SelectItem value={SONG_SELECT_PLACEHOLDERS.songBibleVerse}>
+                      {SONG_SELECT_PLACEHOLDERS.songBibleVerse}
                     </SelectItem>
                     {verses.map((verse) => (
                       <SelectItem key={verse.id} value={verse.id}>

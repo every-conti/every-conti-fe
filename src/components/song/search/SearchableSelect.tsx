@@ -15,6 +15,7 @@ interface SearchableSelectProps {
   selected: OptionType | null;
   onSelect: (option: OptionType | null) => void;
   placeholder?: string;
+  className?: string;
   includeDefaultOption?: boolean; // 기본 옵션 포함 여부
   defaultLabel?: string; // 기본 옵션에 보여질 라벨 (ex. 전체, 선택 안함)
 }
@@ -24,6 +25,7 @@ export default function SearchableSelect({
   selected,
   onSelect,
   placeholder = "선택하세요",
+  className = "w-36",
   includeDefaultOption = true,
   defaultLabel = "전체",
 }: SearchableSelectProps) {
@@ -47,7 +49,7 @@ export default function SearchableSelect({
         }
       }}
     >
-      <SelectTrigger className="w-36">
+      <SelectTrigger className={className}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>
