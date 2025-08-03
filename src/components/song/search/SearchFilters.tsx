@@ -85,26 +85,6 @@ export default function SearchFilters({
   const [filterOpen, setFilterOpen] = useState(false);
   const [openSelectId, setOpenSelectId] = useState<string | null>(null);
 
-  // useEffect(() => {
-  //   const handleClickOutside = (event: MouseEvent) => {
-  //     const allDropdowns = document.querySelectorAll("button");
-  //     console.log(allDropdowns);
-  //     const clickedInsideSome = Array.from(allDropdowns).some((el) =>
-  //       el.contains(event.target as Node)
-  //     );
-  //     if (!clickedInsideSome) {
-  //       setOpenSelectId(null);
-  //     }
-  //   };
-
-  //   document.addEventListener("mousedown", handleClickOutside);
-  //   return () => document.removeEventListener("mousedown", handleClickOutside);
-  // }, []);
-
-  // useEffect(() => {
-  //   console.log("openSelectId", openSelectId);
-  // }, [openSelectId]);
-
   const keys = searchProperties.songKeys;
   const songTypes = searchProperties.songTypes;
   const praiseTeams = searchProperties.praiseTeams;
@@ -194,9 +174,7 @@ export default function SearchFilters({
             <Filter className="w-4 h-4 text-white" />
             <span className="text-sm text-white">필터</span>
           </Button>
-          {/* <div className="flex items-center space-x-2">
-            
-          </div> */}
+
           {filterOpen && (
             <>
               <Select
@@ -204,18 +182,18 @@ export default function SearchFilters({
                 onOpenChange={(isOpen) =>
                   setOpenSelectId(isOpen ? "songType" : null)
                 }
-                value={selectedSongType ? selectedSongType : "장르 선택"}
+                value={selectedSongType ? selectedSongType : SONG_SELECT_PLACEHOLDERS.songType}
                 onValueChange={(value) =>
                   setSelectedSongType(
-                    value === "장르 선택" ? null : (value as SongTypeTypes)
+                    value === SONG_SELECT_PLACEHOLDERS.songType ? null : (value as SongTypeTypes)
                   )
                 }
               >
                 <SelectTrigger className="w-32">
-                  <SelectValue placeholder="장르 선택" />
+                  <SelectValue placeholder={SONG_SELECT_PLACEHOLDERS.songType} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="장르 선택">장르 선택</SelectItem>
+                  <SelectItem value={SONG_SELECT_PLACEHOLDERS.songType}><p className="text-muted-foreground">{SONG_SELECT_PLACEHOLDERS.songType}</p></SelectItem>
                   {songTypes.map((type) => (
                     <SelectItem key={type} value={type}>
                       {SongTypeKorean[type]}
@@ -249,14 +227,13 @@ export default function SearchFilters({
               <MultiSelect
                 open={openSelectId === "songThemes"}
                 onOpenChange={(isOpen) => {
-                  console.log("isOpen", isOpen);
                   setOpenSelectId(isOpen ? "songThemes" : null);
                 }}
                 options={songThemes.map((t) => ({
                   id: t.id,
                   label: t.themeName,
                 }))}
-                placeholder="테마 선택"
+                placeholder={SONG_SELECT_PLACEHOLDERS.songThemes}
                 selected={
                   selectedThemes
                     ? selectedThemes.map((t) => ({
@@ -301,7 +278,7 @@ export default function SearchFilters({
                   <SelectValue placeholder={SONG_SELECT_PLACEHOLDERS.songTempo} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={SONG_SELECT_PLACEHOLDERS.songTempo}>템포 선택</SelectItem>
+                  <SelectItem value={SONG_SELECT_PLACEHOLDERS.songTempo}><p className="text-muted-foreground">{SONG_SELECT_PLACEHOLDERS.songTempo}</p></SelectItem>
                   {songTempos.map((tempo) => (
                     <SelectItem key={tempo} value={tempo}>
                       {SongTempoKorean[tempo]}
@@ -326,7 +303,7 @@ export default function SearchFilters({
                   <SelectValue placeholder={SONG_SELECT_PLACEHOLDERS.songKey} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={SONG_SELECT_PLACEHOLDERS.songKey}>키 선택</SelectItem>
+                  <SelectItem value={SONG_SELECT_PLACEHOLDERS.songKey}><p className="text-muted-foreground">{SONG_SELECT_PLACEHOLDERS.songKey}</p></SelectItem>
                   {keys.map((key) => (
                     <SelectItem key={key} value={key}>
                       {SongKeyKorean[key]}
@@ -334,6 +311,7 @@ export default function SearchFilters({
                   ))}
                 </SelectContent>
               </Select>
+
 
               <Select
                 open={openSelectId === "songSeason"}
@@ -352,11 +330,13 @@ export default function SearchFilters({
                 }
               >
                 <SelectTrigger className="w-36">
-                  <SelectValue placeholder={SONG_SELECT_PLACEHOLDERS.songSeason} />
+                  <SelectValue
+                      className="text-gray-400"
+                      placeholder={SONG_SELECT_PLACEHOLDERS.songSeason} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value={SONG_SELECT_PLACEHOLDERS.songSeason}>
-                    {SONG_SELECT_PLACEHOLDERS.songSeason}
+                    <p className="text-muted-foreground">{SONG_SELECT_PLACEHOLDERS.songSeason}</p>
                   </SelectItem>
                   {seasons.map((season) => (
                     <SelectItem key={season.id} value={season.id}>
@@ -384,7 +364,7 @@ export default function SearchFilters({
                   <SelectValue placeholder={SONG_SELECT_PLACEHOLDERS.songBible} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={SONG_SELECT_PLACEHOLDERS.songBible}>성경 선택</SelectItem>
+                  <SelectItem value={SONG_SELECT_PLACEHOLDERS.songBible}><p className="text-muted-foreground">{SONG_SELECT_PLACEHOLDERS.songBible}</p></SelectItem>
                   {bibles.map((b) => (
                     <SelectItem key={b.id} value={b.id}>
                       {b.bibleKoName}
@@ -419,7 +399,7 @@ export default function SearchFilters({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value={SONG_SELECT_PLACEHOLDERS.songBibleChapter}>
-                      {SONG_SELECT_PLACEHOLDERS.songBibleChapter}
+                      <p className="text-muted-foreground">{SONG_SELECT_PLACEHOLDERS.songBibleChapter}</p>
                     </SelectItem>
                     {chapters.map((chapter) => (
                       <SelectItem key={chapter.id} value={chapter.id}>
@@ -456,7 +436,7 @@ export default function SearchFilters({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value={SONG_SELECT_PLACEHOLDERS.songBibleVerse}>
-                      {SONG_SELECT_PLACEHOLDERS.songBibleVerse}
+                      <p className="text-muted-foreground">{SONG_SELECT_PLACEHOLDERS.songBibleVerse}</p>
                     </SelectItem>
                     {verses.map((verse) => (
                       <SelectItem key={verse.id} value={verse.id}>
@@ -539,7 +519,10 @@ export default function SearchFilters({
               <Badge
                 variant="secondary"
                 className="bg-teal-100 text-teal-800 flex items-center gap-1 cursor-pointer"
-                onClick={() => setSelectedSeason(null)}
+                onClick={() => {
+
+                  setSelectedSeason(null)
+                }}
               >
                 절기: {selectedSeason.seasonName}
                 <X className="w-3 h-3" />

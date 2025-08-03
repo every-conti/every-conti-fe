@@ -16,7 +16,7 @@ import {SongTypeKorean, SongTypeTypes} from "src/types/song/song-type.types";
 import SongThemeDto from "src/dto/common/song-theme.dto";
 import extractYoutubeVideoId from "src/utils/extractYoutubeVideoId";
 import PraiseTeamDto from "src/dto/common/praise-team.dto";
-import {formatYoutubeDuration, parseYoutubeDurationToSeconds} from "src/utils/parseSongDuration";
+import {parseYoutubeDurationToSeconds} from "src/utils/parseSongDuration";
 import {Switch} from "src/components/ui/switch";
 import extractThemesFromAiCompletion from "src/utils/extractThemesFromAiCompletion";
 import SearchableSelect from "src/components/song/search/SearchableSelect";
@@ -30,7 +30,8 @@ import BibleVerseDto from "src/dto/common/bible-verse.dto";
 import {SONG_SELECT_PLACEHOLDERS} from "src/constant/song-select-placeholders.constant";
 import {YoutubeVideoInfoDto} from "src/dto/song/YoutubeVideoInfoDto";
 import YoutubePreview from "src/components/song/YoutubePreview";
-import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "src/components/ui/tooltip";
+import {Popover, PopoverContent, PopoverTrigger} from "src/components/ui/popover";
+import YoutubePopoverButton from "src/components/song/YoutubePopoverButton";
 
 export default function SongCreationPage() {
     const { user } = useAuthStore();
@@ -277,24 +278,10 @@ export default function SongCreationPage() {
                         {/* 기본 정보 */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <div className="flex items-center justify-between mb-2">
-                                    <label className="block text-sm mr-5">유튜브 링크 *</label>
+                                <div className="flex items-center justify-between mb-2 h-8">
+                                    <label className="block text-sm mr-5 d">유튜브 링크 *</label>
                                     {youtubeVId && isYoutubeVIdExist?.data === false && youtubeVideoInfo && (
-                                        <TooltipProvider>
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <Button variant="outline" size="sm">
-                                                        🎬 유튜브 미리보기
-                                                    </Button>
-                                                </TooltipTrigger>
-                                                <TooltipContent side="right" className="p-0">
-                                                    <YoutubePreview
-                                                        youtubeVId={youtubeVId}
-                                                        duration={youtubeVideoInfo.items[0].contentDetails.duration }
-                                                    />
-                                                </TooltipContent>
-                                            </Tooltip>
-                                        </TooltipProvider>
+                                        <YoutubePopoverButton youtubeVId={youtubeVId} duration={youtubeVideoInfo.items[0].contentDetails.duration} />
                                     )}
                                 </div>
                                 
@@ -325,7 +312,7 @@ export default function SongCreationPage() {
                             </div>
 
                             <div>
-                                <label className="block text-sm mb-2">제목 *</label>
+                                <label className="flex items-center block text-sm mb-2 h-8">제목 *</label>
                                 <Input
                                     placeholder="찬양 제목을 입력하세요"
                                     value={title}
@@ -565,64 +552,51 @@ export default function SongCreationPage() {
                             {/* 템포 선택 */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm mb-2">템포</label>
-                                    <Select
-                                        value={selectedTempo ? selectedTempo : SONG_SELECT_PLACEHOLDERS.songTempo}
-                                        onValueChange={(value) =>
-                                            setSelectedTempo(
-                                                value === SONG_SELECT_PLACEHOLDERS.songTempo ? null : (value as SongTempoTypes)
-                                            )
-                                        }
-                                    >
-                                        <SelectTrigger className="w-36">
-                                            <SelectValue placeholder={SONG_SELECT_PLACEHOLDERS.songTempo} />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value={SONG_SELECT_PLACEHOLDERS.songTempo}>템포 선택</SelectItem>
-                                            {songProperties?.songTempos.map((tempo) => (
-                                                <SelectItem key={tempo} value={tempo}>
-                                                    {SongTempoKorean[tempo]}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
+                                    <div>
+                                        <label className="block text-sm mb-2">템포</label>
+                                        <Select value={selectedTempo?.valueOf()} onValueChange={(value) => setSelectedTempo(value as SongTempoTypes)}>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="빠르기를 선택하세요" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {songProperties?.songTempos.map(tempo => (
+                                                    <SelectItem key={tempo} value={tempo}>{SongTempoKorean[tempo]}</SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
                                 </div>
-
 
                                 {/* 시즌 선택 */}
                                 <div>
-                                    <label className="block text-sm mb-2">절기</label>
-                                    <Select
-                                        value={selectedSeason ? selectedSeason.id : SONG_SELECT_PLACEHOLDERS.songSeason}
-                                        onValueChange={(value) =>
-                                            setSelectedSeason(
-                                                value === SONG_SELECT_PLACEHOLDERS.songSeason
-                                                    ? null
-                                                    : (songProperties?.seasons.find((s) => s.id === value) as SongSeasonDto)
-                                            )
-                                        }
-                                    >
-                                        <SelectTrigger className="w-36">
-                                            <SelectValue placeholder={SONG_SELECT_PLACEHOLDERS.songSeason} />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value={SONG_SELECT_PLACEHOLDERS.songSeason}>
-                                                {SONG_SELECT_PLACEHOLDERS.songSeason}
-                                            </SelectItem>
-                                            {songProperties?.seasons.map((season) => (
-                                                <SelectItem key={season.id} value={season.id}>
-                                                    {season.seasonName}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
+                                    <div>
+                                        <label className="block text-sm mb-2">절기</label>
+                                        <Select
+                                            value={selectedSeason?.id}
+                                            onValueChange={(value) => {
+                                                const season = songProperties?.seasons.find((s) => s.id === value);
+                                                setSelectedSeason(season as SongSeasonDto);
+                                            }}
+                                        >
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="절기를 선택하세요" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {songProperties?.seasons.map((season) => (
+                                                    <SelectItem key={season.id} value={season.id}>
+                                                        {season.seasonName}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm mb-2">키</label>
-                                    <Select value={selectedKey} onValueChange={setSelectedKey}>
+                                    <Select value={selectedKey}   onValueChange={(value) => setSelectedKey(value as SongKeyTypes)}>
                                         <SelectTrigger>
                                             <SelectValue placeholder="키를 선택하세요" />
                                         </SelectTrigger>
@@ -635,96 +609,102 @@ export default function SongCreationPage() {
                                 </div>
 
                                 <div>
-                                    {/* 성경 선택 */}
                                     <label className="block text-sm mb-2">성경(장, 절 - 생략 가능)</label>
-                                    <Select
-                                        value={selectedBible ? selectedBible.id : SONG_SELECT_PLACEHOLDERS.songBible}
-                                        onValueChange={(value) =>
-                                            setSelectedBible(
-                                                value === SONG_SELECT_PLACEHOLDERS.songBible
-                                                    ? null
-                                                    : (songProperties?.bibles.find((b) => b.id === value) as BibleDto)
-                                            )
-                                        }
-                                    >
-                                        <SelectTrigger className="w-36">
-                                            <SelectValue placeholder={SONG_SELECT_PLACEHOLDERS.songBible} />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value={SONG_SELECT_PLACEHOLDERS.songBible}>
-                                                성경 선택
-                                            </SelectItem>
-                                            {songProperties?.bibles.map((b) => (
-                                                <SelectItem key={b.id} value={b.id}>
-                                                    {b.bibleKoName}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-
-                                    {/* 성경 장 선택 */}
-                                    {selectedBible && (
-                                        <Select
-                                            value={
-                                                selectedBibleChapter
-                                                    ? selectedBibleChapter.id
-                                                    : SONG_SELECT_PLACEHOLDERS.songBibleChapter
-                                            }
-                                            onValueChange={(value) =>
-                                                setSelectedBibleChapter(
-                                                    value === SONG_SELECT_PLACEHOLDERS.songBibleChapter
-                                                        ? null
-                                                        : (chapters.find((c) => c.id === value) as BibleChapterDto)
-                                                )
-                                            }
-                                        >
-                                            <SelectTrigger className="w-36">
-                                                <SelectValue placeholder="장 선택" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value={SONG_SELECT_PLACEHOLDERS.songBibleChapter}>
-                                                    {SONG_SELECT_PLACEHOLDERS.songBibleChapter}
-                                                </SelectItem>
-                                                {chapters.map((chapter) => (
-                                                    <SelectItem key={chapter.id} value={chapter.id}>
-                                                        {chapter.chapterNum}장
+                                    <div className="flex">
+                                        {/* 성경 선택 */}
+                                        <div className="w-1/3 px-2">
+                                            <Select
+                                                value={selectedBible ? selectedBible.id : SONG_SELECT_PLACEHOLDERS.songBible}
+                                                onValueChange={(value) =>
+                                                    setSelectedBible(
+                                                        value === SONG_SELECT_PLACEHOLDERS.songBible
+                                                            ? null
+                                                            : (songProperties?.bibles.find((b) => b.id === value) as BibleDto)
+                                                    )
+                                                }
+                                            >
+                                                <SelectTrigger className="w-full">
+                                                    <SelectValue placeholder={SONG_SELECT_PLACEHOLDERS.songBible} />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value={SONG_SELECT_PLACEHOLDERS.songBible}>
+                                                        성경 선택
                                                     </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    )}
-
-                                    {/* 성경 절 선택 */}
-                                    {selectedBibleChapter && (
-                                        <Select
-                                            value={
-                                                selectedBibleVerse
-                                                    ? selectedBibleVerse.id
-                                                    : SONG_SELECT_PLACEHOLDERS.songBibleVerse
-                                            }
-                                            onValueChange={(value) =>
-                                                setSelectedBibleVerse(
-                                                    value === SONG_SELECT_PLACEHOLDERS.songBibleVerse
-                                                        ? null
-                                                        : (verses.find((v) => v.id === value) as BibleVerseDto)
-                                                )
-                                            }
-                                        >
-                                            <SelectTrigger className="w-36">
-                                                <SelectValue placeholder={SONG_SELECT_PLACEHOLDERS.songBibleVerse} />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value={SONG_SELECT_PLACEHOLDERS.songBibleVerse}>
-                                                    {SONG_SELECT_PLACEHOLDERS.songBibleVerse}
-                                                </SelectItem>
-                                                {verses.map((verse) => (
-                                                    <SelectItem key={verse.id} value={verse.id}>
-                                                        {verse.verseNum}절
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    )}
+                                                    {songProperties?.bibles.map((b) => (
+                                                        <SelectItem key={b.id} value={b.id}>
+                                                            {b.bibleKoName}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        <div className="w-1/3 px-2">
+                                            {/* 성경 장 선택 */}
+                                            {selectedBible && (
+                                                <Select
+                                                    value={
+                                                        selectedBibleChapter
+                                                            ? selectedBibleChapter.id
+                                                            : SONG_SELECT_PLACEHOLDERS.songBibleChapter
+                                                    }
+                                                    onValueChange={(value) =>
+                                                        setSelectedBibleChapter(
+                                                            value === SONG_SELECT_PLACEHOLDERS.songBibleChapter
+                                                                ? null
+                                                                : (chapters.find((c) => c.id === value) as BibleChapterDto)
+                                                        )
+                                                    }
+                                                >
+                                                    <SelectTrigger className="w-full">
+                                                        <SelectValue placeholder="장 선택" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value={SONG_SELECT_PLACEHOLDERS.songBibleChapter}>
+                                                            {SONG_SELECT_PLACEHOLDERS.songBibleChapter}
+                                                        </SelectItem>
+                                                        {chapters.map((chapter) => (
+                                                            <SelectItem key={chapter.id} value={chapter.id}>
+                                                                {chapter.chapterNum}장
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            )}
+                                        </div>
+                                        <div className="w-1/3 px-2">
+                                            {/* 성경 절 선택 */}
+                                            {selectedBibleChapter && (
+                                                <Select
+                                                    value={
+                                                        selectedBibleVerse
+                                                            ? selectedBibleVerse.id
+                                                            : SONG_SELECT_PLACEHOLDERS.songBibleVerse
+                                                    }
+                                                    onValueChange={(value) =>
+                                                        setSelectedBibleVerse(
+                                                            value === SONG_SELECT_PLACEHOLDERS.songBibleVerse
+                                                                ? null
+                                                                : (verses.find((v) => v.id === value) as BibleVerseDto)
+                                                        )
+                                                    }
+                                                >
+                                                    <SelectTrigger className="w-full">
+                                                        <SelectValue placeholder={SONG_SELECT_PLACEHOLDERS.songBibleVerse} />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value={SONG_SELECT_PLACEHOLDERS.songBibleVerse}>
+                                                            {SONG_SELECT_PLACEHOLDERS.songBibleVerse}
+                                                        </SelectItem>
+                                                        {verses.map((verse) => (
+                                                            <SelectItem key={verse.id} value={verse.id}>
+                                                                {verse.verseNum}절
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            )}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

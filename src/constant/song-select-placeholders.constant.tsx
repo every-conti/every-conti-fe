@@ -6,4 +6,5 @@ export const SONG_SELECT_PLACEHOLDERS = {
     songBible: "성경 선택",
     songBibleChapter: "장 선택",
     songBibleVerse: "절 선택",
+    songThemes: "주제 선택"
 };

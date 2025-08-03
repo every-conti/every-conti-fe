@@ -38,17 +38,17 @@ export default function SearchableSelect({
   }, [search, options]);
 
   return (
-    <Select
-      value={selected?.id ?? ""}
-      onValueChange={(val) => {
-        if (val === "") {
-          onSelect(null);
-        } else {
-          const selectedOption = options.find((opt) => opt.id === val);
-          if (selectedOption) onSelect(selectedOption);
-        }
-      }}
-    >
+      <Select
+          value={selected?.id ?? ""}
+          onValueChange={(val) => {
+            if (val === "" || val === defaultLabel) {
+              onSelect(null);
+            } else {
+              const selectedOption = options.find((opt) => opt.id === val);
+              if (selectedOption) onSelect(selectedOption);
+            }
+          }}
+      >
       <SelectTrigger className={className}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>

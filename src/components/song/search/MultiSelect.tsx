@@ -22,7 +22,7 @@ export default function MultiSelect({
   options,
   selected,
   onChange,
-  placeholder = "선택하세요",
+  placeholder = "선택",
 }: MultiSelectProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -68,7 +68,10 @@ export default function MultiSelect({
         className="w-36 justify-between"
         onClick={() => setOpen((prev) => !prev)}
       >
-        <span className="truncate overflow-hidden whitespace-nowrap max-w-[calc(100%-1.5rem)] text-left">
+        <span className={cn(
+            "truncate overflow-hidden whitespace-nowrap max-w-[calc(100%-1.5rem)] text-left",
+            selected.length === 0 && "text-muted-foreground"
+        )}>
           {selected.length > 0
             ? selected.map((s) => s.label).join(", ")
             : placeholder}
