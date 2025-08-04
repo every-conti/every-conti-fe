@@ -41,22 +41,25 @@ export const useAuthStore = create<AuthStore>((set) => ({
 
   fetchUser: async () => {
     set({ loading: true });
-    try {
-      const data: AccessTokenDto = await apiRequestGet("/auth/token", true);
-      if (!data || !data.accessToken) {
-        set({ user: null, accessToken: null });
-        set({ loading: false });
+
+    let accessToken = useAuthStore.getState().accessToken;
+
+    if (!accessToken) {
+      try {
+        const data: AccessTokenDto = await apiRequestGet("/auth/token", true);
+        if (!data?.accessToken) {
+          set({ user: null, accessToken: null, loading: false });
+          return;
+        }
+        accessToken = data.accessToken;
+        set({ accessToken });
+      } catch (err) {
+        set({ user: null, accessToken: null, loading: false });
         return;
       }
-      set({ accessToken: data.accessToken });
-    } catch (err) {
-      set({ user: null, accessToken: null });
-      set({ loading: false });
-      return;
     }
 
     try {
-      const accessToken = useAuthStore.getState().accessToken;
       const data: UserDto = await apiRequestGet(
         "/member/me",
         true,

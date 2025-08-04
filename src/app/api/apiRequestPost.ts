@@ -52,7 +52,12 @@ export const apiRequestPost = async (
       const data = await response.json();
       return data;
     } else {
-      console.error(`[GET] Failed to get data from ${path}:`, response.status);
+      const errorBody = await response.json().catch(() => null); // JSON 파싱 실패 대비
+      const error: any = new Error("API 요청 실패");
+      error.status = response.status;
+      error.statusText = response.statusText;
+      error.body = errorBody;
+      throw error;
     }
   } catch (error: any) {
     if (error.name === "AbortError") {

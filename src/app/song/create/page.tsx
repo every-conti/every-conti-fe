@@ -27,12 +27,12 @@ import SongSeasonDto from "src/dto/common/song-season.dto";
 import BibleDto from "src/dto/common/bible.dto";
 import BibleChapterDto from "src/dto/common/bible-chapter.dto";
 import BibleVerseDto from "src/dto/common/bible-verse.dto";
-import {SONG_SELECT_PLACEHOLDERS} from "src/constant/song-select-placeholders.constant";
 import {YoutubeVideoInfoDto} from "src/dto/song/YoutubeVideoInfoDto";
 import YoutubePopoverButton from "src/components/song/YoutubePopoverButton";
 import {apiRequestPost} from "src/app/api/apiRequestPost";
+import withAuth from "src/components/common/withAuth";
 
-export default function SongCreationPage() {
+function SongCreationPage() {
     const { user, accessToken } = useAuthStore();
 
     // 폼 상태
@@ -711,3 +711,5 @@ export default function SongCreationPage() {
 
     );
 }
+
+export default withAuth(SongCreationPage);

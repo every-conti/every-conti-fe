@@ -14,12 +14,13 @@ import { Alert, AlertDescription } from "src/components/ui/alert";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { Button } from "src/components/ui/button";
 import { useRouter } from "next/navigation";
-import { apiRequestPost } from "src/app/api/apiRequestPost";
 import { useAuthStore } from "src/store/useAuthStore";
+import {fetchLogin} from "src/app/api/auth";
+import LoginRequestDto from "src/dto/auth/login-request.dto";
 
 export default function Login() {
   const router = useRouter();
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<LoginRequestDto>({
     email: "",
     password: "",
   });
@@ -33,11 +34,10 @@ export default function Login() {
     setError("");
 
     try {
-      const res = await apiRequestPost("/auth/login", formData, false);
+      const res = await fetchLogin(formData);
       if (res) {
-        if (res?.accessToken) {
-          useAuthStore.getState().setAccessToken(res.accessToken);
-          useAuthStore.getState().setUser(res.user);
+        if (res?.data) {
+          useAuthStore.getState().setAccessToken(res.data);
           useAuthStore.getState().fetchUser();
           router.push("/");
         } else {
@@ -60,7 +60,7 @@ export default function Login() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-full">
+    <div className="min-h-[calc(100vh-192px)] flex items-center justify-center">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">로그인</CardTitle>

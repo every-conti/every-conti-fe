@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import { Button } from "src/components/ui/button";
 import { Input } from "src/components/ui/input";
 import { Label } from "src/components/ui/label";
@@ -19,15 +19,19 @@ import {
   Lock,
   User,
   CheckCircle,
-  Clock,
+  Clock, Church,
 } from "lucide-react";
+import {useRouter} from "next/navigation";
+import {
+  fetchSendVerificationMail,
+  fetchSignup,
+  fetchVerifyEmailCode,
+} from "src/app/api/auth";
 
-interface SignupProps {
-  onSignup: (userData: any) => void;
-  onSwitchToLogin: () => void;
-}
 
-export default function Signup({ onSignup, onSwitchToLogin }: SignupProps) {
+export default function Signup() {
+  const router = useRouter();
+
   const [step, setStep] = useState<"form" | "verification" | "verified">(
     "form"
   );
@@ -36,87 +40,136 @@ export default function Signup({ onSignup, onSwitchToLogin }: SignupProps) {
     email: "",
     password: "",
     confirmPassword: "",
+    church: "",
   });
   const [verificationCode, setVerificationCode] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [sending, setSending] = useState(false);       // 이메일 재전송 중
+  const [verifying, setVerifying] = useState(false);   // 인증 코드 검증 중
+
   const [error, setError] = useState("");
-  const [mockVerificationCode] = useState("123456"); // 모의 인증 코드
   const [emailSent, setEmailSent] = useState(false);
+
+  const [timeLeft, setTimeLeft] = useState(180); // 3분
+  const [timerActive, setTimerActive] = useState(false);
+
+  useEffect(() => {
+    if (!timerActive || timeLeft <= 0) return;
+
+    const interval = setInterval(() => {
+      setTimeLeft((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [timerActive, timeLeft]);
+
+  useEffect(() => {
+    if (step === "verified") {
+      const timer = setTimeout(() => {
+        router.replace("/login");
+      }, 2000); // 2초 후 이동
+
+      return () => clearTimeout(timer); // 컴포넌트 언마운트 시 타이머 클리어
+    }
+  }, [step, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setSending(true);
     setError("");
 
+    sendEmailCode();
+  };
+
+
+  const validateFromDatas = () => {
+    if (formData.name.length < 3){
+      setError("닉네임은 3글자 이상이어야 합니다.");
+      setSending(false);
+      return false;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setError("비밀번호가 일치하지 않습니다.");
+      setSending(false);
+      return false;
+    }
+
+    if (formData.password.replace(/\s/g, "").length < 6) {
+      setError("비밀번호는 공백 제외 최소 6자 이상이어야 합니다.");
+      setSending(false);
+      return false;
+    }
+
+    if (formData.church.length < 1) {
+      setError("교회 이름을 입력해주세요.");
+      setSending(false);
+      return false;
+    }
+
+    return true;
+  }
+
+  const sendEmailCode = async () => {
+    const validation = validateFromDatas();
+    if (!validation) return;
+
+    setSending(true);
     try {
-      if (formData.password !== formData.confirmPassword) {
-        setError("비밀번호가 일치하지 않습니다.");
-        return;
-      }
-
-      if (formData.password.length < 6) {
-        setError("비밀번호는 최소 6자 이상이어야 합니다.");
-        return;
-      }
-
-      // 모의 회원가입 및 이메일 발송 처리
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await fetchSendVerificationMail(formData.email);
+      alert("인증 이메일이 전송되었습니다.");
       setEmailSent(true);
       setStep("verification");
-    } catch (err) {
-      setError("회원가입 중 오류가 발생했습니다. 다시 시도해주세요.");
+
+      setTimeLeft(180);
+      setTimerActive(true);
+    } catch (e) {
+      setError("이메일 발송 실패했습니다.");
     } finally {
-      setLoading(false);
+      setSending(false);
     }
   };
 
-  const sendEmailCode = async () => {
-    console.log("Sending email code...");
-    setLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setLoading(false);
-    setEmailSent(true);
-    // 실제로는 이메일 발송 로직이 필요함
-    alert("인증 이메일이 전송되었습니다. (데모용 코드: 123456)");
-    setStep("verification");
-  };
+  const completeSignup = async () => {
+    try {
+      const result = await fetchSignup({
+        email: formData.email,
+        password: formData.password,
+        nickname: formData.name,
+        church: formData.church,
+      });
 
-  const resendVerification = async () => {
-    setLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setLoading(false);
-    setEmailSent(true);
-    // 실제로는 새로운 인증 코드를 생성해야 함
-    alert("인증 이메일이 다시 전송되었습니다. (데모용 코드: 123456)");
+      if (result.success) {
+        setStep("verified");
+      } else {
+        setError(result.data || "회원가입에 실패했습니다. 다시 시도해주세요.");
+      }
+    } catch (err: any) {
+      if (err.status === 409 || err.code === 409) {
+        setError("이미 존재하는 이메일입니다.");
+      } else {
+        setError("서버 오류로 회원가입에 실패했습니다.");
+      }
+    }
   };
 
   const handleVerification = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setVerifying(true);
     setError("");
 
     try {
-      // code - verify
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      if (verificationCode === mockVerificationCode) {
-        setStep("verified");
-        setTimeout(() => {
-          onSignup({
-            email: formData.email,
-            name: formData.name,
-            emailVerified: true,
-          });
-        }, 2000);
+      const res = await fetchVerifyEmailCode({email: formData.email, userCode: verificationCode})
+      if (res.success) {
+        completeSignup();
       } else {
-        setError("인증 코드가 올바르지 않습니다. (데모용 코드: 123456)");
+        setError("인증 코드가 올바르지 않습니다.");
       }
     } catch (err) {
       setError("인증 중 오류가 발생했습니다. 다시 시도해주세요.");
     } finally {
-      setLoading(false);
+      setVerifying(false);
     }
   };
 
@@ -132,9 +185,9 @@ export default function Signup({ onSignup, onSwitchToLogin }: SignupProps) {
     step === "form" ? 33 : step === "verification" ? 66 : 100;
 
   return (
-    <div className="bg-gradient-to-br from-purple-50 to-indigo-100 py-16 px-4">
-      <div className="flex items-center justify-center">
-        <Card className="w-full max-w-md">
+     <div className="flex items-center justify-center min-h-[calc(100vh-192px)] bg-gradient-to-br from-purple-50 to-indigo-100">
+      <div className="flex items-center justify-center w-full max-w-md">
+        <Card className="w-full">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl">회원가입</CardTitle>
             <CardDescription>
@@ -147,12 +200,6 @@ export default function Signup({ onSignup, onSwitchToLogin }: SignupProps) {
           <CardContent>
             {step === "form" && (
               <form onSubmit={handleSubmit} className="space-y-4">
-                {error && (
-                  <Alert variant="destructive">
-                    <AlertDescription>{error}</AlertDescription>
-                  </Alert>
-                )}
-
                 <div className="space-y-2">
                   <Label htmlFor="name">닉네임</Label>
                   <div className="relative">
@@ -245,19 +292,42 @@ export default function Signup({ onSignup, onSwitchToLogin }: SignupProps) {
                   </div>
                 </div>
 
+                <div className="space-y-2">
+                  <Label htmlFor="church">교회 이름</Label>
+                  <div className="relative">
+                    <Church className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Input
+                        id="church"
+                        name="church"
+                        type="text"
+                        placeholder="수원 아바교회"
+                        value={formData.church}
+                        onChange={handleInputChange}
+                        className="pl-10 pr-10"
+                        required
+                    />
+                  </div>
+                </div>
+
+                {error && (
+                    <Alert variant="destructive">
+                      <AlertDescription>{error}</AlertDescription>
+                    </Alert>
+                )}
+
                 <Button
                   type="submit"
                   className="w-full"
-                  disabled={loading}
+                  disabled={sending}
                   onClick={sendEmailCode}
                 >
-                  {loading ? (
+                  {sending ? (
                     <div className="flex items-center space-x-2">
                       <Clock className="h-4 w-4 animate-spin" />
                       <span>이메일 발송 중...</span>
                     </div>
                   ) : (
-                    "회원가입 및 인증 이메일 발송"
+                    "인증 이메일 발송"
                   )}
                 </Button>
 
@@ -265,7 +335,7 @@ export default function Signup({ onSignup, onSwitchToLogin }: SignupProps) {
                   이미 계정이 있으신가요?{" "}
                   <button
                     type="button"
-                    onClick={onSwitchToLogin}
+                    onClick={() => router.replace("/login")}
                     className="text-primary hover:underline"
                   >
                     로그인
@@ -296,17 +366,8 @@ export default function Signup({ onSignup, onSwitchToLogin }: SignupProps) {
 
                   <p className="text-sm text-gray-600 mb-4">
                     이메일함을 확인하여 6자리 인증 코드를 입력해주세요.
-                    <br />
-                    스팸 폴더도 확인해보세요.
                   </p>
 
-                  {/* <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3 mb-4">
-                    <p className="text-xs text-yellow-800">
-                      <strong>데모용:</strong> 실제 이메일이 발송되지 않습니다.
-                      <br />
-                      인증 코드는 <strong>123456</strong>입니다.
-                    </p>
-                  </div> */}
                 </div>
 
                 {error && (
@@ -317,7 +378,17 @@ export default function Signup({ onSignup, onSwitchToLogin }: SignupProps) {
 
                 <form onSubmit={handleVerification} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="verification">인증 코드</Label>
+                    <div className="flex justify-between">
+                      <Label htmlFor="verification">인증 코드</Label>
+                      <p className="text-sm text-gray-500">
+                        유효 시간:{" "}
+                          <span className="font-semibold text-gray-800">
+                      {Math.floor(timeLeft / 60)
+                          .toString()
+                          .padStart(1, "0")} : {(timeLeft % 60).toString().padStart(2, "0")}
+                    </span>
+                      </p>
+                    </div>
                     <Input
                       id="verification"
                       type="text"
@@ -330,25 +401,35 @@ export default function Signup({ onSignup, onSwitchToLogin }: SignupProps) {
                     />
                   </div>
 
+
                   <Button
                     type="submit"
                     className="w-full"
-                    disabled={loading || verificationCode.length !== 6}
+                    disabled={verifying || verificationCode.length !== 6}
                   >
-                    {loading ? "인증 중..." : "이메일 인증 완료"}
+                    {verifying ? "인증 중..." : "이메일 인증 완료"}
                   </Button>
 
                   <div className="text-center space-y-2">
                     <p className="text-xs text-gray-500">
                       이메일을 받지 못하셨나요?
                     </p>
-                    <button
-                      type="button"
-                      className="text-sm text-primary hover:underline"
-                      disabled={loading}
+                    <Button
+                        type="button"
+                        className="w-full"
+                        variant="outline"
+                        onClick={sendEmailCode}
+                        disabled={sending}
                     >
-                      인증 이메일 다시 보내기
-                    </button>
+                      {sending ? (
+                          <div className="flex items-center space-x-2">
+                            <Clock className="h-4 w-4 animate-spin" />
+                            <span>이메일 재전송 중...</span>
+                          </div>
+                      ) : (
+                          "인증 이메일 다시 보내기"
+                      )}
+                    </Button>
                   </div>
                 </form>
               </div>
@@ -364,9 +445,9 @@ export default function Signup({ onSignup, onSwitchToLogin }: SignupProps) {
                   </p>
                   <div className="bg-green-50 border border-green-200 rounded-md p-3">
                     <p className="text-sm text-green-800">
-                      회원가입이 완료되었습니다.
+                      회원가입이 완료되었습니다. 로그인 해주세요.
                       <br />
-                      잠시 후 메인 페이지로 이동합니다...
+                      잠시 후 로그인 페이지로 이동합니다...
                     </p>
                   </div>
                 </div>

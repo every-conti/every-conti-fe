@@ -52,7 +52,7 @@ export default function Header() {
 
   return (
       <>
-        <header className="fixed top-0 left-0 w-[calc(100vw-8px)] bg-white border-b border-gray-200 px-4 sm:px-6 py-3 z-50">
+        <header className="fixed top-0 left-0 w-[calc(100vw-8px)] h-18 bg-white border-b border-gray-200 px-4 sm:px-6 py-3 z-50">
           <div className="max-w-6xl mx-auto flex items-center justify-between">
             {/* 로고 */}
             <div className="flex items-center space-x-2 cursor-pointer" onClick={() => router.push("/")}>
