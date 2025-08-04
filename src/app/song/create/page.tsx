@@ -31,9 +31,12 @@ import {YoutubeVideoInfoDto} from "src/dto/song/YoutubeVideoInfoDto";
 import YoutubePopoverButton from "src/components/song/YoutubePopoverButton";
 import {apiRequestPost} from "src/app/api/apiRequestPost";
 import withAuth from "src/components/common/withAuth";
+import {useRouter} from "next/navigation";
+import {SongDetailDto} from "src/dto/search/song-detail.dto";
 
 function SongCreationPage() {
     const { user, accessToken } = useAuthStore();
+    const router = useRouter();
 
     // 폼 상태
     const [title, setTitle] = useState("");
@@ -67,6 +70,8 @@ function SongCreationPage() {
     const [chapters, setChapters] = useState<BibleChapterDto[]>([]);
     const [verses, setVerses] = useState<BibleVerseDto[]>([]);
     const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
+
+    const [isSaving, setIsSaving] = useState(false);
 
     useEffect(() => {
         if (debouncedYoutubeLink.trim()) {
@@ -209,6 +214,9 @@ function SongCreationPage() {
             return;
         }
 
+        if (isSaving) return; // 중복 클릭 방지
+        setIsSaving(true);
+
         if (!title.trim()) {
             alert("제목은 필수입니다.");
             return;
@@ -219,7 +227,7 @@ function SongCreationPage() {
             return;
         }
 
-        if (isYoutubeVIdExist){
+        if (isYoutubeVIdExist?.data){
             alert("이미 등록된 유튜브 링크입니다.");
             return;
         }
@@ -253,9 +261,12 @@ function SongCreationPage() {
         };
 
         try{
-            const res = await apiRequestPost("/song", newSong, false, accessToken, false)
+            const res: SongDetailDto = await apiRequestPost("/song", newSong, false, accessToken, false);
+            router.push(`/song/detail/${res.id}`);
         } catch (e) {
             alert("생성 오류 발생")
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -613,7 +624,7 @@ function SongCreationPage() {
                                                     alert("제목을 먼저 입력해주세요.");
                                                     return;
                                                 }
-                                                const query = encodeURIComponent(`${title} 키`);
+                                                const query = encodeURIComponent(`${title} 원키`);
                                                 window.open(`https://www.google.com/search?q=${query}`, "_blank");
                                             }}
                                         >
@@ -700,9 +711,22 @@ function SongCreationPage() {
                     {/*    <Upload className="w-4 h-4 mr-2" />*/}
                     {/*    임시저장*/}
                     {/*</Button>*/}
-                    <Button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700">
-                        <Save className="w-4 h-4 mr-2" />
-                        찬양 생성 완료
+                    <Button
+                        onClick={handleSave}
+                        disabled={isSaving}
+                        className="bg-blue-600 hover:bg-blue-700"
+                    >
+                        {isSaving ? (
+                            <>
+                                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                                저장 중...
+                            </>
+                        ) : (
+                            <>
+                                <Save className="w-4 h-4 mr-2" />
+                                찬양 생성 완료
+                            </>
+                        )}
                     </Button>
                 </div>
             </div>

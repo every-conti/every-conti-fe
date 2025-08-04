@@ -11,6 +11,8 @@ import BibleVerseDto from "src/dto/common/bible-verse.dto";
 import { InfiniteSongSearchDto } from "src/dto/search/infinite-song-search.dto";
 import CommonResponseDto from "src/dto/common/common-response.dto";
 import type { NextApiRequest, NextApiResponse } from 'next';
+import {CreateSongDto} from "src/dto/song/CreateSongDto";
+import {apiRequestPost} from "src/app/api/apiRequestPost";
 
 
 export const useInfiniteSearchSongQuery = (
@@ -101,32 +103,3 @@ export function useYoutubeVIdCheck(youtubeVId: string | null) {
     enabled: !!youtubeVId, // youtubeVId가 존재할 때만 fetch
   } as UseQueryOptions<CommonResponseDto<boolean>>);
 }
-
-// export async function fetchYoutubeVideoInfo(req: NextApiRequest, res: NextApiResponse) {
-//   const videoId = req.query.v as string;
-//
-//   if (!videoId) {
-//     return res.status(400).json({ error: "Missing video ID" });
-//   }
-//
-//   const apiKey = process.env.YOUTUBE_API_KEY;
-//
-//   const response = await fetch(
-//       `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id=${videoId}&key=${apiKey}`
-//   );
-//
-//   const data = await response.json();
-//
-//   return res.status(200).json(data);
-// }
-
-//
-// export function useYoutubeVideoInfo(youtubeVId: string | null, enabled: boolean) {
-//   return useQuery({
-//     queryKey: ["youtubeVideoInfo", youtubeVId],
-//     queryFn: () => fetchYoutubeVideoInfo(youtubeVId!),
-//     enabled: !!youtubeVId && enabled,
-//     staleTime: 1000 * 60 * 5,
-//     retry: 1,
-//   });
-// }

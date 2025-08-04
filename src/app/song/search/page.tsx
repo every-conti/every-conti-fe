@@ -64,7 +64,7 @@ export default function SearchDetail() {
       bibleVerseId: selectedBibleVerse?.id,
       songKey: selectedKey ?? undefined,
       themeIds:
-        selectedThemes.length === 0 ? [] : selectedThemes.map((t) => t.id),
+        selectedThemes.length === 0 ? undefined : selectedThemes.map((t) => t.id),
     },
     {
       getNextPageParam: (lastPage: { nextOffset: number | null }) =>
@@ -76,7 +76,6 @@ export default function SearchDetail() {
 
   const songs = data?.pages.flatMap((page) => page.items) ?? [];
 
-  // fetch next page when last item is in view
   useEffect(() => {
     if (inView && hasNextPage) {
       fetchNextPage();
@@ -124,13 +123,6 @@ export default function SearchDetail() {
 
       <div className="flex-1 py-8 px-6">
         <div className="max-w-6xl mx-auto">
-          {/* <div className="mb-6">
-            <p className="text-gray-600">
-              총 <span className="text-blue-600">{songs.length}</span>개의
-              찬양을 찾았습니다
-            </p>
-          </div> */}
-
           {isLoading ? (
             <LoadingSpinner />
           ) : isError ? (
