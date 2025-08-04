@@ -1,6 +1,6 @@
 "use client";
 
-import {Music, Upload, Save, X, RefreshCw, Sparkles, Bot, User} from "lucide-react";
+import {Music, Save, X, RefreshCw, Sparkles, Bot, User} from "lucide-react";
 import {useEffect, useState} from "react";
 import {Card} from "src/components/ui/card";
 import {Input} from "src/components/ui/input";
@@ -29,12 +29,11 @@ import BibleChapterDto from "src/dto/common/bible-chapter.dto";
 import BibleVerseDto from "src/dto/common/bible-verse.dto";
 import {SONG_SELECT_PLACEHOLDERS} from "src/constant/song-select-placeholders.constant";
 import {YoutubeVideoInfoDto} from "src/dto/song/YoutubeVideoInfoDto";
-import YoutubePreview from "src/components/song/YoutubePreview";
-import {Popover, PopoverContent, PopoverTrigger} from "src/components/ui/popover";
 import YoutubePopoverButton from "src/components/song/YoutubePopoverButton";
+import {apiRequestPost} from "src/app/api/apiRequestPost";
 
 export default function SongCreationPage() {
-    const { user } = useAuthStore();
+    const { user, accessToken } = useAuthStore();
 
     // 폼 상태
     const [title, setTitle] = useState("");
@@ -107,11 +106,20 @@ export default function SongCreationPage() {
     const { data: songProperties } = useSongPropertiesQuery();
 
     const toggleTheme = (theme: SongThemeDto) => {
-        setSelectedThemes(prev =>
-            prev.includes(theme)
-                ? prev.filter(t => t.id !== theme.id)
-                : [...prev, theme]
-        );
+        setSelectedThemes((prev) => {
+            const exists = prev.some((t) => t.id === theme.id);
+
+            if (exists) {
+                return prev.filter((t) => t.id !== theme.id); // 제거
+            }
+
+            if (prev.length >= 5) {
+                alert("최대 5개의 테마만 선택할 수 있습니다.");
+                return prev;
+            }
+
+            return [...prev, theme];
+        });
     };
 
     useEffect(() => {
@@ -196,6 +204,11 @@ export default function SongCreationPage() {
     }, [selectedBibleChapter]);
 
     const handleSave = async () => {
+        if (!user){
+            alert("로그인 해야 합니다.");
+            return;
+        }
+
         if (!title.trim()) {
             alert("제목은 필수입니다.");
             return;
@@ -203,6 +216,11 @@ export default function SongCreationPage() {
 
         if (!youtubeVId) {
             alert("유효한 유튜브 링크를 입력해주세요.");
+            return;
+        }
+
+        if (isYoutubeVIdExist){
+            alert("이미 등록된 유튜브 링크입니다.");
             return;
         }
 
@@ -221,37 +239,23 @@ export default function SongCreationPage() {
             lyrics: lyrics.trim() || undefined,
             youtubeVId,
             songType: selectedType,
-            creatorId: user?.id ?? "0",
+            creatorId: user?.id,
             praiseTeamId: praiseTeam.id,
             thumbnail: `https://img.youtube.com/vi/${youtubeVId}/0.jpg`,
             themeIds: selectedThemes.map(t => t.id),
-            tempo: undefined,  // 필요 시 상태값에서 가져오기
+            tempo: selectedTempo?? undefined,
             key: selectedKey,
             duration: youtubeVideoInfo ? parseYoutubeDurationToSeconds(youtubeVideoInfo.items[0].contentDetails.duration) : 0,
-            seasonId: undefined, // 필요 시 상태값에서 추가
-            bibleId: undefined,
-            bibleChapterId: undefined,
-            bibleVerseId: undefined
+            seasonId: selectedSeason?.id,
+            bibleId: selectedBible?.id,
+            bibleChapterId: selectedBibleChapter?.id,
+            bibleVerseId: selectedBibleVerse?.id
         };
 
-        try {
-            const res = await fetch("/api/song", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(newSong)
-            });
-
-            if (!res.ok) {
-                throw new Error("서버 오류");
-            }
-
-            alert("찬양이 성공적으로 등록되었습니다!");
-            // TODO: 이동 or 초기화
-        } catch (err) {
-            console.error(err);
-            alert("찬양 등록 중 오류가 발생했습니다.");
+        try{
+            const res = await apiRequestPost("/song", newSong, false, accessToken, false)
+        } catch (e) {
+            alert("생성 오류 발생")
         }
     };
 
@@ -403,7 +407,7 @@ export default function SongCreationPage() {
                         {/* 테마 선택 방식 토글 */}
                         <div className="border rounded-lg p-4 bg-gray-50">
                             <div className="flex items-center justify-between mb-4">
-                                <label className="text-sm">테마 선택 방식</label>
+                                <label className="text-sm">테마 선택 방식 *</label>
                                 <div className="flex items-center space-x-3">
                                     <div className="flex items-center space-x-2">
                                         <User className="w-4 h-4 text-gray-500" />
@@ -485,7 +489,7 @@ export default function SongCreationPage() {
                                 <>
                                     <div className="flex items-center justify-between mb-2 gap-4">
                                         <p className="text-sm text-gray-600 w-1/2">
-                                            아래에서 직접 테마를 선택하세요 (1개 이상 필수)
+                                            아래에서 직접 테마를 선택하세요 (1-5개)
                                         </p>
                                         <Input
                                             type="text"
@@ -504,6 +508,9 @@ export default function SongCreationPage() {
                                                 <Checkbox
                                                     id={theme.id}
                                                     checked={selectedThemes.includes(theme)}
+                                                    disabled={
+                                                        !selectedThemes.includes(theme) && selectedThemes.length >= 5
+                                                    }
                                                     onCheckedChange={() => toggleTheme(theme)}
                                                 />
                                                 <label htmlFor={theme.id} className="text-sm cursor-pointer">
@@ -595,7 +602,24 @@ export default function SongCreationPage() {
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm mb-2">키</label>
+                                    <div className="flex items-center mb-2">
+                                        <label className="block text-sm mr-5">키</label>
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => {
+                                                if (!title.trim()) {
+                                                    alert("제목을 먼저 입력해주세요.");
+                                                    return;
+                                                }
+                                                const query = encodeURIComponent(`${title} 키`);
+                                                window.open(`https://www.google.com/search?q=${query}`, "_blank");
+                                            }}
+                                        >
+                                            🔍 키 검색
+                                        </Button>
+                                    </div>
                                     <Select value={selectedKey}   onValueChange={(value) => setSelectedKey(value as SongKeyTypes)}>
                                         <SelectTrigger>
                                             <SelectValue placeholder="키를 선택하세요" />
@@ -609,31 +633,20 @@ export default function SongCreationPage() {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm mb-2">성경(장, 절 - 생략 가능)</label>
+                                    <label className="block text-sm mb-2 h-8">성경(장, 절 - 생략 가능)</label>
                                     <div className="flex">
                                         {/* 성경 선택 */}
                                         <div className="w-1/3 px-2">
-                                            <Select
-                                                value={selectedBible ? selectedBible.id : SONG_SELECT_PLACEHOLDERS.songBible}
-                                                onValueChange={(value) =>
-                                                    setSelectedBible(
-                                                        value === SONG_SELECT_PLACEHOLDERS.songBible
-                                                            ? null
-                                                            : (songProperties?.bibles.find((b) => b.id === value) as BibleDto)
-                                                    )
-                                                }
-                                            >
-                                                <SelectTrigger className="w-full">
-                                                    <SelectValue placeholder={SONG_SELECT_PLACEHOLDERS.songBible} />
+                                            <Select value={selectedBible?.id} onValueChange={(value) => {
+                                                const bible = songProperties?.bibles.find((b) => b.id === value);
+                                                setSelectedBible(bible as BibleDto);
+                                            }}>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="성경 선택" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value={SONG_SELECT_PLACEHOLDERS.songBible}>
-                                                        성경 선택
-                                                    </SelectItem>
-                                                    {songProperties?.bibles.map((b) => (
-                                                        <SelectItem key={b.id} value={b.id}>
-                                                            {b.bibleKoName}
-                                                        </SelectItem>
+                                                    {songProperties?.bibles.map(b => (
+                                                        <SelectItem key={b.id} value={b.id}>{b.bibleKoName}</SelectItem>
                                                     ))}
                                                 </SelectContent>
                                             </Select>
@@ -641,31 +654,16 @@ export default function SongCreationPage() {
                                         <div className="w-1/3 px-2">
                                             {/* 성경 장 선택 */}
                                             {selectedBible && (
-                                                <Select
-                                                    value={
-                                                        selectedBibleChapter
-                                                            ? selectedBibleChapter.id
-                                                            : SONG_SELECT_PLACEHOLDERS.songBibleChapter
-                                                    }
-                                                    onValueChange={(value) =>
-                                                        setSelectedBibleChapter(
-                                                            value === SONG_SELECT_PLACEHOLDERS.songBibleChapter
-                                                                ? null
-                                                                : (chapters.find((c) => c.id === value) as BibleChapterDto)
-                                                        )
-                                                    }
-                                                >
-                                                    <SelectTrigger className="w-full">
+                                                <Select value={selectedBibleChapter?.id} onValueChange={(value) => {
+                                                    const chapter = chapters.find((ch) => ch.id === value);
+                                                    setSelectedBibleChapter(chapter as BibleChapterDto);
+                                                }}>
+                                                    <SelectTrigger>
                                                         <SelectValue placeholder="장 선택" />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                        <SelectItem value={SONG_SELECT_PLACEHOLDERS.songBibleChapter}>
-                                                            {SONG_SELECT_PLACEHOLDERS.songBibleChapter}
-                                                        </SelectItem>
-                                                        {chapters.map((chapter) => (
-                                                            <SelectItem key={chapter.id} value={chapter.id}>
-                                                                {chapter.chapterNum}장
-                                                            </SelectItem>
+                                                        {chapters.map(ch => (
+                                                            <SelectItem key={ch.id} value={ch.id}>{ch.chapterNum}장</SelectItem>
                                                         ))}
                                                     </SelectContent>
                                                 </Select>
@@ -674,31 +672,16 @@ export default function SongCreationPage() {
                                         <div className="w-1/3 px-2">
                                             {/* 성경 절 선택 */}
                                             {selectedBibleChapter && (
-                                                <Select
-                                                    value={
-                                                        selectedBibleVerse
-                                                            ? selectedBibleVerse.id
-                                                            : SONG_SELECT_PLACEHOLDERS.songBibleVerse
-                                                    }
-                                                    onValueChange={(value) =>
-                                                        setSelectedBibleVerse(
-                                                            value === SONG_SELECT_PLACEHOLDERS.songBibleVerse
-                                                                ? null
-                                                                : (verses.find((v) => v.id === value) as BibleVerseDto)
-                                                        )
-                                                    }
-                                                >
-                                                    <SelectTrigger className="w-full">
-                                                        <SelectValue placeholder={SONG_SELECT_PLACEHOLDERS.songBibleVerse} />
+                                                <Select value={selectedBibleVerse?.id} onValueChange={(value) => {
+                                                    const verse = verses.find((v) => v.id === value);
+                                                    setSelectedBibleVerse(verse as BibleVerseDto);
+                                                }}>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="절 선택" />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                        <SelectItem value={SONG_SELECT_PLACEHOLDERS.songBibleVerse}>
-                                                            {SONG_SELECT_PLACEHOLDERS.songBibleVerse}
-                                                        </SelectItem>
-                                                        {verses.map((verse) => (
-                                                            <SelectItem key={verse.id} value={verse.id}>
-                                                                {verse.verseNum}절
-                                                            </SelectItem>
+                                                        {verses.map(v => (
+                                                            <SelectItem key={v.id} value={v.id}>{v.verseNum}절</SelectItem>
                                                         ))}
                                                     </SelectContent>
                                                 </Select>
@@ -713,10 +696,10 @@ export default function SongCreationPage() {
 
                 {/* 저장 버튼 */}
                 <div className="flex justify-end space-x-3 mt-8">
-                    <Button variant="outline">
-                        <Upload className="w-4 h-4 mr-2" />
-                        임시저장
-                    </Button>
+                    {/*<Button variant="outline">*/}
+                    {/*    <Upload className="w-4 h-4 mr-2" />*/}
+                    {/*    임시저장*/}
+                    {/*</Button>*/}
                     <Button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700">
                         <Save className="w-4 h-4 mr-2" />
                         찬양 생성 완료

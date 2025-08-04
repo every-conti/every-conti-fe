@@ -60,6 +60,6 @@ export const apiRequestPost = async (
     } else {
       console.error(`[GET] Error fetching data from ${path}:`, error);
     }
-    return error;
+    throw error;
   }
 };
