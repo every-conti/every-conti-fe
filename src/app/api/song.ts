@@ -12,6 +12,7 @@ import { InfiniteSongSearchDto } from "src/dto/search/infinite-song-search.dto";
 import CommonResponseDto from "src/dto/common/common-response.dto";
 import {SongDetailDto} from "src/dto/common/song-detail.dto";
 import {REVALIDATE_TIME_ONE_HOUR} from "src/constant/numbers.constant";
+import {CoUsedSongDto} from "src/dto/song/CoUsedSongDto";
 
 
 export const useInfiniteSearchSongQuery = (
@@ -31,6 +32,7 @@ export const useInfiniteSearchSongQuery = (
     },
     initialPageParam: 0,
     getNextPageParam: (lastPage) => lastPage?.nextOffset ?? undefined,
+    staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
   });
@@ -127,4 +129,23 @@ export function useSongDetailQuery(songId: string) {
     refetchOnMount: false, // 마운트될 때 다시 요청 안 함
     refetchOnWindowFocus: false, // 창 포커스해도 재요청 안 함
   } as UseQueryOptions<SongDetailDto>);
+}
+
+export const fetchCoUsedSongs = async (songId: string) => {
+  const data: CoUsedSongDto[] = await apiRequestGet(
+      `/recommendation/co-used-songs/${songId}`,
+      true
+  );
+  return data;
+}
+
+export function useCoUsedSongsQuery(songId: string) {
+  return useQuery<CoUsedSongDto[]>({
+    queryKey: ["coUsedSongs", songId],
+    queryFn: () => fetchCoUsedSongs(songId),
+    staleTime: Infinity, // 무조건 fresh로 간주
+    cacheTime: REVALIDATE_TIME_ONE_HOUR, // 1시간 동안 캐시 유지 (컴포넌트 언마운트 이후에도)
+    refetchOnMount: false, // 마운트될 때 다시 요청 안 함
+    refetchOnWindowFocus: false, // 창 포커스해도 재요청 안 함
+  } as UseQueryOptions<CoUsedSongDto[]>);
 }

@@ -4,7 +4,7 @@ import PraiseTeamDto from "../common/praise-team.dto";
 export default interface SongLastsDto {
   id: string;
   songName: string;
-  duration: string;
+  duration: number;
   songType: SongTypeTypes;
   praiseTeam: PraiseTeamDto;
   thumbnail: string;

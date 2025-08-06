@@ -2,19 +2,14 @@
 
 import { useState } from "react";
 import {
-    ArrowLeft,
     Play,
     Heart,
     Share2,
-    Plus,
-    Check,
     Clock,
     Music,
     User,
-    Calendar,
     BookOpen,
-    Headphones,
-    Timer
+    Timer, Users
 } from "lucide-react";
 import {Button} from "src/components/ui/button";
 import {Card} from "src/components/ui/card";
@@ -23,16 +18,19 @@ import {Badge} from "src/components/ui/badge";
 import {ScrollArea} from "src/components/ui/scroll-area";
 import { use } from "react";
 import {
+    useCoUsedSongsQuery,
     useSongDetailQuery,
 } from "src/app/api/song";
 import {extractDateOnly, parseSongDuration} from "src/utils/parseSongDuration";
 import {SongTypeKorean} from "src/types/song/song-type.types";
 import {SongTempoKorean} from "src/types/song/song-tempo.types";
+import {Separator} from "radix-ui";
 
 export default function Page({ params }: { params: Promise<{ songId: string; songName: string }> }) {
     const { songId, songName } = use(params);
 
     const { data: song } = useSongDetailQuery(songId);
+    const { data: coUsedSongs } = useCoUsedSongsQuery(songId);
 
     const [isLiked, setIsLiked] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
@@ -232,8 +230,8 @@ export default function Page({ params }: { params: Promise<{ songId: string; son
                 </Card>
 
                 {/* 추가 정보 */}
-                <div className="grid md:grid-cols-2 gap-6">
-                    {/* 곡 정보 */}
+                <div className="grid md:grid-cols-2 gap-6 mb-8">
+                     {/*곡 정보*/}
                     <Card>
                         <div className="p-6">
                             <h3 className="text-lg mb-4 flex items-center gap-2">
@@ -267,7 +265,7 @@ export default function Page({ params }: { params: Promise<{ songId: string; son
                         </div>
                     </Card>
 
-                    {/* 작성자 정보 */}
+                     {/*작성자 정보*/}
                     <Card>
                         <div className="p-6">
                             <h3 className="text-lg mb-4 flex items-center gap-2">
@@ -295,6 +293,86 @@ export default function Page({ params }: { params: Promise<{ songId: string; son
                         </div>
                     </Card>
                 </div>
+
+                {coUsedSongs && (
+                    <Card>
+                        <div className="p-6">
+                            <h3 className="text-xl mb-4 flex items-center gap-2">
+                                <Music className="w-5 h-5" />
+                                함께 쓰인 곡들
+                            </h3>
+                            <p className="text-gray-600 mb-6">이 곡과 함께 콘티에서 자주 사용되는 찬양들입니다</p>
+
+                            <div className="grid gap-4">
+                                {coUsedSongs.map((relatedSong, index) => (
+                                    <div key={relatedSong.song.id} className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer group">
+                                        {/* 순번 */}
+                                        <div className="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium">
+                                            {index + 1}
+                                        </div>
+
+                                        {/* 썸네일 */}
+                                        <div className="relative w-16 h-16 flex-shrink-0 rounded-md overflow-hidden">
+                                            <ImageWithFallback
+                                                src={relatedSong.song.thumbnail}
+                                                alt={relatedSong.song.songName}
+                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                                            />
+                                        </div>
+
+                                        {/* 곡 정보 */}
+                                        <div className="flex-1 min-w-0">
+                                            <h4 className="text-base mb-1 text-gray-900 group-hover:text-blue-600 transition-colors truncate">
+                                                {relatedSong.song.songName}
+                                            </h4>
+                                            <p className="text-sm text-gray-600 mb-2">{relatedSong.song.praiseTeam.praiseTeamName}</p>
+                                            <div className="flex items-center gap-3 text-xs text-gray-500">
+                                                <div className="flex items-center gap-1">
+                                                    <Clock className="w-3 h-3" />
+                                                    {parseSongDuration(relatedSong.song.duration)}
+                                                </div>
+                                                <div className="flex items-center gap-1">
+                                                    <Users className="w-3 h-3" />
+                                                    {relatedSong.usageCount}회 사용
+                                                </div>
+                                                <Badge variant="outline" className="text-xs">
+                                                    {relatedSong.song.songType}
+                                                </Badge>
+                                            </div>
+                                        </div>
+
+                                        {/* 재생 버튼 */}
+                                        <div className="flex-shrink-0">
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="w-10 h-10 p-0 hover:bg-blue-50 hover:text-blue-600"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    // toast.success(`"${relatedSong.songName}" 재생 시작`);
+                                                }}
+                                            >
+                                                <Play className="w-4 h-4" />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* 더보기 버튼 */}
+                            <div className="mt-6 text-center">
+                                <Button
+                                    variant="outline"
+                                    // onClick={() => toast.info("더 많은 관련 곡들을 준비 중입니다")}
+                                    className="w-full sm:w-auto"
+                                >
+                                    더 많은 관련 곡 보기
+                                </Button>
+                            </div>
+                        </div>
+                    </Card>
+                )}
+
             </div>
         </div>
     );
