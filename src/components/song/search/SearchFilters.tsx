@@ -177,6 +177,28 @@ export default function SearchFilters({
 
           {filterOpen && (
             <>
+              <SearchableSelect
+                  options={praiseTeams.map((t) => ({
+                    id: t.id,
+                    label: t.praiseTeamName,
+                  }))}
+                  selected={
+                    selectedPraiseTeam
+                        ? {
+                          id: selectedPraiseTeam.id,
+                          label: selectedPraiseTeam.praiseTeamName,
+                        }
+                        : null
+                  }
+                  onSelect={(opt) => {
+                    const team = praiseTeams.find((t) => t.id === opt?.id);
+                    setSelectedPraiseTeam(team ?? null);
+                  }}
+                  placeholder="찬양팀 선택"
+                  includeDefaultOption={true}
+                  defaultLabel="전체"
+              />
+
               <Select
                 open={openSelectId === "songType"}
                 onOpenChange={(isOpen) =>
@@ -201,28 +223,6 @@ export default function SearchFilters({
                   ))}
                 </SelectContent>
               </Select>
-
-              <SearchableSelect
-                options={praiseTeams.map((t) => ({
-                  id: t.id,
-                  label: t.praiseTeamName,
-                }))}
-                selected={
-                  selectedPraiseTeam
-                    ? {
-                        id: selectedPraiseTeam.id,
-                        label: selectedPraiseTeam.praiseTeamName,
-                      }
-                    : null
-                }
-                onSelect={(opt) => {
-                  const team = praiseTeams.find((t) => t.id === opt?.id);
-                  setSelectedPraiseTeam(team ?? null);
-                }}
-                placeholder="찬양팀 선택"
-                includeDefaultOption={true}
-                defaultLabel="전체"
-              />
 
               <MultiSelect
                 open={openSelectId === "songThemes"}

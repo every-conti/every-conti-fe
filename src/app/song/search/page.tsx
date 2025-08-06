@@ -44,6 +44,7 @@ export default function SearchDetail() {
 
   const { data: searchProperties } = useSongPropertiesQuery();
 
+
   const {
     data,
     fetchNextPage,
@@ -72,7 +73,14 @@ export default function SearchDetail() {
     }
   );
 
-  const { ref, inView } = useInView({ threshold: 1 });
+    useEffect(() => {
+        if (data) {
+            const lastPage = data.pages[data.pages.length - 1];
+        }
+    }, [data]);
+
+
+    const { ref, inView } = useInView({ threshold: 1 });
 
   const songs = data?.pages.flatMap((page) => page.items) ?? [];
 
@@ -88,7 +96,7 @@ export default function SearchDetail() {
         <div className="max-w-6xl mx-auto">
           <h1 className="text-3xl text-gray-800 mb-2">찬양 검색</h1>
           <p className="text-gray-600">
-            원하는 찬양을 키, 장르, 찬양팀별로 찾아보세요
+            원하는 찬양을 필터를 통해 찬양팀, 장르, 주제 별로 찾아보세요
           </p>
         </div>
       </div>

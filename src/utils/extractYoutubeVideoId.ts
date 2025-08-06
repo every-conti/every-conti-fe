@@ -1,9 +1,10 @@
 const extractYoutubeVideoId = (url: string): string | null => {
     try {
         const parsedUrl = new URL(url);
-        if (parsedUrl.hostname === "youtube") {
+
+        if (parsedUrl.hostname === "youtu.be") {
             return parsedUrl.pathname.substring(1);
-        } else if (parsedUrl.hostname.includes("youtube.com")) {
+        } else if (parsedUrl.hostname === "youtube.com" || parsedUrl.hostname === "www.youtube.com") {
             if (parsedUrl.pathname === "/watch") {
                 return parsedUrl.searchParams.get("v");
             } else if (parsedUrl.pathname.startsWith("/embed/")) {
@@ -15,4 +16,5 @@ const extractYoutubeVideoId = (url: string): string | null => {
     }
     return null;
 };
+
 export default extractYoutubeVideoId;

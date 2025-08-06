@@ -1,5 +1,3 @@
-import { SongTempoTypes } from "./song-tempo.types";
-
 export type SongTypeTypes = "CCM" | "HYMN" | "HYMN_REMAKE" | "CHILDREN";
 export const SongTypeKorean: Record<SongTypeTypes, string> = {
   CCM: "CCM",

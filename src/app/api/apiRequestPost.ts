@@ -1,4 +1,4 @@
-import { revalidateTime } from "src/constant/numbers.constant";
+import { REVALIDATE_TIME_ONE_DAY } from "src/constant/numbers.constant";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -37,7 +37,7 @@ export const apiRequestPost = async (
   };
 
   if (isSSG) {
-    fetchOptions.next = { revalidate: revalidateTime };
+    fetchOptions.next = { revalidate: REVALIDATE_TIME_ONE_DAY };
   } else {
     fetchOptions.cache = useCache ? "force-cache" : "no-cache";
   }

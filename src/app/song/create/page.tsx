@@ -1,6 +1,6 @@
 "use client";
 
-import {Music, Save, X, RefreshCw, Sparkles, Bot, User} from "lucide-react";
+import {Music, Save, X, RefreshCw, Sparkles, Bot, User, Info} from "lucide-react";
 import {useEffect, useState} from "react";
 import {Card} from "src/components/ui/card";
 import {Input} from "src/components/ui/input";
@@ -32,7 +32,9 @@ import YoutubePopoverButton from "src/components/song/YoutubePopoverButton";
 import {apiRequestPost} from "src/app/api/apiRequestPost";
 import withAuth from "src/components/common/withAuth";
 import {useRouter} from "next/navigation";
-import {SongDetailDto} from "src/dto/search/song-detail.dto";
+import {SongDetailDto} from "src/dto/common/song-detail.dto";
+import {Popover, PopoverContent, PopoverTrigger} from "src/components/ui/popover";
+
 
 function SongCreationPage() {
     const { user, accessToken } = useAuthStore();
@@ -262,7 +264,7 @@ function SongCreationPage() {
 
         try{
             const res: SongDetailDto = await apiRequestPost("/song", newSong, false, accessToken, false);
-            router.push(`/song/detail/${res.id}`);
+            router.push(`/song/detail/${res.id}/${res.songName}`);
         } catch (e) {
             alert("생성 오류 발생")
         } finally {
@@ -299,7 +301,7 @@ function SongCreationPage() {
                                         <YoutubePopoverButton youtubeVId={youtubeVId} duration={youtubeVideoInfo.items[0].contentDetails.duration} />
                                     )}
                                 </div>
-                                
+
                                 <Input
                                     placeholder="유튜브 링크를 입력하세요"
                                     value={youtubeLink}
@@ -329,7 +331,7 @@ function SongCreationPage() {
                             <div>
                                 <label className="flex items-center block text-sm mb-2 h-8">제목 *</label>
                                 <Input
-                                    placeholder="찬양 제목을 입력하세요"
+                                    placeholder="유튜브 링크 입력 시 자동 입력됩니다."
                                     value={title}
                                     onChange={(e) => setTitle(e.target.value)}
                                 />
@@ -407,7 +409,7 @@ function SongCreationPage() {
                                 </Button>
                             </div>
                             <Textarea
-                                placeholder="찬양 가사를 입력하세요..."
+                                placeholder="가사 검색 기능을 활용해보세요!"
                                 value={lyrics}
                                 onChange={(e) => setLyrics(e.target.value)}
                                 rows={10}
@@ -415,10 +417,10 @@ function SongCreationPage() {
                             />
                         </div>
 
-                        {/* 테마 선택 방식 토글 */}
+                        {/* 주제 선택 방식 토글 */}
                         <div className="border rounded-lg p-4 bg-gray-50">
                             <div className="flex items-center justify-between mb-4">
-                                <label className="text-sm">테마 선택 방식 *</label>
+                                <label className="text-sm">주제 선택 *</label>
                                 <div className="flex items-center space-x-3">
                                     <div className="flex items-center space-x-2">
                                         <User className="w-4 h-4 text-gray-500" />
@@ -434,6 +436,17 @@ function SongCreationPage() {
                                     <div className="flex items-center space-x-2">
                                         <Bot className="w-4 h-4 text-blue-500" />
                                         <span className="text-sm text-blue-600">AI 추천</span>
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <button type="button" className="text-gray-400 hover:text-gray-600">
+                                                    <Info className="w-4 h-4" />
+                                                </button>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-64 text-sm text-gray-700">
+                                                AI 추천은 입력된 가사를 바탕으로 적절한 주제를 제안합니다.<br />
+                                                가사를 먼저 입력해 주세요.
+                                            </PopoverContent>
+                                        </Popover>
                                     </div>
                                 </div>
                             </div>
@@ -442,7 +455,7 @@ function SongCreationPage() {
                                 <div className="space-y-4">
                                     <div className="flex items-center justify-between">
                                         <p className="text-sm text-gray-600">
-                                            AI가 가사를 분석하여 적합한 테마를 추천합니다
+                                            AI가 가사를 분석하여 적합한 주제를 추천합니다
                                         </p>
                                         <Button
                                             variant="outline"
@@ -459,7 +472,7 @@ function SongCreationPage() {
                                             ) : (
                                                 <>
                                                     <Sparkles className="w-3 h-3" />
-                                                    AI 테마 분석
+                                                    AI 주제 분석
                                                 </>
                                             )}
                                         </Button>
@@ -469,7 +482,7 @@ function SongCreationPage() {
                                         <div className="p-3 bg-blue-50 rounded border border-blue-200">
                                             <div className="text-sm text-blue-800 mb-2 flex items-center gap-2">
                                                 <Bot className="w-4 h-4" />
-                                                AI 추천 테마 ({selectedThemes.length}개)
+                                                AI 추천 주제 ({selectedThemes.length}개)
                                             </div>
                                             <div className="flex flex-wrap gap-2 mb-3">
                                                 {selectedThemes.map((theme) => (
@@ -485,14 +498,14 @@ function SongCreationPage() {
                                                 ))}
                                             </div>
                                             <p className="text-xs text-blue-600">
-                                                필요시 아래에서 테마를 추가하거나 제거할 수 있습니다.
+                                                필요시 아래에서 주제를 추가하거나 제거할 수 있습니다.
                                             </p>
                                         </div>
                                     )}
 
                                     {!lyrics.trim() && (
                                         <div className="text-sm text-gray-500 text-center py-2">
-                                            가사를 입력한 후 AI 테마 분석을 실행해보세요
+                                            가사를 입력한 후 AI 주제 분석을 실행해보세요
                                         </div>
                                     )}
                                 </div>
@@ -500,11 +513,11 @@ function SongCreationPage() {
                                 <>
                                     <div className="flex items-center justify-between mb-2 gap-4">
                                         <p className="text-sm text-gray-600 w-1/2">
-                                            아래에서 직접 테마를 선택하세요 (1-5개)
+                                            아래에서 직접 주제를 선택하세요 (1-5개)
                                         </p>
                                         <Input
                                             type="text"
-                                            placeholder="테마 검색"
+                                            placeholder="주제 검색"
                                             value={themeSearch}
                                             onChange={(e) => setThemeSearch(e.target.value)}
                                             className="w-1/2"                                        />
@@ -628,7 +641,7 @@ function SongCreationPage() {
                                                 window.open(`https://www.google.com/search?q=${query}`, "_blank");
                                             }}
                                         >
-                                            🔍 키 검색
+                                            🔍 원키 검색
                                         </Button>
                                     </div>
                                     <Select value={selectedKey}   onValueChange={(value) => setSelectedKey(value as SongKeyTypes)}>
@@ -644,7 +657,7 @@ function SongCreationPage() {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm mb-2 h-8">성경(장, 절 - 생략 가능)</label>
+                                    <label className="block text-sm mb-2 h-8">성경 (장, 절 - 생략 가능)</label>
                                     <div className="flex">
                                         {/* 성경 선택 */}
                                         <div className="w-1/3 px-2">
@@ -724,7 +737,7 @@ function SongCreationPage() {
                         ) : (
                             <>
                                 <Save className="w-4 h-4 mr-2" />
-                                찬양 생성 완료
+                                찬양 등록 완료
                             </>
                         )}
                     </Button>

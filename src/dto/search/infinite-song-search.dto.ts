@@ -1,4 +1,4 @@
-import { SongDetailDto } from "./song-detail.dto";
+import { SongDetailDto } from "../common/song-detail.dto";
 
 export interface InfiniteSongSearchDto {
   items: SongDetailDto[];

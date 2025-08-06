@@ -10,9 +10,8 @@ import BibleChapterDto from "src/dto/common/bible-chapter.dto";
 import BibleVerseDto from "src/dto/common/bible-verse.dto";
 import { InfiniteSongSearchDto } from "src/dto/search/infinite-song-search.dto";
 import CommonResponseDto from "src/dto/common/common-response.dto";
-import type { NextApiRequest, NextApiResponse } from 'next';
-import {CreateSongDto} from "src/dto/song/CreateSongDto";
-import {apiRequestPost} from "src/app/api/apiRequestPost";
+import {SongDetailDto} from "src/dto/common/song-detail.dto";
+import {REVALIDATE_TIME_ONE_HOUR} from "src/constant/numbers.constant";
 
 
 export const useInfiniteSearchSongQuery = (
@@ -21,10 +20,12 @@ export const useInfiniteSearchSongQuery = (
 ) => {
   const { data, isLoading, ...rest } = useInfiniteQuery<InfiniteSongSearchDto>({
     queryKey: ["searchSongs", params],
-    queryFn: async () => {
+    queryFn: async ({ pageParam = 0 }) => {
+      const offset = pageParam as number;
+      const fullParams: SearchSongQueriesDto = { ...params, offset }; // ✅ offset 추가
       const res: InfiniteSongSearchDto = await apiRequestGet(
-        `/song/search?${buildQueryParams({ ...params })}`,
-        true
+          `/song/search?${buildQueryParams(fullParams)}`,
+          true
       );
       return res;
     },
@@ -44,8 +45,13 @@ const buildQueryParams = (params: SearchSongQueriesDto) => {
   const searchParams = new URLSearchParams();
 
   for (const [key, value] of Object.entries(params)) {
-    if (value && value !== "전체") {
-      searchParams.set(key, value as string);
+    if (
+        value !== undefined &&
+        value !== null &&
+        value !== "" &&
+        value !== "전체"
+    ) {
+      searchParams.set(key, value.toString());
     }
   }
 
@@ -65,7 +71,7 @@ export function useSongPropertiesQuery() {
     queryKey: ["searchProperties"],
     queryFn: fetchSongProperties,
     staleTime: Infinity, // 무조건 fresh로 간주
-    cacheTime: 1000 * 60 * 60, // 1시간 동안 캐시 유지 (컴포넌트 언마운트 이후에도)
+    cacheTime: REVALIDATE_TIME_ONE_HOUR, // 1시간 동안 캐시 유지 (컴포넌트 언마운트 이후에도)
     refetchOnMount: false, // 마운트될 때 다시 요청 안 함
     refetchOnWindowFocus: false, // 창 포커스해도 재요청 안 함
   } as UseQueryOptions<SearchPropertiesDto>);
@@ -102,4 +108,23 @@ export function useYoutubeVIdCheck(youtubeVId: string | null) {
     queryFn: () => fetchYoutubeVIdCheck(youtubeVId!),
     enabled: !!youtubeVId, // youtubeVId가 존재할 때만 fetch
   } as UseQueryOptions<CommonResponseDto<boolean>>);
+}
+
+export const fetchSongDetail = async (songId: string) => {
+  const data: SongDetailDto = await apiRequestGet(
+      `/song/detail/${songId}`,
+      true
+  );
+  return data;
+}
+
+export function useSongDetailQuery(songId: string) {
+  return useQuery<SongDetailDto>({
+    queryKey: ["song", songId],
+    queryFn: () => fetchSongDetail(songId),
+    staleTime: Infinity, // 무조건 fresh로 간주
+    cacheTime: REVALIDATE_TIME_ONE_HOUR, // 1시간 동안 캐시 유지 (컴포넌트 언마운트 이후에도)
+    refetchOnMount: false, // 마운트될 때 다시 요청 안 함
+    refetchOnWindowFocus: false, // 창 포커스해도 재요청 안 함
+  } as UseQueryOptions<SongDetailDto>);
 }

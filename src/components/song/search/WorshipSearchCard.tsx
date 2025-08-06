@@ -3,10 +3,11 @@ import { Card } from "src/components/ui/card";
 import { Badge } from "src/components/ui/badge";
 import { Button } from "src/components/ui/button";
 import { ImageWithFallback } from "../../common/ImageWithFallback";
-import { SongDetailDto } from "src/dto/search/song-detail.dto";
+import { SongDetailDto } from "src/dto/common/song-detail.dto";
 import {parseSongDuration} from "src/utils/parseSongDuration";
 import { SongKeyKorean } from "src/types/song/song-key.types";
 import { SongTempoKorean } from "src/types/song/song-tempo.types";
+import Link from "next/link";
 
 export default function WorshipSearchCard(song: SongDetailDto) {
   return (
@@ -31,7 +32,8 @@ export default function WorshipSearchCard(song: SongDetailDto) {
         </div>
 
         {/* 정보 */}
-        <div className="flex-1 p-3 flex flex-col">
+        <Link href={`/song/detail/${song.id}/${song.songName}`} className="h-full w-full">
+          <div className="flex-1 p-3 flex flex-col">
           <div className="flex-1">
             <h3 className="text-base sm:text-lg mb-2 line-clamp-2">
               {song.songName}
@@ -49,9 +51,11 @@ export default function WorshipSearchCard(song: SongDetailDto) {
                   {SongKeyKorean[song.songKey]} Key
                 </Badge>
               )}
-              <Badge variant="outline" className="text-xs">
-                {SongTempoKorean[song.tempo]}
-              </Badge>
+              {song.tempo && (
+                  <Badge variant="outline" className="text-xs">
+                    {SongTempoKorean[song.tempo]}
+                  </Badge>
+              )}
             </div>
 
             <div className="flex flex-wrap gap-2 mb-3">
@@ -86,6 +90,7 @@ export default function WorshipSearchCard(song: SongDetailDto) {
             </div>
           </div>
         </div>
+        </Link>
       </div>
     </Card>
   );

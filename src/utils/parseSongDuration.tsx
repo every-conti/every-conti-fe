@@ -31,3 +31,7 @@ export function parseYoutubeDurationToSeconds(isoDuration: string): number {
   const seconds = parseInt(match[2] || "0", 10);
   return minutes * 60 + seconds;
 }
+
+export function extractDateOnly(isoString: string): string {
+  return new Date(isoString).toISOString().split("T")[0];
+}

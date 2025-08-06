@@ -1,1 +1,2 @@
-export const revalidateTime = 3600 * 24;
+export const REVALIDATE_TIME_ONE_DAY = 86400;
+export const REVALIDATE_TIME_ONE_HOUR = 3600;
