@@ -24,9 +24,11 @@ import {
 import {extractDateOnly, parseSongDuration} from "src/utils/parseSongDuration";
 import {SongTypeKorean} from "src/types/song/song-type.types";
 import {SongTempoKorean} from "src/types/song/song-tempo.types";
-import {Separator} from "radix-ui";
+import {useRouter} from "next/navigation";
+import shareContent from "src/utils/shareContent";
 
 export default function Page({ params }: { params: Promise<{ songId: string; songName: string }> }) {
+    const router = useRouter();
     const { songId, songName } = use(params);
 
     const { data: song } = useSongDetailQuery(songId);
@@ -42,11 +44,6 @@ export default function Page({ params }: { params: Promise<{ songId: string; son
     const handleLike = () => {
         setIsLiked(!isLiked);
         // toast.success(isLiked ? "좋아요를 취소했습니다" : "좋아요를 눌렀습니다");
-    };
-
-    const handleShare = () => {
-        navigator.clipboard.writeText(window.location.href);
-        // toast.success("링크가 클립보드에 복사되었습니다");
     };
 
     const handlePlay = () => {
@@ -205,7 +202,7 @@ export default function Page({ params }: { params: Promise<{ songId: string; son
                                     좋아요
                                 </Button>
 
-                                <Button variant="outline" onClick={handleShare}>
+                                <Button variant="outline" onClick={() => shareContent("song")}>
                                     <Share2 className="w-4 h-4 mr-1" />
                                     공유하기
                                 </Button>
@@ -229,70 +226,63 @@ export default function Page({ params }: { params: Promise<{ songId: string; son
                     </div>
                 </Card>
 
-                {/* 추가 정보 */}
-                <div className="grid md:grid-cols-2 gap-6 mb-8">
-                     {/*곡 정보*/}
-                    <Card>
-                        <div className="p-6">
-                            <h3 className="text-lg mb-4 flex items-center gap-2">
-                                <Music className="w-5 h-5" />
-                                곡 정보
-                            </h3>
-                            <div className="space-y-3">
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600">곡 타입</span>
-                                    {song?.songType ? <span>{SongTypeKorean[song?.songType]}</span> : <span className="text-gray-500">정보 없음</span>}
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600">템포</span>
-                                    {song?.tempo ? <span>{SongTempoKorean[song?.tempo]}</span> : <span className="text-gray-500">정보 없음</span>}
-                                </div>
-                                {song?.season && (
+                 {/*곡 정보*/}
+                <Card className="mb-8">
+                    <div className="p-6">
+                        <h3 className="text-lg mb-4 flex items-center gap-2">
+                            <Music className="w-5 h-5" />
+                            곡 정보
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-[1fr_1px_1fr] gap-6">
+                            <div>
+                                <div className="space-y-3">
                                     <div className="flex justify-between">
-                                        <span className="text-gray-600">절기</span>
-                                        {song?.season ? <span>{song.season.seasonName}</span> : <span className="text-gray-500">정보 없음</span>}
+                                        <span className="text-gray-600">곡 타입</span>
+                                        {song?.songType ? <span>{SongTypeKorean[song?.songType]}</span> : <span className="text-gray-500">정보 없음</span>}
                                     </div>
-                                )}
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600">재생 시간</span>
-                                    {song?.duration ? <span>{parseSongDuration(song.duration)}</span> : <span className="text-gray-500">정보 없음</span>}
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600">키</span>
-                                    {song?.songKey ? <span>song?.songKey</span> : <span className="text-gray-500">정보 없음</span>}
-                                </div>
-                            </div>
-                        </div>
-                    </Card>
-
-                     {/*작성자 정보*/}
-                    <Card>
-                        <div className="p-6">
-                            <h3 className="text-lg mb-4 flex items-center gap-2">
-                                <User className="w-5 h-5" />
-                                작성자 정보
-                            </h3>
-                            <div className="space-y-3">
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600">찬양팀</span>
-                                    <span>{song?.praiseTeam.praiseTeamName}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600">등록자</span>
-                                    <span>{song?.creatorNickname.nickname}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600">업로드 일시</span>
-                                    {song?.createdAt ? <span>{extractDateOnly(song?.createdAt)}</span> : <span className="text-gray-500">정보 없음</span>}
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-600">템포</span>
+                                        {song?.tempo ? <span>{SongTempoKorean[song?.tempo]}</span> : <span className="text-gray-500">정보 없음</span>}
+                                    </div>
+                                    {song?.season && (
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-600">절기</span>
+                                            {song?.season ? <span>{song.season.seasonName}</span> : <span className="text-gray-500">정보 없음</span>}
+                                        </div>
+                                    )}
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-600">재생 시간</span>
+                                        {song?.duration ? <span>{parseSongDuration(song.duration)}</span> : <span className="text-gray-500">정보 없음</span>}
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-600">키</span>
+                                        {song?.songKey ? <span>song?.songKey</span> : <span className="text-gray-500">정보 없음</span>}
+                                    </div>
                                 </div>
                             </div>
 
-                            {/*<p className="text-sm text-gray-600">*/}
-                            {/*    {song?.praiseTeam}*/}
-                            {/*</p>*/}
+                            {/* 가운데 세로 줄 */}
+                            <div className="hidden md:block w-px bg-gray-300 mx-auto" />
+
+                            <div>
+                                <div className="space-y-3">
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-600">찬양팀</span>
+                                        <span>{song?.praiseTeam.praiseTeamName}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-600">등록자</span>
+                                        <span>{song?.creatorNickname.nickname}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-600">업로드 일시</span>
+                                        {song?.createdAt ? <span>{extractDateOnly(song?.createdAt)}</span> : <span className="text-gray-500">정보 없음</span>}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </Card>
-                </div>
+                    </div>
+                </Card>
 
                 {coUsedSongs && (
                     <Card>
@@ -301,76 +291,82 @@ export default function Page({ params }: { params: Promise<{ songId: string; son
                                 <Music className="w-5 h-5" />
                                 함께 쓰인 곡들
                             </h3>
-                            <p className="text-gray-600 mb-6">이 곡과 함께 콘티에서 자주 사용되는 찬양들입니다</p>
+                            <p className="text-gray-600 mb-6">
+                                이 곡과 함께 콘티에서 자주 사용되는 찬양들입니다
+                            </p>
 
-                            <div className="grid gap-4">
-                                {coUsedSongs.map((relatedSong, index) => (
-                                    <div key={relatedSong.song.id} className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer group">
-                                        {/* 순번 */}
-                                        <div className="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium">
-                                            {index + 1}
-                                        </div>
+                            {coUsedSongs && coUsedSongs.length > 0 ? (
+                                <div className="grid gap-4">
+                                    {coUsedSongs.map((relatedSong, index) => (
+                                        <div
+                                            onClick={() =>
+                                                router.push(
+                                                    `/song/detail/${relatedSong.song.id}/${relatedSong.song.songName}`
+                                                )
+                                            }
+                                            key={relatedSong.song.id}
+                                            className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer group"
+                                        >
+                                            {/* 순번 */}
+                                            <div className="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium">
+                                                {index + 1}
+                                            </div>
 
-                                        {/* 썸네일 */}
-                                        <div className="relative w-16 h-16 flex-shrink-0 rounded-md overflow-hidden">
-                                            <ImageWithFallback
-                                                src={relatedSong.song.thumbnail}
-                                                alt={relatedSong.song.songName}
-                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                                            />
-                                        </div>
+                                            {/* 썸네일 */}
+                                            <div className="relative w-16 h-16 flex-shrink-0 rounded-md overflow-hidden">
+                                                <ImageWithFallback
+                                                    src={relatedSong.song.thumbnail}
+                                                    alt={relatedSong.song.songName}
+                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                                                />
+                                            </div>
 
-                                        {/* 곡 정보 */}
-                                        <div className="flex-1 min-w-0">
-                                            <h4 className="text-base mb-1 text-gray-900 group-hover:text-blue-600 transition-colors truncate">
-                                                {relatedSong.song.songName}
-                                            </h4>
-                                            <p className="text-sm text-gray-600 mb-2">{relatedSong.song.praiseTeam.praiseTeamName}</p>
-                                            <div className="flex items-center gap-3 text-xs text-gray-500">
-                                                <div className="flex items-center gap-1">
-                                                    <Clock className="w-3 h-3" />
-                                                    {parseSongDuration(relatedSong.song.duration)}
+                                            {/* 곡 정보 */}
+                                            <div className="flex-1 min-w-0">
+                                                <h4 className="text-base mb-1 text-gray-900 group-hover:text-blue-600 transition-colors truncate">
+                                                    {relatedSong.song.songName}
+                                                </h4>
+                                                <p className="text-sm text-gray-600 mb-2">
+                                                    {relatedSong.song.praiseTeam.praiseTeamName}
+                                                </p>
+                                                <div className="flex items-center gap-3 text-xs text-gray-500">
+                                                    <div className="flex items-center gap-1">
+                                                        <Clock className="w-3 h-3" />
+                                                        {parseSongDuration(relatedSong.song.duration)}
+                                                    </div>
+                                                    <div className="flex items-center gap-1">
+                                                        <Users className="w-3 h-3" />
+                                                        {relatedSong.usageCount}회 사용
+                                                    </div>
+                                                    <Badge variant="outline" className="text-xs">
+                                                        {relatedSong.song.songType}
+                                                    </Badge>
                                                 </div>
-                                                <div className="flex items-center gap-1">
-                                                    <Users className="w-3 h-3" />
-                                                    {relatedSong.usageCount}회 사용
-                                                </div>
-                                                <Badge variant="outline" className="text-xs">
-                                                    {relatedSong.song.songType}
-                                                </Badge>
+                                            </div>
+
+                                            {/* 재생 버튼 */}
+                                            <div className="flex-shrink-0">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="w-10 h-10 p-0 hover:bg-blue-50 hover:text-blue-600"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        // toast.success(`"${relatedSong.songName}" 재생 시작`);
+                                                    }}
+                                                >
+                                                    <Play className="w-4 h-4" />
+                                                </Button>
                                             </div>
                                         </div>
-
-                                        {/* 재생 버튼 */}
-                                        <div className="flex-shrink-0">
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                className="w-10 h-10 p-0 hover:bg-blue-50 hover:text-blue-600"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    // toast.success(`"${relatedSong.songName}" 재생 시작`);
-                                                }}
-                                            >
-                                                <Play className="w-4 h-4" />
-                                            </Button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-
-                            {/* 더보기 버튼 */}
-                            <div className="mt-6 text-center">
-                                <Button
-                                    variant="outline"
-                                    // onClick={() => toast.info("더 많은 관련 곡들을 준비 중입니다")}
-                                    className="w-full sm:w-auto"
-                                >
-                                    더 많은 관련 곡 보기
-                                </Button>
-                            </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="text-sm text-gray-500">관련된 곡이 없습니다.</p>
+                            )}
                         </div>
                     </Card>
+
                 )}
 
             </div>
