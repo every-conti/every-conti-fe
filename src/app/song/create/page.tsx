@@ -14,7 +14,7 @@ import { useDebounce } from "use-debounce";
 import {SongKeyKorean, SongKeyTypes} from "src/types/song/song-key.types";
 import {SongTypeKorean, SongTypeTypes} from "src/types/song/song-type.types";
 import SongThemeDto from "src/dto/common/song-theme.dto";
-import extractYoutubeVideoId from "src/utils/extractYoutubeVideoId";
+import {extractYoutubeVideoId} from "src/utils/youtubeVIdUtils";
 import PraiseTeamDto from "src/dto/common/praise-team.dto";
 import {parseYoutubeDurationToSeconds} from "src/utils/parseSongDuration";
 import {Switch} from "src/components/ui/switch";

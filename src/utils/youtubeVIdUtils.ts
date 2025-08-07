@@ -1,4 +1,4 @@
-const extractYoutubeVideoId = (url: string): string | null => {
+export function extractYoutubeVideoId(url: string): string | null {
     try {
         const parsedUrl = new URL(url);
 
@@ -17,4 +17,6 @@ const extractYoutubeVideoId = (url: string): string | null => {
     return null;
 };
 
-export default extractYoutubeVideoId;
+export function getFullYoutubeURIByVId(youtubeVId: string){
+    return `https://www.youtube.com/watch?v=${youtubeVId}`;
+}

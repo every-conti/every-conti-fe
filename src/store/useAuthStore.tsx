@@ -17,8 +17,6 @@ interface AuthStore {
   getAccessToken: () => string | null;
 }
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
-
 export const useAuthStore = create<AuthStore>((set) => ({
   user: null,
   loading: true,

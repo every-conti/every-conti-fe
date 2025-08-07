@@ -2,16 +2,16 @@ import { ChevronRight, Upload, Music, List, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import ContiContentCard from "src/components/home/ContiContentCard";
 import HeroSection from "src/components/home/HeroSection";
-import NewWorshipCard from "src/components/common/NewWorshipCard";
+import NewSongCard from "src/components/common/NewSongCard";
 import { Button } from "src/components/ui/button";
 import { Card } from "src/components/ui/card";
 import { fetchFamousPraiseTeams, fetchLastSongs } from "src/app/api/home";
 import FamousContiDto from "src/dto/home/famous-conti.dto";
-import SongLastsDto from "src/dto/home/song-lasts.dto";
+import {MinimumSongToPlayDto} from "src/dto/common/minimum-song-to-play.dto";
 
 export default async function App() {
   const famousContis: FamousContiDto[] = await fetchFamousPraiseTeams();
-  const lastSongs: SongLastsDto[] = await fetchLastSongs();
+  const lastSongs: MinimumSongToPlayDto[] = await fetchLastSongs();
 
   return (
       <>
@@ -88,7 +88,7 @@ export default async function App() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {lastSongs.map((song, index) => (
-                  <NewWorshipCard
+                  <NewSongCard
                       key={song.id}
                       song={song}
                   />

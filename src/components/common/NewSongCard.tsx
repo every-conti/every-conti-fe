@@ -4,9 +4,10 @@ import { Badge } from "src/components/ui/badge";
 import { Play, Clock } from "lucide-react";
 import { ImageWithFallback } from "./ImageWithFallback";
 import { parseSongDuration } from "src/utils/parseSongDuration";
-import SongLastsDto from "src/dto/home/song-lasts.dto";
+import {MinimumSongToPlayDto} from "src/dto/common/minimum-song-to-play.dto";
+import PlayButton from "src/components/common/PlayButton";
 
-export default function NewWorshipCard({ song }: { song: SongLastsDto }) {
+export default function NewSongCard({ song }: { song: MinimumSongToPlayDto }) {
   const { thumbnail, songName, duration, praiseTeam, songType, id } = song;
 
   return (
@@ -17,18 +18,12 @@ export default function NewWorshipCard({ song }: { song: SongLastsDto }) {
               alt={songName}
               className="w-full h-36 object-cover"
           />
-
           <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-            <div
-                className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center cursor-pointer"
-                // onClick={(e) => {
-                //   e.stopPropagation();
-                //   // 여기에 재생 로직 추가
-                //   console.log("재생 버튼 클릭");
-                // }}
-            >
-              <Play className="w-6 h-6 text-gray-800 ml-1" />
-            </div>
+              <PlayButton song={song} >
+                  <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center cursor-pointer">
+                  <Play className="w-6 h-6 text-gray-800 ml-1" />
+                </div>
+              </PlayButton>
           </div>
 
           <Badge className="absolute bottom-2 right-2 bg-black/70 text-white text-xs">

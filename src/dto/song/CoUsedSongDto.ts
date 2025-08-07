@@ -1,6 +1,6 @@
-import {SongWithPraiseTeamSimpleDto} from "src/dto/song/SongWithPraiseTeamSimpleDto";
+import {MinimumSongToPlayDto} from "src/dto/common/minimum-song-to-play.dto";
 
 export type CoUsedSongDto = {
-    song: SongWithPraiseTeamSimpleDto,
+    song: MinimumSongToPlayDto,
     usageCount: number
 };
