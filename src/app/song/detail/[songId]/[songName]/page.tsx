@@ -7,7 +7,6 @@ import {
     Share2,
     Clock,
     Music,
-    User,
     BookOpen,
     Timer, Users
 } from "lucide-react";
@@ -285,35 +284,33 @@ export default function Page({ params }: { params: Promise<{ songId: string; son
                 </Card>
 
                 {coUsedSongs && (
-                    <Card>
-                        <div className="p-6">
-                            <h3 className="text-xl mb-4 flex items-center gap-2">
+                    <Card className="overflow-hidden">
+                        <div className="p-4 sm:p-6">
+                            <h3 className="text-xl mb-3 sm:mb-4 flex items-center gap-2">
                                 <Music className="w-5 h-5" />
                                 함께 쓰인 곡들
                             </h3>
-                            <p className="text-gray-600 mb-6">
+                            <p className="text-gray-600 mb-4 sm:mb-6">
                                 이 곡과 함께 콘티에서 자주 사용되는 찬양들입니다
                             </p>
 
                             {coUsedSongs && coUsedSongs.length > 0 ? (
-                                <div className="grid gap-4">
+                                <div className="grid grid-cols-1 gap-3 sm:gap-4">
                                     {coUsedSongs.map((relatedSong, index) => (
                                         <div
-                                            onClick={() =>
-                                                router.push(
-                                                    `/song/detail/${relatedSong.song.id}/${relatedSong.song.songName}`
-                                                )
-                                            }
                                             key={relatedSong.song.id}
-                                            className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer group"
+                                            onClick={() =>
+                                                router.push(`/song/detail/${relatedSong.song.id}/${relatedSong.song.songName}`)
+                                            }
+                                            className="flex items-center gap-3 sm:gap-4 w-full p-3 sm:p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer group min-w-0 overflow-hidden"
                                         >
                                             {/* 순번 */}
-                                            <div className="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium">
+                                            <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs sm:text-sm font-medium">
                                                 {index + 1}
                                             </div>
 
                                             {/* 썸네일 */}
-                                            <div className="relative w-16 h-16 flex-shrink-0 rounded-md overflow-hidden">
+                                            <div className="relative w-14 h-14 sm:w-16 sm:h-16 flex-shrink-0 rounded-md overflow-hidden">
                                                 <ImageWithFallback
                                                     src={relatedSong.song.thumbnail}
                                                     alt={relatedSong.song.songName}
@@ -323,13 +320,13 @@ export default function Page({ params }: { params: Promise<{ songId: string; son
 
                                             {/* 곡 정보 */}
                                             <div className="flex-1 min-w-0">
-                                                <h4 className="text-base mb-1 text-gray-900 group-hover:text-blue-600 transition-colors truncate">
+                                                <h4 className="text-sm sm:text-base mb-0.5 sm:mb-1 text-gray-900 group-hover:text-blue-600 transition-colors truncate break-words">
                                                     {relatedSong.song.songName}
                                                 </h4>
-                                                <p className="text-sm text-gray-600 mb-2">
+                                                <p className="text-xs sm:text-sm text-gray-600 mb-1.5 sm:mb-2 truncate break-words">
                                                     {relatedSong.song.praiseTeam.praiseTeamName}
                                                 </p>
-                                                <div className="flex items-center gap-3 text-xs text-gray-500">
+                                                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] sm:text-xs text-gray-500 min-w-0">
                                                     <div className="flex items-center gap-1">
                                                         <Clock className="w-3 h-3" />
                                                         {parseSongDuration(relatedSong.song.duration)}
@@ -338,7 +335,7 @@ export default function Page({ params }: { params: Promise<{ songId: string; son
                                                         <Users className="w-3 h-3" />
                                                         {relatedSong.usageCount}회 사용
                                                     </div>
-                                                    <Badge variant="outline" className="text-xs">
+                                                    <Badge variant="outline" className="text-[11px] sm:text-xs">
                                                         {relatedSong.song.songType}
                                                     </Badge>
                                                 </div>
@@ -349,10 +346,10 @@ export default function Page({ params }: { params: Promise<{ songId: string; son
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
-                                                    className="w-10 h-10 p-0 hover:bg-blue-50 hover:text-blue-600"
+                                                    className="w-9 h-9 sm:w-10 sm:h-10 p-0 hover:bg-blue-50 hover:text-blue-600"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        // toast.success(`"${relatedSong.songName}" 재생 시작`);
+                                                        // ...
                                                     }}
                                                 >
                                                     <Play className="w-4 h-4" />
@@ -366,8 +363,8 @@ export default function Page({ params }: { params: Promise<{ songId: string; son
                             )}
                         </div>
                     </Card>
-
                 )}
+
 
             </div>
         </div>

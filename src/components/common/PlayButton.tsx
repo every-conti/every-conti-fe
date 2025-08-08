@@ -11,12 +11,11 @@ interface PlayButtonProps {
 }
 
 export default function PlayButton({ song, children }: PlayButtonProps) {
-    const { setCurrentSong, setIsPlaying, setProgress } = usePlayerStore();
+    const { setCurrentSong, setIsPlaying } = usePlayerStore();
 
     const handlePlay = () => {
         setCurrentSong(song);
         setIsPlaying(true);
-        setProgress(0);
     };
 
     return (
