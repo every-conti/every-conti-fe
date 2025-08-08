@@ -34,12 +34,11 @@ import withAuth from "src/components/common/withAuth";
 import {useRouter} from "next/navigation";
 import {SongDetailDto} from "src/dto/common/song-detail.dto";
 import {Popover, PopoverContent, PopoverTrigger} from "src/components/ui/popover";
-import {usePlayerStore} from "src/store/usePlayerStore";
+import PageTitle from "src/components/common/PageTitle";
 
 
 function SongCreationPage() {
     const { user, accessToken } = useAuthStore();
-    const { setCurrentSong, setIsPlaying } = usePlayerStore();
     const router = useRouter();
 
     // 폼 상태
@@ -276,15 +275,9 @@ function SongCreationPage() {
 
     return (
         <>
-            <div className="bg-white py-8 px-6 border-b border-gray-200">
-                <div className="max-w-6xl mx-auto">
-                    <h1 className="text-3xl text-gray-800 mb-2">찬양 등록</h1>
-                    <p className="text-gray-600">
-                        다른 사람들에게 추천할, 자신만의 찬양을 등록해 보세요
-                    </p>
-                </div>
-            </div>
-        <div className="py-8 px-6">
+            <PageTitle title="찬양 등록" description="다른 사람들에게 추천할, 자신만의 찬양을 등록해 보세요" />
+
+            <div className="py-8 px-6">
             <div className="max-w-4xl mx-auto">
 
                 <Card className="p-6">

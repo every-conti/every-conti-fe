@@ -13,6 +13,7 @@ import CommonResponseDto from "src/dto/common/common-response.dto";
 import {SongDetailDto} from "src/dto/common/song-detail.dto";
 import {REVALIDATE_TIME_ONE_HOUR} from "src/constant/numbers.constant";
 import {CoUsedSongDto} from "src/dto/song/CoUsedSongDto";
+import buildQueryParams from "src/utils/buildQueryParams";
 
 
 export const useInfiniteSearchSongQuery = (
@@ -41,23 +42,6 @@ export const useInfiniteSearchSongQuery = (
     isLoading,
     ...rest,
   };
-};
-
-const buildQueryParams = (params: SearchSongQueriesDto) => {
-  const searchParams = new URLSearchParams();
-
-  for (const [key, value] of Object.entries(params)) {
-    if (
-        value !== undefined &&
-        value !== null &&
-        value !== "" &&
-        value !== "전체"
-    ) {
-      searchParams.set(key, value.toString());
-    }
-  }
-
-  return searchParams.toString();
 };
 
 export const fetchSongProperties = async () => {

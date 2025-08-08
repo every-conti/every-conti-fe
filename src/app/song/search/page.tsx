@@ -19,6 +19,7 @@ import SongThemeDto from "src/dto/common/song-theme.dto";
 import { SongKeyTypes } from "src/types/song/song-key.types";
 import { SongTempoTypes } from "src/types/song/song-tempo.types";
 import { SongTypeTypes } from "src/types/song/song-type.types";
+import PageTitle from "src/components/common/PageTitle";
 
 export default function SearchDetail() {
   const [searchTerm, setSearchTerm] = useState<string | null>(null);
@@ -73,12 +74,6 @@ export default function SearchDetail() {
     }
   );
 
-    useEffect(() => {
-        if (data) {
-            const lastPage = data.pages[data.pages.length - 1];
-        }
-    }, [data]);
-
 
     const { ref, inView } = useInView({ threshold: 1 });
 
@@ -92,14 +87,7 @@ export default function SearchDetail() {
 
   return (
     <>
-      <div className="bg-white py-8 px-6 border-b border-gray-200">
-        <div className="max-w-6xl mx-auto">
-          <h1 className="text-3xl text-gray-800 mb-2">찬양 검색</h1>
-          <p className="text-gray-600">
-            원하는 찬양을 필터를 통해 찬양팀, 장르, 주제 별로 찾아보세요
-          </p>
-        </div>
-      </div>
+        <PageTitle title="찬양 검색" description="원하는 찬양을 필터를 통해 찬양팀, 장르, 주제 별로 찾아보세요" />
 
       {searchProperties && (
         <SearchFilters
