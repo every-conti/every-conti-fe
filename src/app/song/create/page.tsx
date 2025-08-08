@@ -34,10 +34,12 @@ import withAuth from "src/components/common/withAuth";
 import {useRouter} from "next/navigation";
 import {SongDetailDto} from "src/dto/common/song-detail.dto";
 import {Popover, PopoverContent, PopoverTrigger} from "src/components/ui/popover";
+import {usePlayerStore} from "src/store/usePlayerStore";
 
 
 function SongCreationPage() {
     const { user, accessToken } = useAuthStore();
+    const { setCurrentSong, setIsPlaying } = usePlayerStore();
     const router = useRouter();
 
     // 폼 상태

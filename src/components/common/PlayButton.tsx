@@ -21,10 +21,11 @@ export default function PlayButton({ song, children }: PlayButtonProps) {
     return (
         <div
             onClick={(e) => {
+                e.preventDefault();
                 e.stopPropagation();
                 handlePlay();
             }}
-            className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center cursor-pointer"
+            className="cursor-pointer"
         >
             {children ?? <Play className="w-6 h-6 text-gray-800 ml-1" />}
         </div>

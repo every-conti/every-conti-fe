@@ -1,6 +1,6 @@
 import {ShareModeTypes} from "src/types/share-mode.types";
 
-export function handleUnsupportedShare(shareData: any) {
+function handleUnsupportedShare(shareData: any) {
     if (shareData.url) {
         const textarea = document.createElement("textarea");
         textarea.value = `${shareData.text}\n${shareData.url}`;

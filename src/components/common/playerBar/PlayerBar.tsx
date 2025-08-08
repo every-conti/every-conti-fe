@@ -315,9 +315,10 @@ export default function PlayerBar() {
                                             {currentSong.praiseTeam.praiseTeamName}
                                         </p>
                                         <div className="flex items-center gap-1 mt-1">
+                                            {currentSong.songKey &&
                                             <Badge variant="outline" className="text-xs px-1.5 py-0">
                                                 {currentSong.songKey}
-                                            </Badge>
+                                            </Badge>}
                                             <Badge variant="secondary" className="text-xs px-1.5 py-0">
                                                 {currentSong.songType}
                                             </Badge>

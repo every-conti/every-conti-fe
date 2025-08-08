@@ -12,25 +12,27 @@ export default function NewSongCard({ song }: { song: MinimumSongToPlayDto }) {
 
   return (
       <Card className="overflow-hidden hover:shadow-lg transition-shadow">
-        <div className="relative">
-          <ImageWithFallback
-              src={thumbnail}
-              alt={songName}
-              className="w-full h-36 object-cover"
-          />
-          <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-              <PlayButton song={song} >
-                  <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center cursor-pointer">
-                  <Play className="w-6 h-6 text-gray-800 ml-1" />
-                </div>
-              </PlayButton>
-          </div>
+          <PlayButton song={song}>
+              <div className="relative">
+              <ImageWithFallback
+                  src={thumbnail}
+                  alt={songName}
+                  className="w-full h-36 object-cover"
+              />
+              <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
 
-          <Badge className="absolute bottom-2 right-2 bg-black/70 text-white text-xs">
-            <Clock className="w-3 h-3 mr-1" />
-            {duration ? parseSongDuration(duration) : "00:00"}
-          </Badge>
-        </div>
+                      <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center cursor-pointer">
+                      <Play className="w-6 h-6 text-gray-800 ml-1" />
+                    </div>
+              </div>
+
+
+              <Badge className="absolute bottom-2 right-2 bg-black/70 text-white text-xs">
+                <Clock className="w-3 h-3 mr-1" />
+                {duration ? parseSongDuration(duration) : "00:00"}
+              </Badge>
+            </div>
+          </PlayButton>
 
         <Link href={`/song/detail/${id}/${songName}`} className="h-full block">
           <div className="p-4 hover:bg-gray-50 transition-colors">
