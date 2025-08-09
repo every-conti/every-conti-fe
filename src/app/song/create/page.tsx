@@ -9,7 +9,13 @@ import {Badge} from "src/components/ui/badge";
 import { Textarea } from "src/components/ui/textarea";
 import {Button} from "src/components/ui/button";
 import {Checkbox} from "src/components/ui/checkbox";
-import {fetchBibleChapter, fetchBibleVerse, useSongPropertiesQuery, useYoutubeVIdCheck} from "src/app/api/song";
+import {
+    fetchBibleChapter,
+    fetchBibleVerse,
+    fetchSongCreate,
+    useSongPropertiesQuery,
+    useYoutubeVIdCheck
+} from "src/app/api/song";
 import { useDebounce } from "use-debounce";
 import {SongKeyKorean, SongKeyTypes} from "src/types/song/song-key.types";
 import {SongTypeKorean, SongTypeTypes} from "src/types/song/song-type.types";
@@ -29,7 +35,6 @@ import BibleChapterDto from "src/dto/common/bible-chapter.dto";
 import BibleVerseDto from "src/dto/common/bible-verse.dto";
 import {YoutubeVideoInfoDto} from "src/dto/song/YoutubeVideoInfoDto";
 import YoutubePopoverButton from "src/components/song/YoutubePopoverButton";
-import {apiRequestPost} from "src/app/api/apiRequestPost";
 import withAuth from "src/components/common/withAuth";
 import {useRouter} from "next/navigation";
 import {SongDetailDto} from "src/dto/common/song-detail.dto";
@@ -264,7 +269,7 @@ function SongCreationPage() {
         };
 
         try{
-            const res: SongDetailDto = await apiRequestPost("/song", newSong, false, accessToken, false);
+            const res: SongDetailDto = await fetchSongCreate(newSong);
             router.push(`/song/detail/${res.id}/${res.songName}`);
         } catch (e) {
             alert("생성 오류 발생")

@@ -1,28 +1,65 @@
-import {apiRequestPost} from "src/app/api/apiRequestPost";
 import CommonResponseDto from "src/dto/common/common-response.dto";
 import SignupRequestDto from "src/dto/auth/signup-request.dto";
 import EmailCodeVerificationDto from "src/dto/auth/email-code-verification.dto";
 import LoginRequestDto from "src/dto/auth/login-request.dto";
-import {apiRequestGet} from "src/app/api/apiRequestGet";
+import {apiRequestWithRefresh} from "src/app/api/apiRequestWithRefresh";
+import ApiOptions from "src/types/ApiOptions";
+import AccessTokenDto from "src/dto/auth/access-token.dto";
+import UserDto from "src/dto/user/user.dto";
 
 export const fetchLogin = async (loginRequestDto : LoginRequestDto) => {
-    const res: CommonResponseDto<string> = await apiRequestPost("/auth/login", loginRequestDto, false);
+    const apiOptions: ApiOptions = {
+        method: "POST",
+        data: loginRequestDto,
+    }
+    const res: CommonResponseDto<string> = await apiRequestWithRefresh("/auth/login", apiOptions);
     return res;
 };
 
 export const fetchSendVerificationMail = async (email: string) => {
-    const res: CommonResponseDto<string> = await apiRequestPost("/mail/code", {email}, false);
+    const apiOptions: ApiOptions = {
+        method: "POST",
+        data: {email},
+    }
+    const res: CommonResponseDto<string> = await apiRequestWithRefresh("/mail/code", apiOptions);
     return res;
 }
 
 export const fetchVerifyEmailCode = async (emailCodeVerificationDto: EmailCodeVerificationDto) => {
     const {email, userCode} = emailCodeVerificationDto;
-    const res: CommonResponseDto<string> = await apiRequestGet(`/mail/code/verify?email=${email}&userCode=${userCode}`,false);
+    const res: CommonResponseDto<string> = await apiRequestWithRefresh(`/mail/code/verify?email=${email}&userCode=${userCode}`);
     return res;
 }
 
 export const fetchSignup = async (signupRequestDto: SignupRequestDto) => {
-    const res: CommonResponseDto<string> = await apiRequestPost("/member", signupRequestDto, false);
+    const apiOptions: ApiOptions = {
+        method: "POST",
+        data: signupRequestDto,
+    }
+    const res: CommonResponseDto<string> = await apiRequestWithRefresh("/member", apiOptions);
     return res;
 };
 
+export const fetchNewAccessToken = async () => {
+    const apiOptions: ApiOptions = {
+        requiresAuth: true,
+    }
+    const data: AccessTokenDto = await apiRequestWithRefresh("/auth/token", apiOptions);
+    return data;
+}
+
+export const fetchMyUserInfo = async () => {
+    const apiOptions: ApiOptions = {
+        requiresAuth: true,
+    }
+    const data: UserDto = await apiRequestWithRefresh("/member/me", apiOptions);
+    return data;
+}
+
+export const fetchLogout = async () => {
+    const apiOptions: ApiOptions = {
+        requiresAuth: true,
+    }
+    const data: UserDto = await apiRequestWithRefresh("/auth/logout", apiOptions);
+    return data;
+}

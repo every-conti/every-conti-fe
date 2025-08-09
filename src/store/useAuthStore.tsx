@@ -1,8 +1,7 @@
-import { apiRequestGet } from "src/app/api/apiRequestGet";
-import { apiRequestPost } from "src/app/api/apiRequestPost";
 import AccessTokenDto from "src/dto/auth/access-token.dto";
 import UserDto from "src/dto/user/user.dto";
 import { create } from "zustand";
+import {fetchLogout, fetchMyUserInfo, fetchNewAccessToken} from "src/app/api/auth";
 
 interface AuthStore {
   user: UserDto | null;
@@ -31,7 +30,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
       set({ user: null, accessToken: null });
       return;
     }
-    await apiRequestPost("/auth/logout", null, true, accessToken);
+    await fetchLogout();
     set({ user: null, accessToken: null });
 
     set({ loading: false });
@@ -44,7 +43,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
 
     if (!accessToken) {
       try {
-        const data: AccessTokenDto = await apiRequestGet("/auth/token", true);
+        const data: AccessTokenDto = await fetchNewAccessToken();
         if (!data?.accessToken) {
           set({ user: null, accessToken: null, loading: false });
           return;
@@ -58,11 +57,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
     }
 
     try {
-      const data: UserDto = await apiRequestGet(
-        "/member/me",
-        true,
-        accessToken
-      );
+      const data: UserDto = await fetchMyUserInfo();
       set({ user: data });
     } catch (err) {
       set({ user: null });

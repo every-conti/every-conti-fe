@@ -2,6 +2,10 @@
 import PageTitle from "src/components/common/PageTitle";
 import ContiCard from "src/components/conti/ContiCard";
 import {useInfiniteSearchContiQuery} from "src/app/api/conti";
+import LoadingSpinner from "src/components/common/LoadingSpinner";
+import WorshipSearchCard from "src/components/song/search/WorshipSearchCard";
+import {useInView} from "react-intersection-observer";
+import {useAuthStore} from "src/store/useAuthStore";
 
 export default function ContiFeedPage() {
   const {
@@ -19,7 +23,9 @@ export default function ContiFeedPage() {
       }
   );
 
+  const { user } = useAuthStore();
   const contis = data?.pages.flatMap((page) => page.items) ?? [];
+  const { ref, inView } = useInView({ threshold: 1 });
 
   return (
     <>
@@ -40,10 +46,36 @@ export default function ContiFeedPage() {
           {/*    </p>*/}
           {/*  </div>*/}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {contis.map((conti) => (
-                <ContiCard key={conti.conti.id} conti={conti} />
-              ))}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+                {isLoading ? (
+                    <LoadingSpinner />
+                ) : isError ? (
+                    <div className="text-red-500 text-center py-8">
+                        <p>로드 중 오류가 발생했습니다. 다시 시도해주세요.</p>
+                    </div>
+                ) : contis.length === 0 ? (
+                    <div className="text-center py-16">
+                        <p className="text-gray-500 text-lg mb-2">콘티가 없습니다</p>
+                    </div>
+                ) : (
+                    <>
+                        {contis.map((conti) => (
+                            <ContiCard key={conti.conti.id} conti={conti} />
+                        ))}
+
+                        <div ref={ref} />
+
+                        {isFetchingNextPage && (
+                            <div className="text-center py-4">
+                                <LoadingSpinner />
+                            </div>
+                        )}
+                    </>
+                )}
+
+              {/*{contis.map((conti) => (*/}
+              {/*  <ContiCard key={conti.conti.id} conti={conti} />*/}
+              {/*))}*/}
             </div>
           {/*</TabsContent>*/}
 

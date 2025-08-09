@@ -20,7 +20,7 @@ const navItems = [
     label: "콘티",
     children: [
       { label: "콘티 보기", path: "/conti" },
-      { label: "팔로잉 콘티", path: "/conti/following" },
+      // { label: "팔로잉 콘티", path: "/conti/following" },
       { label: "등록", path: "/conti/create"}
     ],
   },

@@ -1,1 +1,1 @@
-export type ShareModeTypes = "song";
+export type ShareModeTypes = "song" | "conti";

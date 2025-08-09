@@ -5,12 +5,12 @@ import HeroSection from "src/components/home/HeroSection";
 import NewSongCard from "src/components/common/NewSongCard";
 import { Button } from "src/components/ui/button";
 import { Card } from "src/components/ui/card";
-import { fetchFamousPraiseTeams, fetchLastSongs } from "src/app/api/home";
+import {fetchFamousPraiseTeamsContis, fetchLastSongs} from "src/app/api/home";
 import FamousContiDto from "src/dto/home/famous-conti.dto";
 import {MinimumSongToPlayDto} from "src/dto/common/minimum-song-to-play.dto";
 
 export default async function App() {
-  const famousContis: FamousContiDto[] = await fetchFamousPraiseTeams();
+  const famousContis: FamousContiDto[] = await fetchFamousPraiseTeamsContis();
   const lastSongs: MinimumSongToPlayDto[] = await fetchLastSongs();
 
   return (

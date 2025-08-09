@@ -14,16 +14,19 @@ function handleUnsupportedShare(shareData: any) {
     }
 }
 
-export default function shareContent(mode: ShareModeTypes){
+export default function shareContent(mode: ShareModeTypes, url?: string){
     const shareData = {
         title: "",
         text: "",
-        url: `${window.location.href}`,
+        url: url ?? `${window.location.href}`,
     };
 
     switch (mode) {
         case "song":
             shareData.text = `에브리콘티에서 찬양의 정보를 확인하고 콘티를 등록해보세요`;
+            break;
+        case "conti":
+            shareData.text = `에브리콘티에서 콘티의 정보를 확인하고 콘티를 등록해보세요`;
             break;
 
         default:

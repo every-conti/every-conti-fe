@@ -3,7 +3,6 @@ import {
   useQuery,
   UseQueryOptions,
 } from "@tanstack/react-query";
-import { apiRequestGet } from "./apiRequestGet";
 import { SearchPropertiesDto } from "src/dto/search/search-properties.dto";
 import { SearchSongQueriesDto } from "src/dto/search/request/search-song-queries.dto";
 import BibleChapterDto from "src/dto/common/bible-chapter.dto";
@@ -14,20 +13,38 @@ import {SongDetailDto} from "src/dto/common/song-detail.dto";
 import {REVALIDATE_TIME_ONE_HOUR} from "src/constant/numbers.constant";
 import {CoUsedSongDto} from "src/dto/song/CoUsedSongDto";
 import buildQueryParams from "src/utils/buildQueryParams";
+import ApiOptions from "src/types/ApiOptions";
+import {apiRequestWithRefresh} from "src/app/api/apiRequestWithRefresh";
+import {CreateSongDto} from "src/dto/song/CreateSongDto";
 
+export const fetchSongCreate = async (createSongDto :CreateSongDto) => {
+  const apiOptions: ApiOptions = {
+    method: "POST",
+    requiresAuth: true,
+  }
+  const data: SongDetailDto = await apiRequestWithRefresh(
+      "/song",
+      apiOptions
+  );
+  return data;
+}
 
 export const useInfiniteSearchSongQuery = (
   params: SearchSongQueriesDto,
   options = {}
 ) => {
+  const apiOptions: ApiOptions = {
+    useCache: true,
+  }
+
   const { data, isLoading, ...rest } = useInfiniteQuery<InfiniteSongSearchDto>({
     queryKey: ["searchSongs", params],
     queryFn: async ({ pageParam = 0 }) => {
       const offset = pageParam as number;
       const fullParams: SearchSongQueriesDto = { ...params, offset }; // ✅ offset 추가
-      const res: InfiniteSongSearchDto = await apiRequestGet(
+      const res: InfiniteSongSearchDto = await apiRequestWithRefresh(
           `/song/search?${buildQueryParams(fullParams)}`,
-          true
+          apiOptions
       );
       return res;
     },
@@ -45,9 +62,12 @@ export const useInfiniteSearchSongQuery = (
 };
 
 export const fetchSongProperties = async () => {
-  const data: SearchPropertiesDto = await apiRequestGet(
+  const apiOptions: ApiOptions = {
+    useCache: true,
+  }
+  const data: SearchPropertiesDto = await apiRequestWithRefresh(
     "/song/properties",
-    true
+    apiOptions
   );
   return data;
 };
@@ -64,25 +84,32 @@ export function useSongPropertiesQuery() {
 }
 
 export const fetchBibleChapter = async (bibleId: string) => {
-  const data: BibleChapterDto[] = await apiRequestGet(
-    `/bible/${bibleId}/chapters`,
-    true
+  const apiOptions: ApiOptions = {
+    useCache: true,
+  }
+  const data: BibleChapterDto[] = await apiRequestWithRefresh(
+    `/bible/${bibleId}/chapters`, apiOptions
   );
   return data;
 };
 
 export const fetchBibleVerse = async (bibleChapterId: string) => {
-  const data: BibleVerseDto[] = await apiRequestGet(
-    `/bible/${bibleChapterId}/verses`,
-    true
+  const apiOptions: ApiOptions = {
+    useCache: true,
+  }
+  const data: BibleVerseDto[] = await apiRequestWithRefresh(
+    `/bible/${bibleChapterId}/verses`, apiOptions
   );
   return data;
 };
 
 export const fetchYoutubeVIdCheck = async (youtubeVId: string) => {
-  const data: CommonResponseDto<boolean> = await apiRequestGet(
+  const apiOptions: ApiOptions = {
+    useCache: true,
+  }
+  const data: CommonResponseDto<boolean> = await apiRequestWithRefresh(
       `/song/youtube-v-id/check/${youtubeVId}`,
-      true
+      apiOptions
   );
   return data;
 };
@@ -97,9 +124,11 @@ export function useYoutubeVIdCheck(youtubeVId: string | null) {
 }
 
 export const fetchSongDetail = async (songId: string) => {
-  const data: SongDetailDto = await apiRequestGet(
-      `/song/detail/${songId}`,
-      true
+  const apiOptions: ApiOptions = {
+    useCache: true,
+  }
+  const data: SongDetailDto = await apiRequestWithRefresh(
+      `/song/detail/${songId}`, apiOptions
   );
   return data;
 }
@@ -116,9 +145,11 @@ export function useSongDetailQuery(songId: string) {
 }
 
 export const fetchCoUsedSongs = async (songId: string) => {
-  const data: CoUsedSongDto[] = await apiRequestGet(
-      `/recommendation/co-used-songs/${songId}`,
-      true
+  const apiOptions: ApiOptions = {
+    useCache: true,
+  }
+  const data: CoUsedSongDto[] = await apiRequestWithRefresh(
+      `/recommendation/co-used-songs/${songId}`, apiOptions
   );
   return data;
 }

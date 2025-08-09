@@ -1,11 +1,24 @@
 import {Card} from "src/components/ui/card";
 import {ImageWithFallback} from "src/components/common/ImageWithFallback";
-import {Calendar, Clock, Heart, MessageCircle, MoreHorizontal, Play, Plus, Share2, Users} from "lucide-react";
+import {Calendar, Clock, MoreHorizontal, Play, Plus, Share2} from "lucide-react";
 import { Button } from "../ui/button";
 import {Badge} from "src/components/ui/badge";
 import FamousContiDto from "src/dto/home/famous-conti.dto";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger
+} from "../ui/dropdown-menu";
+import shareContent from "src/utils/shareContent";
+import {useState} from "react";
+import {useAuthStore} from "src/store/useAuthStore";
+import {fetchContiCopyProperties} from "src/app/api/conti";
 
 const ContiCard = ({ conti }: { conti: FamousContiDto }) => {
+    const [copying, setCopying] = useState(false);
+    const { user } = useAuthStore();
 
     const totalDuration = conti.conti.songs.reduce((total, song) => total + song.duration, 0);
 
@@ -13,6 +26,20 @@ const ContiCard = ({ conti }: { conti: FamousContiDto }) => {
         const minutes = Math.floor(totalSeconds / 60);
         const seconds = totalSeconds % 60;
         return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+    };
+
+
+    const handleCopyConti = async () => {
+        // if (!onCopyConti || !contiId) return;
+        try {
+            setCopying(true);
+            await fetchContiCopyProperties(conti.conti.id);
+            // toast?.({ description: "내 콘티로 복사되었어요." });
+        } catch (e: any) {
+            // toast?.({ variant: "destructive", description: e?.message ?? "복사 중 오류가 발생했습니다." });
+        } finally {
+            setCopying(false);
+        }
     };
 
     return (
@@ -46,11 +73,38 @@ const ContiCard = ({ conti }: { conti: FamousContiDto }) => {
             <div className="p-4">
                 {/* 제목과 설명 */}
                 <div className="mb-3">
-                    <h3 className="text-lg mb-1 line-clamp-1">{conti.conti.title}</h3>
+                    <div className="flex justify-between items-center">
+                        <h3 className="text-lg mb-1 line-clamp-1">{conti.conti.title}</h3>
+                        {/* 액션 */}
+                        <div className="flex items-center justify-between text-sm">
+                            {/* 우측 메뉴 (공유 / 내 콘티로 복사) */}
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                        <MoreHorizontal className="w-4 h-4" />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-44">
+                                    <DropdownMenuItem onClick={() => shareContent("conti")}>
+                                        <Share2 className="w-4 h-4 mr-2" />
+                                        공유하기
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem
+                                        disabled={!user || copying}
+                                        onClick={handleCopyConti}
+                                    >
+                                        <Plus className="w-4 h-4 mr-2" />
+                                        {copying ? "복사 중..." : "내 콘티로 복사"}
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
+                    </div>
                     <p className="text-sm text-gray-600 line-clamp-2">{conti.conti.description}</p>
                 </div>
 
-                {/* 작성자 정보 */}
+                {/* 작성자 찬양팀 정보 */}
                 <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center space-x-2">
                         <ImageWithFallback
@@ -68,163 +122,26 @@ const ContiCard = ({ conti }: { conti: FamousContiDto }) => {
                         </div>
                         <div className="flex items-center space-x-1">
                             <Clock className="w-3 h-3" />
-                            {"14:30"}
-                            {/*<span>{getTotalDuration(conti.songs)}</span>*/}
+                            <span>{formatTotalDuration(totalDuration)}</span>
                         </div>
                     </div>
                 </div>
 
-                {/* 테마 태그 */}
-                {/*<div className="flex flex-wrap gap-1 mb-3">*/}
-                {/*    {conti.themes.slice(0, 2).map(theme => (*/}
-                {/*        <Badge key={theme} variant="outline" className="text-xs">*/}
-                {/*            {theme}*/}
-                {/*        </Badge>*/}
-                {/*    ))}*/}
-                {/*    {conti.themes.length > 2 && (*/}
-                {/*        <Badge variant="outline" className="text-xs text-gray-500">*/}
-                {/*            +{conti.themes.length - 2}*/}
-                {/*        </Badge>*/}
-                {/*    )}*/}
-                {/*</div>*/}
-
-                {/* 액션 */}
-                <div className="flex items-center justify-between text-sm">
-                    {/*<div className="flex items-center space-x-4 text-gray-500">*/}
-                    {/*    <div className="flex items-center space-x-1">*/}
-                    {/*        <Heart className="w-4 h-4" />*/}
-                    {/*        <span>{conti.likes}</span>*/}
-                    {/*    </div>*/}
-                    {/*    <div className="flex items-center space-x-1">*/}
-                    {/*        <Users className="w-4 h-4" />*/}
-                    {/*        <span>{conti.comments}</span>*/}
-                    {/*    </div>*/}
-                    {/*</div>*/}
-
-                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                        <MoreHorizontal className="w-4 h-4" />
-                    </Button>
+                {/* 노래 태그 */}
+                <div className="flex flex-wrap gap-1 mb-3">
+                    {conti.conti.songs.slice(0, 4).map(song => (
+                        <Badge key={song.id} variant="outline" className="text-xs">
+                            {song.songName}
+                        </Badge>
+                    ))}
+                    {conti.conti.songs.length > 4 && (
+                        <Badge variant="outline" className="text-xs text-gray-500">
+                            +{conti.conti.songs.length - 4}
+                        </Badge>
+                    )}
                 </div>
             </div>
         </Card>
-        // <Card className="p-6 hover:shadow-lg transition-shadow">
-        //     {/* 헤더 */}
-        //     <div className="flex items-center justify-between mb-4">
-        //         <div className="flex items-center space-x-3">
-        //             <ImageWithFallback
-        //                 src={conti.authorImage}
-        //                 alt={conti.author}
-        //                 className="w-10 h-10 rounded-full object-cover"
-        //             />
-        //             <div>
-        //                 <h3 className="text-base">{conti.author}</h3>
-        //                 <div className="flex items-center space-x-2 text-sm text-gray-500">
-        //                     <Calendar className="w-3 h-3" />
-        //                     <span>{conti.date}</span>
-        //                 </div>
-        //             </div>
-        //         </div>
-        //
-        //         <div className="flex items-center space-x-2">
-        //             {!followingUsers.includes(conti.author) && (
-        //                 <Button
-        //                     size="sm"
-        //                     variant="outline"
-        //                     onClick={() => toggleFollow(conti.author)}
-        //                 >
-        //                     <Plus className="w-3 h-3 mr-1" />
-        //                     팔로우
-        //                 </Button>
-        //             )}
-        //             <Button variant="ghost" size="sm">
-        //                 <MoreHorizontal className="w-4 h-4" />
-        //             </Button>
-        //         </div>
-        //     </div>
-        //
-        //     {/* 콘티 정보 */}
-        //     <div className="mb-4">
-        //         <h2 className="text-lg mb-2">{conti.title}</h2>
-        //         <p className="text-gray-600 text-sm mb-3">{conti.description}</p>
-        //
-        //         <div className="flex items-center space-x-4 text-sm text-gray-500 mb-4">
-        //             <div className="flex items-center space-x-1">
-        //                 <Users className="w-4 h-4" />
-        //                 <span>{conti.songs.length}곡</span>
-        //             </div>
-        //             <div className="flex items-center space-x-1">
-        //                 <Clock className="w-4 h-4" />
-        //                 <span>{formatTotalDuration(totalDuration)}</span>
-        //             </div>
-        //         </div>
-        //     </div>
-        //
-        //     {/* 썸네일 */}
-        //     <div className="relative mb-4">
-        //         <ImageWithFallback
-        //             src={conti.thumbnail}
-        //             alt={conti.title}
-        //             className="w-full h-48 object-cover rounded-lg"
-        //         />
-        //         <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity cursor-pointer rounded-lg">
-        //             <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center">
-        //                 <Play className="w-8 h-8 text-gray-800 ml-1" />
-        //             </div>
-        //         </div>
-        //     </div>
-        //
-        //     {/* 곡 목록 */}
-        //     <div className="mb-4">
-        //         <h4 className="text-sm mb-2 text-gray-700">수록곡</h4>
-        //         <div className="space-y-2">
-        //             {conti.songs.slice(0, 3).map((song, index) => (
-        //                 <div
-        //                     key={index}
-        //                     className="flex items-center justify-between text-sm"
-        //                 >
-        //                     <div className="flex items-center space-x-2">
-        //                         <span className="text-gray-400 w-4">{index + 1}.</span>
-        //                         <span>{song.title}</span>
-        //                         <span className="text-gray-500">- {song.artist}</span>
-        //                     </div>
-        //                     <div className="flex items-center space-x-2">
-        //                         <Badge variant="outline" className="text-xs">
-        //                             {song.key}
-        //                         </Badge>
-        //                         <span className="text-gray-400 text-xs">{song.duration}</span>
-        //                     </div>
-        //                 </div>
-        //             ))}
-        //             {conti.songs.length > 3 && (
-        //                 <p className="text-xs text-gray-500">
-        //                     외 {conti.songs.length - 3}곡
-        //                 </p>
-        //             )}
-        //         </div>
-        //     </div>
-        //
-        //     {/* 액션 버튼 */}
-        //     <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-        //         <div className="flex items-center space-x-4">
-        //             <Button variant="ghost" size="sm" className="text-gray-600">
-        //                 <Heart className="w-4 h-4 mr-1" />
-        //                 {conti.likes}
-        //             </Button>
-        //             <Button variant="ghost" size="sm" className="text-gray-600">
-        //                 <MessageCircle className="w-4 h-4 mr-1" />
-        //                 {conti.comments}
-        //             </Button>
-        //             <Button variant="ghost" size="sm" className="text-gray-600">
-        //                 <Share2 className="w-4 h-4 mr-1" />
-        //                 공유
-        //             </Button>
-        //         </div>
-        //
-        //         <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
-        //             콘티 사용하기
-        //         </Button>
-        //     </div>
-        // </Card>
     );
 };
 
