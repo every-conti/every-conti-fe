@@ -90,6 +90,7 @@ export default async function App() {
               {lastSongs.map((song, index) => (
                   <NewSongCard
                       key={song.id}
+
                       song={song}
                   />
               ))}

@@ -3,7 +3,7 @@ import SignupRequestDto from "src/dto/auth/signup-request.dto";
 import EmailCodeVerificationDto from "src/dto/auth/email-code-verification.dto";
 import LoginRequestDto from "src/dto/auth/login-request.dto";
 import {apiRequestWithRefresh} from "src/app/api/apiRequestWithRefresh";
-import ApiOptions from "src/types/ApiOptions";
+import ApiOptions from "src/app/api/ApiOptions";
 import AccessTokenDto from "src/dto/auth/access-token.dto";
 import UserDto from "src/dto/user/user.dto";
 

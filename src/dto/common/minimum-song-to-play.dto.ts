@@ -11,4 +11,5 @@ export interface MinimumSongToPlayDto {
     thumbnail: string;
     songKey: SongKeyTypes | null;
     duration: number;
+    lyrics: string | null;
 }

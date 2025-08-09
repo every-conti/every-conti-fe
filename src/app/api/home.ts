@@ -1,5 +1,5 @@
 import {apiRequestWithRefresh} from "src/app/api/apiRequestWithRefresh";
-import ApiOptions from "src/types/ApiOptions";
+import ApiOptions from "src/app/api/ApiOptions";
 
 export const fetchFamousPraiseTeamsContis = async () => {
   const apiOptions: ApiOptions = {

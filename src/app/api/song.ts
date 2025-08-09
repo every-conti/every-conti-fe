@@ -13,7 +13,7 @@ import {SongDetailDto} from "src/dto/common/song-detail.dto";
 import {REVALIDATE_TIME_ONE_HOUR} from "src/constant/numbers.constant";
 import {CoUsedSongDto} from "src/dto/song/CoUsedSongDto";
 import buildQueryParams from "src/utils/buildQueryParams";
-import ApiOptions from "src/types/ApiOptions";
+import ApiOptions from "src/app/api/ApiOptions";
 import {apiRequestWithRefresh} from "src/app/api/apiRequestWithRefresh";
 import {CreateSongDto} from "src/dto/song/CreateSongDto";
 

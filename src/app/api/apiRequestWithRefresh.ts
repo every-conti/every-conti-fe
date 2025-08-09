@@ -1,7 +1,7 @@
 import { REVALIDATE_TIME_ONE_DAY } from "src/constant/numbers.constant";
 import { useAuthStore } from "src/store/useAuthStore";
 import AccessTokenDto from "src/dto/auth/access-token.dto";
-import ApiOptions from "src/types/ApiOptions";
+import ApiOptions from "src/app/api/ApiOptions";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 

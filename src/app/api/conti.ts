@@ -6,7 +6,7 @@ import {InfiniteContiSearchDto} from "src/dto/search/infinite-conti-search.dto";
 import {SearchContiQueriesDto} from "src/dto/search/request/search-conti-queries.dto";
 import CommonResponseDto from "src/dto/common/common-response.dto";
 import {apiRequestWithRefresh} from "src/app/api/apiRequestWithRefresh";
-import ApiOptions from "src/types/ApiOptions";
+import ApiOptions from "src/app/api/ApiOptions";
 
 export const useInfiniteSearchContiQuery = (
     params: SearchContiQueriesDto,
