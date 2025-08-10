@@ -273,7 +273,7 @@ export default function SimpleBottomBar(props: MusicPlayerPropsDto){
                                             variant="ghost"
                                             size="sm"
                                             className="w-8 h-8 p-0"
-                                            disabled={!hasNext && !(repeatMode === "all")}
+                                            disabled={!hasNext}
                                             onClick={nextSong}
                                         >
                                             <SkipForward className="w-4 h-4" />
@@ -291,6 +291,26 @@ export default function SimpleBottomBar(props: MusicPlayerPropsDto){
 
                                     {/* 액션 버튼들 */}
                                     <div className="flex items-center space-x-1">
+                                        <div className="w-full flex items-center gap-2 justify-between">
+                                            <Volume2 className="w-4 h-4" onClick={() =>  setState((prev) => ({ ...prev, volume: 0 }))} />
+                                            <Slider
+                                                value={[Math.round(state.volume * 100)]}
+                                                onValueChange={(v) => setState((prev) => ({ ...prev, volume: (v?.[0] ?? 0) / 100 }))}
+                                                max={100}
+                                                step={1}
+                                                sliderBarBG="bg-blue-500"
+                                                variant="thin"
+                                                className="w-20 sm:w-24 h-6
+                                                [--slider-track-height:6px]
+                                                [&_.slider-track]:bg-white/30
+                                                [&_.slider-range]:bg-blue-400
+                                                [&_.slider-thumb]:bg-white
+                                                [&_.slider-thumb]:ring-2
+                                                [&_.slider-thumb]:ring-blue-400/60
+                                              "
+                                            />
+                                        </div>
+
                                         <Button
                                             variant="ghost"
                                             size="sm"
@@ -313,42 +333,6 @@ export default function SimpleBottomBar(props: MusicPlayerPropsDto){
                                                 <Plus className="w-4 h-4" />
                                             )}
                                         </Button>
-
-                                        <div className="relative hidden sm:block">
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                className="w-8 h-8 p-0"
-                                                onClick={() => {
-                                                    setShowVolumeControl(!showVolumeControl)
-                                                }}
-                                            >
-                                                <Volume2 className="w-4 h-4" />
-                                            </Button>
-
-                                            {showVolumeControl && (
-                                                <div className="absolute bottom-full right-0 mb-2 p-3 bg-white rounded-lg shadow-lg border z-10">
-                                                    <div className="w-20">
-                                                        <div className="h-16 flex items-center justify-center">
-                                                            <Slider
-                                                                value={[state.volume * 100]}
-                                                                onValueChange={(value) => setState(prevState => ({
-                                                                    ...prevState,
-                                                                    volume: value[0] / 100
-                                                                }))}
-                                                                max={100}
-                                                                step={1}
-                                                                orientation="horizontal"
-                                                                className="w-16"
-                                                            />
-                                                        </div>
-                                                        <div className="text-xs text-center text-gray-600 mt-1">
-                                                            {Math.round(state.volume * 100)}%
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </div>
 
                                         <Button
                                             variant="ghost"

@@ -24,8 +24,7 @@ function QueueItem({
     return (
         <div
             key={`queue-${song.id ?? index}`}
-            className={`w-full max-w-full flex items-center space-x-2 sm:space-x-3 p-2 sm:p-3 rounded-lg transition-colors ${
-                isActive ? "bg-white/20 border border-white/30" : "hover:bg-white/10"
+            className={`w-full max-w-full flex justify-between items-center space-x-2 sm:space-x-3 p-2 sm:p-3 rounded-lg transition-colors ${                isActive ? "bg-white/20 border border-white/30" : "hover:bg-white/10"
             }`}
         >
             <div className="relative w-11 h-11 sm:w-12 sm:h-12 rounded-md overflow-hidden flex-shrink-0">
@@ -43,12 +42,16 @@ function QueueItem({
                 </div>
             </div>
 
-            {/* ✨ 오버플로우 방지 핵심 */}
             <div className="flex-1 min-w-0">
-                <h4 className={`truncate ${isActive ? "text-blue-300" : "text-white"} break-words`}>
+                <h4 className={`${isActive ? "text-blue-300" : "text-white"} line-clamp-1`}
+                title={song.songName}
+                >
                     {song.songName}
                 </h4>
-                <p className="text-xs sm:text-sm text-gray-300 truncate break-words">
+                <p
+                    className="truncate text-xs sm:text-sm text-gray-300"
+                    title={song.praiseTeam?.praiseTeamName}
+                >
                     {song.praiseTeam?.praiseTeamName}
                 </p>
             </div>
@@ -193,13 +196,13 @@ export default function FullScreenMusicPlayer(props: MusicPlayerPropsDto) {
                                 </Button>
                             </div>
 
-                            <div className="h-[calc(100dvh-14rem)]">
+                            <div className="h-[calc(100dvh-10rem)] w-full">
                                 <ScrollArea className="h-full overscroll-contain">
                                     {playlist.length > 0 ? (
                                         <div className="space-y-2">
                                             {playlist.map((song, index) => (
                                                 <QueueItem
-                                                    key={`queue-full-${song.id ?? index}`}
+                                                    key={`queue-full-${song.id + index}`}
                                                     song={song}
                                                     index={index}
                                                     isActive={index === (currentSongIndex ?? -1)}
@@ -288,8 +291,8 @@ export default function FullScreenMusicPlayer(props: MusicPlayerPropsDto) {
 
                                 {/* 곡 정보 */}
                                 <div className="text-center mb-6 px-2 w-full max-w-full">
-                                    <h1 className="text-xl sm:text-2xl lg:text-3xl mb-1.5 break-words">{currentSong.songName}</h1>
-                                    <p className="text-base sm:text-lg text-gray-300 mb-3 break-words">{currentSong.praiseTeam.praiseTeamName}</p>
+                                    <h1 className="text-xl sm:text-2xl lg:text-3xl mb-1.5 truncate ">{currentSong.songName}</h1>
+                                    <p className="text-base sm:text-lg text-gray-300 mb-3 truncate ">{currentSong.praiseTeam.praiseTeamName}</p>
 
                                     <div className="flex justify-center items-center gap-2 flex-wrap">
                                         {currentSong.songKey && (
@@ -313,6 +316,7 @@ export default function FullScreenMusicPlayer(props: MusicPlayerPropsDto) {
                                     <Slider
                                         variant="thin"
                                         value={[isSeeking ? progress : state.played * 100]}
+                                        sliderBarBG="bg-blue-500"
                                         onValueChange={handleSeek}
                                         max={100}
                                         step={0.1}
@@ -395,6 +399,8 @@ export default function FullScreenMusicPlayer(props: MusicPlayerPropsDto) {
                                             onValueChange={(v) => setState((prev) => ({ ...prev, volume: (v?.[0] ?? 0) / 100 }))}
                                             max={100}
                                             step={1}
+                                            sliderBarBG="bg-blue-500"
+                                            variant="thin"
                                             className="
                                                 w-28 sm:w-32 h-6
                                                 [--slider-track-height:6px]

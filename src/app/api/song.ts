@@ -20,6 +20,7 @@ import {CreateSongDto} from "src/dto/song/CreateSongDto";
 export const fetchSongCreate = async (createSongDto :CreateSongDto) => {
   const apiOptions: ApiOptions = {
     method: "POST",
+    data: createSongDto,
     requiresAuth: true,
   }
   const data: SongDetailDto = await apiRequestWithRefresh(

@@ -8,6 +8,7 @@ import {cn} from "src/lib/utils";
 interface SliderWithLoad extends React.ComponentProps<typeof SliderPrimitive.Root>{
     loadedPercent?: number;
     variant?: "default" | "thin";
+    sliderBarBG?: string;
 }
 
 function Slider({
@@ -17,6 +18,7 @@ function Slider({
     min = 0,
     max = 100,
     loadedPercent = 0,
+    sliderBarBG,
     variant = "default",
     ...props
 }: SliderWithLoad) {
@@ -69,7 +71,9 @@ function Slider({
 
                 <SliderPrimitive.Range
                     data-slot="slider-range"
-                    className="bg-primary absolute data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full"
+                    className={cn("absolute data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full",
+                        sliderBarBG ?? "bg-primary"
+                    )}
                 />
             </SliderPrimitive.Track>
 
