@@ -6,7 +6,7 @@ import Link from "next/link";
 import FamousContiDto from "src/dto/home/famous-conti.dto";
 
 export default function ContiContentCard({ famousContiDto }: { famousContiDto: FamousContiDto }) {
-        const { conti, praiseTeam } = famousContiDto;
+    const { conti, praiseTeam } = famousContiDto;
     const { id, date, songs } = conti;
     const { previewImg } = praiseTeam;
 
@@ -24,14 +24,14 @@ export default function ContiContentCard({ famousContiDto }: { famousContiDto: F
 
       <div className="space-y-2">
         {songs.map((song, index) => (
-          <div key={song.id} className="flex items-center justify-between py-1">
+          <div key={song.song.id} className="flex items-center justify-between py-1">
             <div className="flex items-center space-x-2">
               <span className="text-sm text-gray-600">{index + 1}.</span>
-              <span className="text-sm">{song.songName}</span>
+              <span className="text-sm">{song.song.songName}</span>
             </div>
-            {song.songKey && (
+            {song.song.songKey && (
               <Badge variant="secondary" className="text-xs">
-                {song.songKey} Key
+                {song.song.songKey} Key
               </Badge>
             )}
           </div>

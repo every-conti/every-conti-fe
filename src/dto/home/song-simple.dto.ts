@@ -1,10 +1,6 @@
-import { SongKeyTypes } from "src/types/song/song-key.types";
+import {MinimumSongToPlayDto} from "src/dto/common/minimum-song-to-play.dto";
 
 export default interface SongSimpleDto {
-  id: string;
-  songName: string;
-  songKey: SongKeyTypes;
-  duration: number;
-  thumbnail: string;
+  song: MinimumSongToPlayDto;
   idx: number;
 }

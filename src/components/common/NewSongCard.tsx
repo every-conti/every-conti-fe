@@ -12,7 +12,7 @@ export default function NewSongCard({ song }: { song: MinimumSongToPlayDto }) {
 
   return (
       <Card className="overflow-hidden hover:shadow-lg transition-shadow">
-          <PlayButton song={song}>
+          <PlayButton songs={[song]}>
               <div className="relative">
               <ImageWithFallback
                   src={thumbnail}

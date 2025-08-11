@@ -26,7 +26,7 @@ export const usePlayerStore = create<PlayerStore>((set) => ({
       const list = [...s.playlist, ...songs];
       return {
         playlist: list,
-        currentSongIndex: list.length - 1,
+        currentSongIndex: s.playlist.length,
         isPlaying: true,
       };
     });

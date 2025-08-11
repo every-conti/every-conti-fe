@@ -10,18 +10,17 @@ import loadingIcon from "src/assets/loading.gif";
 
 const navItems = [
   {
-    label: "찬양",
-    children: [
-      { label: "검색", path: "/song/search" },
-      { label: "등록", path: "/song/create" },
-    ],
-  },
-  {
     label: "콘티",
     children: [
-      { label: "콘티 보기", path: "/conti" },
-      // { label: "팔로잉 콘티", path: "/conti/following" },
+      { label: "콘티 검색", path: "/conti/search" },
       { label: "등록", path: "/conti/create"}
+    ],
+  },
+    {
+    label: "찬양",
+    children: [
+      { label: "찬양 검색", path: "/song/search" },
+      { label: "찬양 등록", path: "/song/create" },
     ],
   },
 ];

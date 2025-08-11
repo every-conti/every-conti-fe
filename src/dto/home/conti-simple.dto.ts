@@ -1,4 +1,4 @@
-import SongSimpleDto from "./song-simple.dto";
+import SongSimpleDto from "src/dto/home/song-simple.dto";
 
 export default interface ContiSimpleDto {
   id: string;

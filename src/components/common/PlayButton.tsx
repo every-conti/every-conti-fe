@@ -6,15 +6,15 @@ import {usePlayerStore} from "src/store/usePlayerStore";
 import {ReactNode} from "react";
 
 interface PlayButtonProps {
-    song: MinimumSongToPlayDto;
+    songs: MinimumSongToPlayDto[];
     children?: ReactNode;
 }
 
-export default function PlayButton({ song, children }: PlayButtonProps) {
+export default function PlayButton({ songs, children }: PlayButtonProps) {
     const enqueueAndPlay = usePlayerStore((s) => s.enqueueAndPlay); // 또는 playOne
 
     const handlePlay = () => {
-        enqueueAndPlay([song]);
+        enqueueAndPlay(songs);
     };
 
     return (

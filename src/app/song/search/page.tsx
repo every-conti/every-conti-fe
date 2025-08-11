@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import {useEffect, useMemo, useState} from "react";
 import { useDebounce } from "use-debounce";
 import { useInView } from "react-intersection-observer";
 import {
@@ -18,10 +18,16 @@ import SongSeasonDto from "src/dto/common/song-season.dto";
 import SongThemeDto from "src/dto/common/song-theme.dto";
 import { SongKeyTypes } from "src/types/song/song-key.types";
 import { SongTempoTypes } from "src/types/song/song-tempo.types";
-import { SongTypeTypes } from "src/types/song/song-type.types";
+import {SongTypeKorean, SongTypeTypes} from "src/types/song/song-type.types";
 import PageTitle from "src/components/common/PageTitle";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+
 
 export default function SearchDetail() {
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+
   const [searchTerm, setSearchTerm] = useState<string | null>(null);
   const [debouncedSearchTerm] = useDebounce(searchTerm, 400);
   const [selectedKey, setSelectedKey] = useState<SongKeyTypes | null>(null);
@@ -43,8 +49,10 @@ export default function SearchDetail() {
   const [selectedBibleVerse, setSelectedBibleVerse] =
     useState<BibleVerseDto | null>(null);
 
-  const { data: searchProperties } = useSongPropertiesQuery();
+    const [chapters, setChapters] = useState<BibleChapterDto[]>([]);
+    const [verses, setVerses] = useState<BibleVerseDto[]>([]);
 
+  const { data: searchProperties } = useSongPropertiesQuery();
 
   const {
     data,
@@ -78,12 +86,124 @@ export default function SearchDetail() {
     const { ref, inView } = useInView({ threshold: 1 });
 
   const songs = data?.pages.flatMap((page) => page.items) ?? [];
+    const [isRestored, setIsRestored] = useState(false);
 
   useEffect(() => {
     if (inView && hasNextPage) {
       fetchNextPage();
     }
   }, [inView, hasNextPage, fetchNextPage]);
+
+    const parseIntOrNull = (v?: string | null) =>
+        v != null && v !== "" && !Number.isNaN(Number(v)) ? Number(v) : null;
+
+    // URL -> State (첫 마운트 + 브라우저 뒤/앞 이동)
+    useEffect(() => {
+        if (!searchProperties) return;
+
+        const needsBible = searchParams.get("bible");
+        if (needsBible && (chapters.length === 0 || verses.length === 0)) return;
+
+        // searchParams는 읽기 전용 스냅샷이라 매번 새로 읽어와야 함
+        const text = searchParams.get("text");
+        const songType = searchParams.get("songType") as SongTypeTypes | null;
+        const tempo = searchParams.get("tempo") as SongTempoTypes | null;
+        const songKey = searchParams.get("songKey") as SongKeyTypes | null;
+
+        const praiseTeam = searchParams.get("praiseTeam");
+        const season = searchParams.get("season");
+        const duration = parseIntOrNull(searchParams.get("duration"));
+        const bible = searchParams.get("bible");
+        const chapter = parseIntOrNull(searchParams.get("chapter"));
+        const verse = parseIntOrNull(searchParams.get("verse"));
+
+        const themeIdsRaw = searchParams.get("themes");
+        const themeIds = themeIdsRaw
+            ? themeIdsRaw
+                .split(",")
+            : [];
+
+
+        // 문자열들은 그대로, 숫자 id들은 필요한 최소 필드만 세팅
+        setSearchTerm(text ?? null);
+        setSelectedSongType(songType ? songType : null);
+        setSelectedTempo(tempo ?? null);
+        setSelectedKey(songKey ?? null);
+
+        setSelectedPraiseTeam(
+            praiseTeam ? ( searchProperties?.praiseTeams.find(t => t.praiseTeamName === praiseTeam) as PraiseTeamDto) : null
+        );
+        setSelectedSeason(season ? (searchProperties?.seasons.find(s => s.seasonName === season) as SongSeasonDto) : null);
+        setSelectedDuration(duration);
+
+        setSelectedBible(bible ? (searchProperties?.bibles.find(b => b.bibleKoName === bible) as BibleDto) : null);
+        setSelectedBibleChapter(
+            chapters ? chapters.find(ch => ch.chapterNum === chapter) as BibleChapterDto : null
+        );
+        setSelectedBibleVerse(
+            verses ? verses.find(v => v.verseNum === verse) as BibleVerseDto : null
+        );
+
+        setSelectedThemes(
+            themeIds.length > 0
+                ? searchProperties?.songThemes.filter((th) =>
+                themeIds.includes(String(th.themeName))
+            ) ?? []
+                : []
+        );
+
+        setIsRestored(true);
+    }, [searchParams, searchProperties, chapters, verses]);
+
+    // State -> URL
+    const serialized = useMemo(() => {
+        const params = new URLSearchParams();
+
+        const set = (k: string, v: string | number | null | undefined) => {
+            if (v === null || v === undefined || v === "") return;
+            params.set(k, String(v));
+        };
+
+        set("text", debouncedSearchTerm ?? undefined);
+        set("songType", selectedSongType ?? undefined);
+        set("tempo", selectedTempo ?? undefined);
+        set("songKey", selectedKey ?? undefined);
+        set("praiseTeam", selectedPraiseTeam?.praiseTeamName);
+        set("season", selectedSeason?.seasonName);
+        set("duration", selectedDuration ?? undefined);
+        set("bible", selectedBible?.bibleKoName);
+        set("chapter", selectedBibleChapter?.chapterNum);
+        set("verse", selectedBibleVerse?.verseNum);
+
+        if (selectedThemes.length > 0) {
+            set("themes", selectedThemes.map((th) => th.themeName).join(","));
+        }
+
+        return params.toString();
+    }, [
+        debouncedSearchTerm,
+        selectedSongType,
+        selectedTempo,
+        selectedKey,
+        selectedPraiseTeam,
+        selectedSeason,
+        selectedDuration,
+        selectedBible,
+        selectedBibleChapter,
+        selectedBibleVerse,
+        selectedThemes,
+    ]);
+
+    useEffect(() => {
+        if (!isRestored) return; // 최초 복원 전에는 URL 갱신 안 함
+        const next = serialized ? `${pathname}?${serialized}` : pathname;
+        const current = searchParams.toString()
+            ? `${pathname}?${searchParams.toString()}`
+            : pathname;
+        if (next !== current) {
+            router.replace(next, { scroll: false });
+        }
+    }, [serialized, pathname, isRestored]);
 
   return (
     <>
@@ -114,6 +234,10 @@ export default function SearchDetail() {
           setSelectedBibleChapter={setSelectedBibleChapter}
           selectedBibleVerse={selectedBibleVerse}
           setSelectedBibleVerse={setSelectedBibleVerse}
+          chapters={chapters}
+          setChapters={setChapters}
+          verses={verses}
+          setVerses={setVerses}
         />
       )}
 

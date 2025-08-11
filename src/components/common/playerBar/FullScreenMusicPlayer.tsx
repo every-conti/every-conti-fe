@@ -303,11 +303,6 @@ export default function FullScreenMusicPlayer(props: MusicPlayerPropsDto) {
                                         <Badge variant="outline" className="bg-white/10 text-white border-white/20">
                                             {currentSong.songType}
                                         </Badge>
-                                        {playlist.length > 1 && (
-                                            <Badge variant="outline" className="bg-white/10 text-white border-white/20">
-                                                {(currentSongIndex ?? 0) + 1}/{playlist.length}
-                                            </Badge>
-                                        )}
                                     </div>
                                 </div>
 

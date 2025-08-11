@@ -15,7 +15,7 @@ export default function WorshipSearchCard(song: SongDetailDto) {
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow">
       <div className="flex flex-col sm:flex-row">
-      <PlayButton song={song}>
+      <PlayButton songs={[song]}>
           {/* 썸네일 */}
           <div className="relative w-full h-40 sm:w-60 sm:h-auto flex-shrink-0">
             <ImageWithFallback
@@ -79,7 +79,7 @@ export default function WorshipSearchCard(song: SongDetailDto) {
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mt-4">
             {/* 왼쪽 버튼들 */}
             <div className="flex items-center space-x-2">
-              <PlayButton song={song}>
+              <PlayButton songs={[song]}>
                 <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
                   <Play className="w-4 h-4 mr-1" />
                   재생

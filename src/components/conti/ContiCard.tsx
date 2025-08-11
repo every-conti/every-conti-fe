@@ -15,12 +15,13 @@ import shareContent from "src/utils/shareContent";
 import {useState} from "react";
 import {useAuthStore} from "src/store/useAuthStore";
 import {fetchContiCopyProperties} from "src/app/api/conti";
+import PlayButton from "src/components/common/PlayButton";
 
 const ContiCard = ({ conti }: { conti: FamousContiDto }) => {
     const [copying, setCopying] = useState(false);
     const { user } = useAuthStore();
 
-    const totalDuration = conti.conti.songs.reduce((total, song) => total + song.duration, 0);
+    const totalDuration = conti.conti.songs.reduce((total, song) => total + song.song.duration, 0);
 
     const formatTotalDuration = (totalSeconds: number) => {
         const minutes = Math.floor(totalSeconds / 60);
@@ -47,27 +48,29 @@ const ContiCard = ({ conti }: { conti: FamousContiDto }) => {
               {/*onClick={() => onViewContiDetail && onViewContiDetail(convertToContiDetail(conti))}>*/}
 
             {/* 썸네일 */}
-            <div className="relative aspect-video overflow-hidden">
-                <ImageWithFallback
-                    src={conti.conti.songs[0].thumbnail}
-                    alt={conti.conti.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
+            <PlayButton songs={conti.conti.songs.map(s => s.song)}>
+                <div className="relative aspect-video overflow-hidden">
+                    <ImageWithFallback
+                        src={conti.conti.songs[0].song.thumbnail}
+                        alt={conti.conti.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
 
-                {/* 재생 오버레이 */}
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200 flex items-center justify-center">
-                    <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                        <Play className="w-5 h-5 text-gray-800 ml-0.5" />
+                    {/* 재생 오버레이 */}
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200 flex items-center justify-center">
+                        <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                            <Play className="w-5 h-5 text-gray-800 ml-0.5" />
+                        </div>
+                    </div>
+
+                    {/* 곡 수 배지 */}
+                    <div className="absolute top-3 right-3">
+                        <Badge variant="secondary" className="bg-black/50 text-white border-0">
+                            {conti.conti.songs.length}곡
+                        </Badge>
                     </div>
                 </div>
-
-                {/* 곡 수 배지 */}
-                <div className="absolute top-3 right-3">
-                    <Badge variant="secondary" className="bg-black/50 text-white border-0">
-                        {conti.conti.songs.length}곡
-                    </Badge>
-                </div>
-            </div>
+            </PlayButton>
 
             {/* 콘티 정보 */}
             <div className="p-4">
@@ -130,8 +133,8 @@ const ContiCard = ({ conti }: { conti: FamousContiDto }) => {
                 {/* 노래 태그 */}
                 <div className="flex flex-wrap gap-1 mb-3">
                     {conti.conti.songs.slice(0, 4).map(song => (
-                        <Badge key={song.id} variant="outline" className="text-xs">
-                            {song.songName}
+                        <Badge key={song.song.id} variant="outline" className="text-xs">
+                            {song.song.songName}
                         </Badge>
                     ))}
                     {conti.conti.songs.length > 4 && (

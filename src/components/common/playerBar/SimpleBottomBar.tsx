@@ -82,7 +82,7 @@ export default function SimpleBottomBar(props: MusicPlayerPropsDto){
 
     return (
         <>
-            <div style={{ height: spacerH }} />
+            <div style={{ height: spacerH }} className="bg-gray-100" />
             <div className="fixed bottom-4 left-4 right-4 z-50 max-w-[1100px] mx-auto" ref={setBarRef}>
                 <div className="bg-white border-t border-gray-200 shadow-lg rounded-2xl overflow-hidden">
                     {/* 모바일: 기존 스타일 유지 + 좌측 텍스트 / 우측 컨트롤 + 토글 */}

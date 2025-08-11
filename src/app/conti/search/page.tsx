@@ -3,7 +3,6 @@ import PageTitle from "src/components/common/PageTitle";
 import ContiCard from "src/components/conti/ContiCard";
 import {useInfiniteSearchContiQuery} from "src/app/api/conti";
 import LoadingSpinner from "src/components/common/LoadingSpinner";
-import WorshipSearchCard from "src/components/song/search/WorshipSearchCard";
 import {useInView} from "react-intersection-observer";
 import {useAuthStore} from "src/store/useAuthStore";
 

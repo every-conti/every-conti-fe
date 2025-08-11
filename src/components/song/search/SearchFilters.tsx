@@ -55,6 +55,10 @@ interface SearchFiltersProps {
   setSelectedBibleChapter: (chapter: BibleChapterDto | null) => void;
   selectedBibleVerse: BibleVerseDto | null;
   setSelectedBibleVerse: (verse: BibleVerseDto | null) => void;
+  chapters: BibleChapterDto[];
+  setChapters: (chapters: BibleChapterDto[]) => void;
+  verses: BibleVerseDto[];
+  setVerses: (verses: BibleVerseDto[]) => void;
 }
 
 export default function SearchFilters({
@@ -81,6 +85,10 @@ export default function SearchFilters({
   setSelectedBibleChapter,
   selectedBibleVerse,
   setSelectedBibleVerse,
+    chapters,
+    setChapters,
+    verses,
+    setVerses,
 }: SearchFiltersProps) {
   const [filterOpen, setFilterOpen] = useState(false);
   const [openSelectId, setOpenSelectId] = useState<string | null>(null);
@@ -92,8 +100,6 @@ export default function SearchFilters({
   const songThemes = searchProperties.songThemes;
   const songTempos = searchProperties.songTempos;
   const seasons = searchProperties.seasons;
-  const [chapters, setChapters] = useState<BibleChapterDto[]>([]);
-  const [verses, setVerses] = useState<BibleVerseDto[]>([]);
 
   const hasActiveFilters =
     selectedKey !== null ||
