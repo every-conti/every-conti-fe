@@ -42,7 +42,7 @@ export const useInfiniteSearchSongQuery = (
     queryKey: ["searchSongs", params],
     queryFn: async ({ pageParam = 0 }) => {
       const offset = pageParam as number;
-      const fullParams: SearchSongQueriesDto = { ...params, offset }; // ✅ offset 추가
+      const fullParams: SearchSongQueriesDto = { ...params, offset };
       const res: InfiniteSongSearchDto = await apiRequestWithRefresh(
           `/song/search?${buildQueryParams(fullParams)}`,
           apiOptions
@@ -50,6 +50,7 @@ export const useInfiniteSearchSongQuery = (
       return res;
     },
     initialPageParam: 0,
+    enabled: params.enabled ?? true,
     getNextPageParam: (lastPage) => lastPage?.nextOffset ?? undefined,
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,

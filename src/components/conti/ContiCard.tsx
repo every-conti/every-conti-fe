@@ -14,8 +14,8 @@ import {
 import shareContent from "src/utils/shareContent";
 import {useState} from "react";
 import {useAuthStore} from "src/store/useAuthStore";
-import {fetchContiCopyProperties} from "src/app/api/conti";
 import PlayButton from "src/components/common/PlayButton";
+import {fetchContiCopy} from "src/app/api/conti";
 
 const ContiCard = ({ conti }: { conti: FamousContiDto }) => {
     const [copying, setCopying] = useState(false);
@@ -34,7 +34,7 @@ const ContiCard = ({ conti }: { conti: FamousContiDto }) => {
         // if (!onCopyConti || !contiId) return;
         try {
             setCopying(true);
-            await fetchContiCopyProperties(conti.conti.id);
+            await fetchContiCopy(conti.conti.id);
             // toast?.({ description: "내 콘티로 복사되었어요." });
         } catch (e: any) {
             // toast?.({ variant: "destructive", description: e?.message ?? "복사 중 오류가 발생했습니다." });

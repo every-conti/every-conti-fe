@@ -65,7 +65,7 @@ export default function MultiSelect({
     <div className="relative" ref={ref}>
       <Button
         variant="outline"
-        className="w-43.5 justify-between"
+        className="justify-between w-40 md:w-60"
         onClick={() => setOpen((prev) => !prev)}
       >
         <span className={cn(

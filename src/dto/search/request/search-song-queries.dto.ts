@@ -10,9 +10,11 @@ export interface SearchSongQueriesDto {
   tempo?: SongTempoTypes;
   seasonId?: string;
   songKey?: SongKeyTypes;
-  duration?: number;
+  minDuration?: number;
+  maxDuration?: number;
   bibleId?: string;
   bibleChapterId?: string;
   bibleVerseId?: string;
   offset?: number | null;
+  enabled?: boolean;
 }

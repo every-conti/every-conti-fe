@@ -27,7 +27,7 @@ export default async function App() {
                   </div>
                   <h3 className="text-lg sm:text-2xl font-semibold text-gray-800 mb-2">콘티 등록</h3>
                   <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">
-                    예배에 사용할 콘티를 손쉽게 등록하고 구성할 수 있어요.
+                    예배에 사용할 콘티를 손쉽게 등록해보세요.
                   </p>
                   <Button className="bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base px-6 py-2 sm:px-8 sm:py-3 rounded-full">
                     콘티 만들기 <ArrowRight className="w-4 h-4 ml-2" />

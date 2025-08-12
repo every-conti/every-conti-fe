@@ -150,12 +150,10 @@ export default function PlayerBar() {
         light: false,
         muted: false,
         played: 0,
-        loaded: 0,
         duration: 0,
         // playbackRate: 1.0,
         loop: false,
         seeking: false,
-        loadedSeconds: 0,
         playedSeconds: 0,
     };
     const [state, setState] = useState<ReactPlayerStateDto>(initialState);

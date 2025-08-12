@@ -21,6 +21,7 @@ import { SongTempoTypes } from "src/types/song/song-tempo.types";
 import {SongTypeKorean, SongTypeTypes} from "src/types/song/song-type.types";
 import PageTitle from "src/components/common/PageTitle";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import {MIN_SONG_DURATION, MAX_SONG_DURATION} from "src/constant/conti/conti-search.constant";
 
 
 export default function SearchDetail() {
@@ -36,13 +37,13 @@ export default function SearchDetail() {
   const [selectedPraiseTeam, setSelectedPraiseTeam] =
     useState<PraiseTeamDto | null>(null);
   const [selectedThemes, setSelectedThemes] = useState<SongThemeDto[]>([]);
-  const [selectedTempo, setSelectedTempo] = useState<SongTempoTypes | null>(
+    const [duration, setDuration] = useState<[number, number]>([MIN_SONG_DURATION, MAX_SONG_DURATION]);
+    const [selectedTempo, setSelectedTempo] = useState<SongTempoTypes | null>(
     null
   );
   const [selectedSeason, setSelectedSeason] = useState<SongSeasonDto | null>(
     null
   );
-  const [selectedDuration, setSelectedDuration] = useState<number | null>(null);
   const [selectedBible, setSelectedBible] = useState<BibleDto | null>(null);
   const [selectedBibleChapter, setSelectedBibleChapter] =
     useState<BibleChapterDto | null>(null);
@@ -68,7 +69,8 @@ export default function SearchDetail() {
       praiseTeamId: selectedPraiseTeam?.id,
       tempo: selectedTempo ?? undefined,
       seasonId: selectedSeason?.id,
-      duration: selectedDuration ?? undefined,
+      minDuration: duration[0] ?? undefined,
+      maxDuration: duration[1] ?? undefined,
       bibleId: selectedBible?.id,
       bibleChapterId: selectedBibleChapter?.id,
       bibleVerseId: selectedBibleVerse?.id,
@@ -82,8 +84,7 @@ export default function SearchDetail() {
     }
   );
 
-
-    const { ref, inView } = useInView({ threshold: 1 });
+  const { ref, inView } = useInView({ threshold: 1 });
 
   const songs = data?.pages.flatMap((page) => page.items) ?? [];
     const [isRestored, setIsRestored] = useState(false);
@@ -100,9 +101,7 @@ export default function SearchDetail() {
     // URL -> State (첫 마운트 + 브라우저 뒤/앞 이동)
     useEffect(() => {
         if (!searchProperties) return;
-
-        const needsBible = searchParams.get("bible");
-        if (needsBible && (chapters.length === 0 || verses.length === 0)) return;
+        console.log("searchParams", searchParams);
 
         // searchParams는 읽기 전용 스냅샷이라 매번 새로 읽어와야 함
         const text = searchParams.get("text");
@@ -112,7 +111,8 @@ export default function SearchDetail() {
 
         const praiseTeam = searchParams.get("praiseTeam");
         const season = searchParams.get("season");
-        const duration = parseIntOrNull(searchParams.get("duration"));
+        const minDuration = parseIntOrNull(searchParams.get("min"));
+        const maxDuration = parseIntOrNull(searchParams.get("max"));
         const bible = searchParams.get("bible");
         const chapter = parseIntOrNull(searchParams.get("chapter"));
         const verse = parseIntOrNull(searchParams.get("verse"));
@@ -134,7 +134,7 @@ export default function SearchDetail() {
             praiseTeam ? ( searchProperties?.praiseTeams.find(t => t.praiseTeamName === praiseTeam) as PraiseTeamDto) : null
         );
         setSelectedSeason(season ? (searchProperties?.seasons.find(s => s.seasonName === season) as SongSeasonDto) : null);
-        setSelectedDuration(duration);
+        setDuration([minDuration ?? MIN_SONG_DURATION, maxDuration ?? MAX_SONG_DURATION]);
 
         setSelectedBible(bible ? (searchProperties?.bibles.find(b => b.bibleKoName === bible) as BibleDto) : null);
         setSelectedBibleChapter(
@@ -153,7 +153,7 @@ export default function SearchDetail() {
         );
 
         setIsRestored(true);
-    }, [searchParams, searchProperties, chapters, verses]);
+    }, [searchProperties, chapters, verses]);
 
     // State -> URL
     const serialized = useMemo(() => {
@@ -170,7 +170,8 @@ export default function SearchDetail() {
         set("songKey", selectedKey ?? undefined);
         set("praiseTeam", selectedPraiseTeam?.praiseTeamName);
         set("season", selectedSeason?.seasonName);
-        set("duration", selectedDuration ?? undefined);
+        set("min", duration[0] ?? undefined);
+        set("max", duration[1] ?? undefined);
         set("bible", selectedBible?.bibleKoName);
         set("chapter", selectedBibleChapter?.chapterNum);
         set("verse", selectedBibleVerse?.verseNum);
@@ -187,7 +188,7 @@ export default function SearchDetail() {
         selectedKey,
         selectedPraiseTeam,
         selectedSeason,
-        selectedDuration,
+        duration,
         selectedBible,
         selectedBibleChapter,
         selectedBibleVerse,
@@ -226,8 +227,8 @@ export default function SearchDetail() {
           setSelectedTempo={setSelectedTempo}
           selectedSeason={selectedSeason}
           setSelectedSeason={setSelectedSeason}
-          selectedDuration={selectedDuration}
-          setSelectedDuration={setSelectedDuration}
+          duration={duration}
+          setDuration={setDuration}
           selectedBible={selectedBible}
           setSelectedBible={setSelectedBible}
           selectedBibleChapter={selectedBibleChapter}

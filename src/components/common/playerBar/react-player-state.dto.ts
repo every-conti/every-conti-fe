@@ -7,10 +7,8 @@ export interface ReactPlayerStateDto {
     light: boolean,
     muted: boolean,
     played: number,
-    loaded: number,
     duration: number,
     loop: boolean,
     seeking: boolean,
-    loadedSeconds: number,
     playedSeconds: number,
 }

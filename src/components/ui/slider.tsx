@@ -6,7 +6,6 @@ import {cn} from "src/lib/utils";
 
 
 interface SliderWithLoad extends React.ComponentProps<typeof SliderPrimitive.Root>{
-    loadedPercent?: number;
     variant?: "default" | "thin";
     sliderBarBG?: string;
 }
@@ -17,7 +16,6 @@ function Slider({
     value,
     min = 0,
     max = 100,
-    loadedPercent = 0,
     sliderBarBG,
     variant = "default",
     ...props
@@ -58,17 +56,6 @@ function Slider({
                         : "data-[orientation=horizontal]:h-4 data-[orientation=horizontal]:w-full data-[orientation=vertical]:w-1.5 data-[orientation=vertical]:h-full",
                 )}
             >
-                {/* 로드된 구간: 트랙 높이에 맞춰 꽉 채우기 */}
-                {loadedPercent > 0 && (
-                    <div
-                        className={cn(
-                            "absolute left-0 bg-gray-300/60 pointer-events-none transition-all",
-                            "data-[orientation=horizontal]:inset-y-0 data-[orientation=vertical]:inset-x-0",
-                        )}
-                        style={{ width: `${loadedPercent}%`, zIndex: 0 }}
-                    />
-                )}
-
                 <SliderPrimitive.Range
                     data-slot="slider-range"
                     className={cn("absolute data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full",

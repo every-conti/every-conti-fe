@@ -12,14 +12,14 @@ const navItems = [
   {
     label: "콘티",
     children: [
-      { label: "콘티 검색", path: "/conti/search" },
-      { label: "등록", path: "/conti/create"}
+      { label: "콘티 찾기", path: "/conti/search" },
+      { label: "콘티 등록", path: "/conti/create"}
     ],
   },
     {
     label: "찬양",
     children: [
-      { label: "찬양 검색", path: "/song/search" },
+      { label: "찬양 찾기", path: "/song/search" },
       { label: "찬양 등록", path: "/song/create" },
     ],
   },

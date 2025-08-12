@@ -94,7 +94,6 @@ export default function SimpleBottomBar(props: MusicPlayerPropsDto){
                                 onValueChange={handleSeek}
                                 max={100}
                                 step={0.1}
-                                loadedPercent={state.loaded}
                                 className="w-full h-1" // 높이 얇게
                             />
                         </div>
@@ -191,7 +190,6 @@ export default function SimpleBottomBar(props: MusicPlayerPropsDto){
                                         onValueChange={handleSeek}
                                         max={100}
                                         step={0.1}
-                                        loadedPercent={state.loaded}
                                         className="w-full"
                                     />
                                     <div className="flex justify-between text-xs text-gray-500 mt-1">

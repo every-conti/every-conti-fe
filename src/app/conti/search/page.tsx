@@ -1,34 +1,82 @@
 "use client";
 import PageTitle from "src/components/common/PageTitle";
 import ContiCard from "src/components/conti/ContiCard";
-import {useInfiniteSearchContiQuery} from "src/app/api/conti";
+import {useContiPropertiesQuery, useInfiniteSearchContiQuery} from "src/app/api/conti";
 import LoadingSpinner from "src/components/common/LoadingSpinner";
 import {useInView} from "react-intersection-observer";
 import {useAuthStore} from "src/store/useAuthStore";
+import ContiSearchFilters from "src/components/conti/ContiSearchFilters";
+import {useState} from "react";
+import {useDebounce} from "use-debounce";
+import {SongTypeTypes} from "src/types/song/song-type.types";
+import PraiseTeamDto from "src/dto/common/praise-team.dto";
+import {SongDetailDto} from "src/dto/common/song-detail.dto";
+import {MAX_TOTAL_DURATION, MIN_TOTAL_DURATION} from "src/constant/conti/conti-search.constant";
 
 export default function ContiFeedPage() {
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isLoading,
-    isError,
-  } = useInfiniteSearchContiQuery(
-      {},
-      {
-        getNextPageParam: (lastPage: { nextOffset: number | null }) =>
-            lastPage.nextOffset ?? undefined,
-      }
-  );
 
   const { user } = useAuthStore();
-  const contis = data?.pages.flatMap((page) => page.items) ?? [];
+
   const { ref, inView } = useInView({ threshold: 1 });
 
-  return (
+    const [searchTerm, setSearchTerm] = useState<string | null>(null);
+    const [songSearchTerm, setSongSearchTerm] = useState<string | null>(null);
+    const [debouncedSearchTerm] = useDebounce(searchTerm, 400);
+    const [debouncedSongSearchTerm] = useDebounce(songSearchTerm, 400);
+
+    const [selectedSongType, setSelectedSongType] =
+        useState<SongTypeTypes | null>(null);
+    const [selectedPraiseTeam, setSelectedPraiseTeam] =
+        useState<PraiseTeamDto | null>(null);
+    const [duration, setDuration] = useState<[number, number]>([MIN_TOTAL_DURATION, MAX_TOTAL_DURATION]);
+    const [selectedSongs, setSelectedSongs] = useState<SongDetailDto[]>([]);
+
+    const { data: searchProperties } = useContiPropertiesQuery();
+    const {
+        data,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        isLoading,
+        isError,
+    } = useInfiniteSearchContiQuery(
+        {
+            text: debouncedSearchTerm ?? undefined,
+            songType: selectedSongType ?? undefined,
+            praiseTeamId: selectedPraiseTeam?.id,
+            songIds: selectedSongs ? selectedSongs.map(s => s.id) : undefined,
+            minTotalDuration: duration[0] !== MIN_TOTAL_DURATION * 60 ? duration[0] : undefined,
+            maxTotalDuration:  duration[1] !== MAX_TOTAL_DURATION * 60 ? duration[1] : undefined,
+        },
+        {
+            getNextPageParam: (lastPage: { nextOffset: number | null }) =>
+                lastPage.nextOffset ?? undefined,
+        }
+    );
+    const contis = data?.pages.flatMap((page) => page.items) ?? [];
+
+    return (
     <>
       <PageTitle title="콘티 보기" description="다양한 찬양팀들의 콘티를 둘러보세요" />
+
+      {searchProperties && (
+          <ContiSearchFilters
+            searchProperties={searchProperties}
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            songSearchTerm={songSearchTerm}
+            debouncedSongSearchTerm={debouncedSongSearchTerm}
+            selectedSongs={selectedSongs}
+            setSelectedSongs={setSelectedSongs}
+            setSongSearchTerm={setSongSearchTerm}
+            selectedSongType={selectedSongType}
+            setSelectedSongType={setSelectedSongType}
+            selectedPraiseTeam={selectedPraiseTeam}
+            setSelectedPraiseTeam={setSelectedPraiseTeam}
+            duration={duration}
+            setDuration={setDuration}
+        />)
+      }
 
       <div className="max-w-4xl mx-auto py-8 px-6">
         {/*<Tabs defaultValue="popular" className="w-full">*/}
