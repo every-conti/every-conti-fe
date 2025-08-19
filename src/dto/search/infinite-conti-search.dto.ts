@@ -1,6 +1,6 @@
-import FamousContiDto from "src/dto/home/famous-conti.dto";
+import ContiWithSongDto from "src/dto/common/conti-with-song.dto";
 
 export interface InfiniteContiSearchDto {
-  items: FamousContiDto[];
+  items: ContiWithSongDto[];
   nextOffset: number | null;
 }

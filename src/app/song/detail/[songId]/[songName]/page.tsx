@@ -8,7 +8,7 @@ import {
     Clock,
     Music,
     BookOpen,
-    Timer, Users
+    Timer, Users, ArrowLeft, MoreVertical
 } from "lucide-react";
 import {Button} from "src/components/ui/button";
 import {Card} from "src/components/ui/card";
@@ -25,16 +25,21 @@ import {SongTypeKorean} from "src/types/song/song-type.types";
 import {SongTempoKorean} from "src/types/song/song-tempo.types";
 import {useRouter} from "next/navigation";
 import shareContent from "src/utils/shareContent";
+import {usePlayerStore} from "src/store/usePlayerStore";
+import {MinimumSongToPlayDto} from "src/dto/common/minimum-song-to-play.dto";
+import {useCurrentSong} from "src/store/useCurrentSong";
 
 export default function Page({ params }: { params: Promise<{ songId: string; songName: string }> }) {
     const router = useRouter();
     const { songId, songName } = use(params);
+    const {isPlaying, setIsPlaying, enqueueAndPlay} = usePlayerStore();
+    const currentSong = useCurrentSong();
 
     const { data: song } = useSongDetailQuery(songId);
     const { data: coUsedSongs } = useCoUsedSongsQuery(songId);
 
+    const isCurrentSongPlaying = currentSong?.id === song?.id && isPlaying;
     const [isLiked, setIsLiked] = useState(false);
-    const [isPlaying, setIsPlaying] = useState(false);
 
     const handleAddToConti = () => {
         // onAddToConti(song);
@@ -42,29 +47,43 @@ export default function Page({ params }: { params: Promise<{ songId: string; son
 
     const handleLike = () => {
         setIsLiked(!isLiked);
-        // toast.success(isLiked ? "좋아요를 취소했습니다" : "좋아요를 눌렀습니다");
     };
 
     const handlePlay = () => {
-        setIsPlaying(!isPlaying);
-        // toast.success(isPlaying ? "재생을 중지했습니다" : "재생을 시작했습니다");
+        if (!song) return;
+
+        if (currentSong?.id === song.id) {
+            setIsPlaying(!isPlaying);
+        } else {
+            enqueueAndPlay([song as MinimumSongToPlayDto]);
+        }
     };
 
     return (
         <div className="min-h-screen bg-gray-50">
-            {/* 헤더 */}
-            {/*<div className="bg-white border-b border-gray-200 sticky top-16 z-40">*/}
-            {/*    <div className="max-w-4xl mx-auto px-6 py-4">*/}
-            {/*        <Button*/}
-            {/*            variant="ghost"*/}
-            {/*            onClick={onBack}*/}
-            {/*            className="mb-4"*/}
-            {/*        >*/}
-            {/*            <ArrowLeft className="w-4 h-4 mr-2" />*/}
-            {/*            검색으로 돌아가기*/}
-            {/*        </Button>*/}
-            {/*    </div>*/}
-            {/*</div>*/}
+            <div className="bg-white border-b border-gray-200">
+                <div className="max-w-4xl mx-auto px-6 py-4">
+                    <div className="flex items-center justify-between">
+                        <Button
+                            variant="ghost"
+                            onClick={router.back}
+                            className="flex items-center"
+                        >
+                            <ArrowLeft className="w-4 h-4 mr-2"/>
+                            뒤로
+                        </Button>
+
+                        <div className="flex items-center space-x-2">
+                            <Button variant="ghost" size="sm" onClick={() => shareContent("song")}>
+                                <Share2 className="w-4 h-4"/>
+                            </Button>
+                            <Button variant="ghost" size="sm">
+                                <MoreVertical className="w-4 h-4"/>
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <div className="max-w-4xl mx-auto px-6 py-8">
                 {/* 메인 정보 카드 */}
@@ -84,15 +103,15 @@ export default function Page({ params }: { params: Promise<{ songId: string; son
                                     onClick={handlePlay}
                                     className="w-full bg-blue-600 hover:bg-blue-700"
                                 >
-                                    <Play className={`w-5 h-5 mr-2 ${isPlaying ? 'hidden' : ''}`} />
-                                    <div className={`w-5 h-5 mr-2 ${isPlaying ? '' : 'hidden'}`}>
+                                    <Play className={`w-5 h-5 mr-2 ${isCurrentSongPlaying ? 'hidden' : ''}`} />
+                                    <div className={`w-5 h-5 mr-2 ${isCurrentSongPlaying ? '' : 'hidden'}`}>
                                         <div className="flex space-x-1">
                                             <div className="w-1 h-5 bg-white rounded animate-pulse"></div>
                                             <div className="w-1 h-5 bg-white rounded animate-pulse" style={{animationDelay: '0.2s'}}></div>
                                             <div className="w-1 h-5 bg-white rounded animate-pulse" style={{animationDelay: '0.4s'}}></div>
                                         </div>
                                     </div>
-                                    {isPlaying ? '재생 중...' : '재생하기'}
+                                    {isCurrentSongPlaying ? '재생 중...' : '재생하기'}
                                 </Button>
                             </div>
                         </div>
@@ -199,11 +218,6 @@ export default function Page({ params }: { params: Promise<{ songId: string; son
                                 >
                                     <Heart className={`w-4 h-4 mr-1 ${isLiked ? 'fill-current' : ''}`} />
                                     좋아요
-                                </Button>
-
-                                <Button variant="outline" onClick={() => shareContent("song")}>
-                                    <Share2 className="w-4 h-4 mr-1" />
-                                    공유하기
                                 </Button>
                             </div>
                         </div>
@@ -349,7 +363,7 @@ export default function Page({ params }: { params: Promise<{ songId: string; son
                                                     className="w-9 h-9 sm:w-10 sm:h-10 p-0 hover:bg-blue-50 hover:text-blue-600"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        // ...
+                                                        enqueueAndPlay([relatedSong.song]);
                                                     }}
                                                 >
                                                     <Play className="w-4 h-4" />

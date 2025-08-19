@@ -41,6 +41,7 @@ export default function SearchDetail() {
     const [selectedTempo, setSelectedTempo] = useState<SongTempoTypes | null>(
     null
   );
+    const durationChanged = duration[0] !== MIN_SONG_DURATION || duration[1] !== MAX_SONG_DURATION;
   const [selectedSeason, setSelectedSeason] = useState<SongSeasonDto | null>(
     null
   );
@@ -69,8 +70,8 @@ export default function SearchDetail() {
       praiseTeamId: selectedPraiseTeam?.id,
       tempo: selectedTempo ?? undefined,
       seasonId: selectedSeason?.id,
-      minDuration: duration[0] ?? undefined,
-      maxDuration: duration[1] ?? undefined,
+      minDuration: durationChanged ? duration[0] * 60 : undefined,
+      maxDuration: durationChanged ? duration[1] * 60 : undefined,
       bibleId: selectedBible?.id,
       bibleChapterId: selectedBibleChapter?.id,
       bibleVerseId: selectedBibleVerse?.id,
@@ -101,7 +102,6 @@ export default function SearchDetail() {
     // URL -> State (첫 마운트 + 브라우저 뒤/앞 이동)
     useEffect(() => {
         if (!searchProperties) return;
-        console.log("searchParams", searchParams);
 
         // searchParams는 읽기 전용 스냅샷이라 매번 새로 읽어와야 함
         const text = searchParams.get("text");

@@ -11,7 +11,10 @@ import {useDebounce} from "use-debounce";
 import {SongTypeTypes} from "src/types/song/song-type.types";
 import PraiseTeamDto from "src/dto/common/praise-team.dto";
 import {SongDetailDto} from "src/dto/common/song-detail.dto";
-import {MAX_TOTAL_DURATION, MIN_TOTAL_DURATION} from "src/constant/conti/conti-search.constant";
+import {
+    MAX_TOTAL_DURATION,
+    MIN_TOTAL_DURATION
+} from "src/constant/conti/conti-search.constant";
 
 export default function ContiFeedPage() {
 
@@ -28,7 +31,10 @@ export default function ContiFeedPage() {
         useState<SongTypeTypes | null>(null);
     const [selectedPraiseTeam, setSelectedPraiseTeam] =
         useState<PraiseTeamDto | null>(null);
+    const [includePersonalConti, setIncludePersonalConti] = useState<boolean>(false);
     const [duration, setDuration] = useState<[number, number]>([MIN_TOTAL_DURATION, MAX_TOTAL_DURATION]);
+    const durationChanged = duration[0] !== MIN_TOTAL_DURATION || duration[1] !== MAX_TOTAL_DURATION;
+
     const [selectedSongs, setSelectedSongs] = useState<SongDetailDto[]>([]);
 
     const { data: searchProperties } = useContiPropertiesQuery();
@@ -45,8 +51,9 @@ export default function ContiFeedPage() {
             songType: selectedSongType ?? undefined,
             praiseTeamId: selectedPraiseTeam?.id,
             songIds: selectedSongs ? selectedSongs.map(s => s.id) : undefined,
-            minTotalDuration: duration[0] !== MIN_TOTAL_DURATION * 60 ? duration[0] : undefined,
-            maxTotalDuration:  duration[1] !== MAX_TOTAL_DURATION * 60 ? duration[1] : undefined,
+            minTotalDuration: durationChanged ? duration[0] * 60 : undefined,
+            maxTotalDuration:  durationChanged ? duration[1] * 60 : undefined,
+            includePersonalConti,
         },
         {
             getNextPageParam: (lastPage: { nextOffset: number | null }) =>
@@ -73,6 +80,8 @@ export default function ContiFeedPage() {
             setSelectedSongType={setSelectedSongType}
             selectedPraiseTeam={selectedPraiseTeam}
             setSelectedPraiseTeam={setSelectedPraiseTeam}
+            includePersonalConti={includePersonalConti}
+            setIncludePersonalConti={setIncludePersonalConti}
             duration={duration}
             setDuration={setDuration}
         />)
@@ -107,7 +116,7 @@ export default function ContiFeedPage() {
                 ) : (
                     <>
                         {contis.map((conti) => (
-                            <ContiCard key={conti.conti.id} conti={conti} />
+                            <ContiCard key={conti.id} conti={conti} />
                         ))}
 
                         <div ref={ref} />

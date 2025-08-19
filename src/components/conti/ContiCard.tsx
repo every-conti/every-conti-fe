@@ -3,7 +3,6 @@ import {ImageWithFallback} from "src/components/common/ImageWithFallback";
 import {Calendar, Clock, MoreHorizontal, Play, Plus, Share2} from "lucide-react";
 import { Button } from "../ui/button";
 import {Badge} from "src/components/ui/badge";
-import FamousContiDto from "src/dto/home/famous-conti.dto";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -16,12 +15,14 @@ import {useState} from "react";
 import {useAuthStore} from "src/store/useAuthStore";
 import PlayButton from "src/components/common/PlayButton";
 import {fetchContiCopy} from "src/app/api/conti";
+import Link from "next/link";
+import ContiWithSongDto from "src/dto/common/conti-with-song.dto";
 
-const ContiCard = ({ conti }: { conti: FamousContiDto }) => {
+const ContiCard = ({ conti }: { conti: ContiWithSongDto }) => {
     const [copying, setCopying] = useState(false);
     const { user } = useAuthStore();
 
-    const totalDuration = conti.conti.songs.reduce((total, song) => total + song.song.duration, 0);
+    const totalDuration = conti.songs.reduce((total, song) => total + song.song.duration, 0);
 
     const formatTotalDuration = (totalSeconds: number) => {
         const minutes = Math.floor(totalSeconds / 60);
@@ -34,7 +35,7 @@ const ContiCard = ({ conti }: { conti: FamousContiDto }) => {
         // if (!onCopyConti || !contiId) return;
         try {
             setCopying(true);
-            await fetchContiCopy(conti.conti.id);
+            await fetchContiCopy(conti.id);
             // toast?.({ description: "내 콘티로 복사되었어요." });
         } catch (e: any) {
             // toast?.({ variant: "destructive", description: e?.message ?? "복사 중 오류가 발생했습니다." });
@@ -48,11 +49,11 @@ const ContiCard = ({ conti }: { conti: FamousContiDto }) => {
               {/*onClick={() => onViewContiDetail && onViewContiDetail(convertToContiDetail(conti))}>*/}
 
             {/* 썸네일 */}
-            <PlayButton songs={conti.conti.songs.map(s => s.song)}>
+            <PlayButton songs={conti.songs.map(s => s.song)}>
                 <div className="relative aspect-video overflow-hidden">
                     <ImageWithFallback
-                        src={conti.conti.songs[0].song.thumbnail}
-                        alt={conti.conti.title}
+                        src={conti.songs[0].song.thumbnail}
+                        alt={conti.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
 
@@ -66,18 +67,19 @@ const ContiCard = ({ conti }: { conti: FamousContiDto }) => {
                     {/* 곡 수 배지 */}
                     <div className="absolute top-3 right-3">
                         <Badge variant="secondary" className="bg-black/50 text-white border-0">
-                            {conti.conti.songs.length}곡
+                            {conti.songs.length}곡
                         </Badge>
                     </div>
                 </div>
             </PlayButton>
 
             {/* 콘티 정보 */}
-            <div className="p-4">
+            <Link href={`/conti/detail/${conti.id}`}>
+                <div className="p-4">
                 {/* 제목과 설명 */}
                 <div className="mb-3">
                     <div className="flex justify-between items-center">
-                        <h3 className="text-lg mb-1 line-clamp-1">{conti.conti.title}</h3>
+                        <h3 className="text-lg mb-1 line-clamp-1">{conti.title}</h3>
                         {/* 액션 */}
                         <div className="flex items-center justify-between text-sm">
                             {/* 우측 메뉴 (공유 / 내 콘티로 복사) */}
@@ -104,24 +106,24 @@ const ContiCard = ({ conti }: { conti: FamousContiDto }) => {
                             </DropdownMenu>
                         </div>
                     </div>
-                    <p className="text-sm text-gray-600 line-clamp-2">{conti.conti.description}</p>
+                    <p className="text-sm text-gray-600 line-clamp-2">{conti.description}</p>
                 </div>
 
                 {/* 작성자 찬양팀 정보 */}
                 <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center space-x-2">
                         <ImageWithFallback
-                            src={conti.praiseTeam.previewImg ?? ""}
-                            alt={conti.praiseTeam.praiseTeamName}
+                            src={conti.creator.profileImage ?? ""}
+                            alt={conti.creator.nickname}
                             className="w-6 h-6 rounded-full object-cover"
                         />
-                        <span className="text-sm text-gray-700">{conti.praiseTeam.praiseTeamName}</span>
+                        <span className="text-sm text-gray-700">{conti.creator.nickname}</span>
                     </div>
 
                     <div className="flex items-center space-x-3 text-xs text-gray-500">
                         <div className="flex items-center space-x-1">
                             <Calendar className="w-3 h-3" />
-                            <span>{conti.conti.date.slice(5)}</span>
+                            <span>{conti.date.slice(5)}</span>
                         </div>
                         <div className="flex items-center space-x-1">
                             <Clock className="w-3 h-3" />
@@ -132,18 +134,19 @@ const ContiCard = ({ conti }: { conti: FamousContiDto }) => {
 
                 {/* 노래 태그 */}
                 <div className="flex flex-wrap gap-1 mb-3">
-                    {conti.conti.songs.slice(0, 4).map(song => (
+                    {conti.songs.slice(0, 4).map(song => (
                         <Badge key={song.song.id} variant="outline" className="text-xs">
                             {song.song.songName}
                         </Badge>
                     ))}
-                    {conti.conti.songs.length > 4 && (
+                    {conti.songs.length > 4 && (
                         <Badge variant="outline" className="text-xs text-gray-500">
-                            +{conti.conti.songs.length - 4}
+                            +{conti.songs.length - 4}
                         </Badge>
                     )}
                 </div>
             </div>
+            </Link>
         </Card>
     );
 };

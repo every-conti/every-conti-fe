@@ -10,4 +10,5 @@ export interface SearchContiQueriesDto {
   songType?: SongTypeTypes;
   minTotalDuration?: number;
   maxTotalDuration?: number;
+  includePersonalConti: boolean;
 }

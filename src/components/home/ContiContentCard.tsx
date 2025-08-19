@@ -3,18 +3,17 @@ import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
-import FamousContiDto from "src/dto/home/famous-conti.dto";
+import ContiWithSongDto from "src/dto/common/conti-with-song.dto";
 
-export default function ContiContentCard({ famousContiDto }: { famousContiDto: FamousContiDto }) {
-    const { conti, praiseTeam } = famousContiDto;
-    const { id, date, songs } = conti;
-    const { previewImg } = praiseTeam;
+export default function ContiContentCard({ contiWithSongDto }: { contiWithSongDto: ContiWithSongDto }) {
+    const { id, date, songs, creator } = contiWithSongDto;
+    const { praiseTeam } = creator;
 
   return (
     <Card className="p-6 space-y-4 hover:shadow-lg transition-shadow">
       <div className="flex items-center space-x-3">
         <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-          <span className="text-xl">{previewImg}</span>
+          <span className="text-xl">{praiseTeam.previewImg}</span>
         </div>
         <div>
           <h3 className="text-lg">{praiseTeam.praiseTeamName}</h3>

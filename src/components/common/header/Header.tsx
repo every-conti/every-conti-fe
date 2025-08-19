@@ -84,7 +84,7 @@ export default function Header() {
                         }`}
                         onClick={() => {
                           if (group.label === "찬양") router.push("/song/search");
-                          if (group.label === "콘티") router.push("/conti");
+                          if (group.label === "콘티") router.push("/conti/search");
                         }}
                     >
                       {group.label}

@@ -105,12 +105,17 @@ export default function SearchFilters({
   const songTempos = searchProperties.songTempos;
   const seasons = searchProperties.seasons;
 
-    const [durationChanging, setDurationChanging] = useState<[number, number]>([MIN_SONG_DURATION, MAX_SONG_DURATION]);
+    const [durationChanging, setDurationChanging] = useState<[number, number]>(duration);
     const durationChangingRef = useRef<[number, number]>(durationChanging);
     useEffect(() => {
         durationChangingRef.current = durationChanging;
     }, [durationChanging]);
     const [isAdjustingDuration, setIsAdjustingDuration] = useState(false);
+    useEffect(() => {
+        if (!isAdjustingDuration) {
+            setDurationChanging(duration);
+        }
+    }, [duration, isAdjustingDuration]);
 
   const hasActiveFilters =
       selectedKey !== null ||
@@ -184,7 +189,8 @@ export default function SearchFilters({
         const onPointerUp = () => {
             if (!isAdjustingDuration) return;
             setIsAdjustingDuration(false);
-            setDuration(durationChangingRef.current);
+            const next = durationChangingRef.current;
+            if (duration[0] !== next[0] || duration[1] !== next[1]) setDuration(next);
         };
         window.addEventListener("pointerup", onPointerUp);
         return () => window.removeEventListener("pointerup", onPointerUp);
@@ -316,8 +322,8 @@ export default function SearchFilters({
                               <label className="text-sm text-gray-700">총 길이</label>
                           </div>
                           <span className="text-sm text-gray-500">
-                                        {durationChanging[0]}분 - {durationChanging[1]}분
-                                    </span>
+                                {durationChanging[0]}분 - {durationChanging[1]}분
+                            </span>
                       </div>
                       <div className="px-3">
                           <Slider

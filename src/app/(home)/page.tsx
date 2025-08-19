@@ -6,11 +6,11 @@ import NewSongCard from "src/components/common/NewSongCard";
 import { Button } from "src/components/ui/button";
 import { Card } from "src/components/ui/card";
 import {fetchFamousPraiseTeamsContis, fetchLastSongs} from "src/app/api/home";
-import FamousContiDto from "src/dto/home/famous-conti.dto";
 import {MinimumSongToPlayDto} from "src/dto/common/minimum-song-to-play.dto";
+import ContiWithSongDto from "src/dto/common/conti-with-song.dto";
 
 export default async function App() {
-  const famousContis: FamousContiDto[] = await fetchFamousPraiseTeamsContis();
+  const famousContis: ContiWithSongDto[] = await fetchFamousPraiseTeamsContis();
   const lastSongs: MinimumSongToPlayDto[] = await fetchLastSongs();
 
   return (
@@ -64,8 +64,8 @@ export default async function App() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {famousContis.map((content, index) => (
                   <ContiContentCard
-                      key={content.conti.id}
-                      famousContiDto={content}
+                      key={content.id}
+                      contiWithSongDto={content}
                   />
               ))}
             </div>

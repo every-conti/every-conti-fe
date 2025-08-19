@@ -1,4 +1,5 @@
 import SongSimpleDto from "src/dto/home/song-simple.dto";
+import UserSimpleDto from "src/dto/user/user-simple.dto";
 
 export default interface ContiSimpleDto {
   id: string;
@@ -6,6 +7,6 @@ export default interface ContiSimpleDto {
   description: string;
   date: string;
   songs: SongSimpleDto[];
-  creatorId: string;
+  creator: UserSimpleDto;
   createdAt: Date;
 }

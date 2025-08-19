@@ -9,7 +9,7 @@ import {
     ChevronUp,
     Clock,
     Users,
-    Music,
+    Music, User,
 } from "lucide-react";
 import { Input } from "src/components/ui/input";
 import { Slider } from "src/components/ui/slider";
@@ -54,6 +54,9 @@ interface ContiSearchFiltersProps {
     selectedPraiseTeam: PraiseTeamDto | null;
     setSelectedPraiseTeam: (selectedPraiseTeam: PraiseTeamDto | null) => void;
 
+    includePersonalConti: boolean;
+    setIncludePersonalConti: (includePersonalConti: boolean) => void;
+
     duration: [number, number]
     setDuration: (duration: [number, number]) => void;
 }
@@ -71,6 +74,8 @@ export default function ContiSearchFilters({
    setSelectedSongType,
    selectedPraiseTeam,
    setSelectedPraiseTeam,
+   includePersonalConti,
+   setIncludePersonalConti,
    duration,
    setDuration,
 }: ContiSearchFiltersProps) {
@@ -298,7 +303,7 @@ export default function ContiSearchFilters({
                 {/* 고급 필터 */}
                 <Collapsible open={isAdvancedOpen} onOpenChange={setIsAdvancedOpen}>
                     <CollapsibleContent className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-100">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-gray-100">
                             {/* 찬양팀 (50%) */}
                             <div className="space-y-2 w-full md:col-span-1">
                                 <div className="flex items-center space-x-2">
@@ -314,13 +319,45 @@ export default function ContiSearchFilters({
                                             : null
                                     }
                                     onSelect={(opt) => {
-                                        const team = praiseTeams.find((t) => t.id === opt?.id);
-                                        setSelectedPraiseTeam(team ?? null);
+                                        if (!opt) {
+                                            setSelectedPraiseTeam(null);
+                                            return;
+                                        }
+                                        const team = praiseTeams.find((t) => t.id === opt.id) ?? null;
+                                        // 팀을 고르면 개인 콘티 해제
+                                        setIncludePersonalConti(false);
+                                        setSelectedPraiseTeam(team);
                                     }}
                                     placeholder="찬양팀 선택"
                                     includeDefaultOption
                                     defaultLabel="전체"
                                 />
+                            </div>
+
+                            {/* 개인 콘티 포함 */}
+                            <div className="space-y-3 w-full md:col-span-1">
+                                <div className="flex items-center space-x-2">
+                                    <User className="w-4 h-4 text-gray-500" />
+                                    <label className="text-sm text-gray-700">개인 콘티 포함</label>
+                                </div>
+                                <div className="flex items-center space-x-2 px-2">
+                                    <input
+                                        type="checkbox"
+                                        id="includePersonalConti"
+                                        checked={includePersonalConti}
+                                        onChange={(e) => {
+                                            const checked = e.target.checked;
+                                            setIncludePersonalConti(checked);
+                                            if (checked) {
+                                                setSelectedPraiseTeam(null);
+                                            }
+                                        }}
+                                        className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+                                    />
+                                    <label htmlFor="includePersonalConti" className="text-sm text-gray-600">
+                                        포함
+                                    </label>
+                                </div>
                             </div>
 
                             {/* 총 길이 (50%) */}

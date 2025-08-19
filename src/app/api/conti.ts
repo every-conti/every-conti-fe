@@ -9,6 +9,7 @@ import {apiRequestWithRefresh} from "src/app/api/apiRequestWithRefresh";
 import ApiOptions from "src/app/api/ApiOptions";
 import {REVALIDATE_TIME_ONE_HOUR} from "src/constant/numbers.constant";
 import {SearchContiPropertiesDto} from "src/dto/conti/search-conti-properties.dto";
+import ContiWithSongDto from "src/dto/common/conti-with-song.dto";
 
 export const useInfiniteSearchContiQuery = (
     params: SearchContiQueriesDto,
@@ -41,6 +42,28 @@ export const useInfiniteSearchContiQuery = (
         ...rest,
     };
 };
+
+export const fetchContiDetail = async (contiId: string) => {
+    const apiOptions: ApiOptions = {
+        useCache: true,
+    }
+    const data: ContiWithSongDto = await apiRequestWithRefresh(
+        `/conti/${contiId}`,
+        apiOptions
+    );
+    return data;
+}
+
+export const useContiDetailQuery = (contiId: string) => {
+    return useQuery<ContiWithSongDto>({
+        queryKey: ["conti", contiId],
+        queryFn: () => fetchContiDetail(contiId),
+        staleTime: Infinity, // 무조건 fresh로 간주
+        cacheTime: REVALIDATE_TIME_ONE_HOUR, // 1시간 동안 캐시 유지 (컴포넌트 언마운트 이후에도)
+        refetchOnMount: false, // 마운트될 때 다시 요청 안 함
+        refetchOnWindowFocus: false, // 창 포커스해도 재요청 안 함
+    } as UseQueryOptions<ContiWithSongDto>);
+}
 
 export const fetchContiProperties = async () => {
     const apiOptions: ApiOptions = {
