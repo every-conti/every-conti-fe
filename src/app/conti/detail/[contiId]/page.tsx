@@ -23,10 +23,12 @@ import {useCurrentSong} from "src/store/useCurrentSong";
 import {MinimumSongToPlayDto} from "src/dto/common/minimum-song-to-play.dto";
 import {useRouter} from "next/navigation";
 import {parseSongDuration} from "src/utils/parseSongDuration";
+import ContiCopyModal from "src/components/conti/ContiCopyModal";
+import ContiWithSongDto from "src/dto/common/conti-with-song.dto";
 
 export default function ContiDetailPage({ params }: { params: Promise<{ contiId: string; }> }) {
     const router = useRouter();
-    const [isLiked, setIsLiked] = useState(false);
+    // const [isLiked, setIsLiked] = useState(false);
     const { isPlaying, enqueueAndPlay } = usePlayerStore()
     const currentSong = useCurrentSong();
     const { contiId } = use(params);
@@ -35,6 +37,8 @@ export default function ContiDetailPage({ params }: { params: Promise<{ contiId:
 
     // 총 재생 시간 계산
     const totalDuration = conti ? conti.songs.reduce((total, song) => total + song.song.duration, 0) : 0;
+
+    const [isCopyModalOpen, setIsCopyModalOpen] = useState<boolean>(false);
 
     const formatTotalDuration = (totalSeconds: number) => {
         const hours = Math.floor(totalSeconds / 3600);
@@ -61,10 +65,10 @@ export default function ContiDetailPage({ params }: { params: Promise<{ contiId:
         enqueueAndPlay(conti.songs.map(s => s.song));
     }
 
-    const handleLike = () => {
-        setIsLiked(!isLiked);
-        // toast.success(isLiked ? "좋아요를 취소했습니다" : "좋아요를 눌렀습니다");
-    };
+    // const handleLike = () => {
+    //     setIsLiked(!isLiked);
+    //     // toast.success(isLiked ? "좋아요를 취소했습니다" : "좋아요를 눌렀습니다");
+    // };
 
     const isCurrentSongPlaying = (song: MinimumSongToPlayDto) => {
         return (currentSong?.id === song.id) && isPlaying;
@@ -165,20 +169,22 @@ export default function ContiDetailPage({ params }: { params: Promise<{ contiId:
 
                                 <Button
                                     variant="outline"
-                                    // onClick={handleCopyConti}
+                                    onClick={() => {
+                                        setIsCopyModalOpen(!isCopyModalOpen);
+                                    }}
                                 >
                                     <Copy className="w-4 h-4 mr-2"/>
                                     콘티 복사
                                 </Button>
 
-                                <Button
-                                    variant="outline"
-                                    onClick={handleLike}
-                                    className={isLiked ? "text-red-500 border-red-300" : ""}
-                                >
-                                    <Heart className={`w-4 h-4 mr-2 ${isLiked ? 'fill-current' : ''}`}/>
-                                    좋아요
-                                </Button>
+                                {/*<Button*/}
+                                {/*    variant="outline"*/}
+                                {/*    onClick={handleLike}*/}
+                                {/*    className={isLiked ? "text-red-500 border-red-300" : ""}*/}
+                                {/*>*/}
+                                {/*    <Heart className={`w-4 h-4 mr-2 ${isLiked ? 'fill-current' : ''}`}/>*/}
+                                {/*    좋아요*/}
+                                {/*</Button>*/}
                             </div>
                         </div>
                     </div>
@@ -263,6 +269,16 @@ export default function ContiDetailPage({ params }: { params: Promise<{ contiId:
                     </div>
                 </Card>
             </div>
+
+            {/* 콘티 복사 모달 */}
+            <ContiCopyModal
+                isOpen={isCopyModalOpen}
+                onClose={() => setIsCopyModalOpen(false)}
+                conti={conti}
+                savedContis={[]}
+                onCreateNewConti={() => {}}
+                onAddToExistingConti={() => {}}
+            />
         </div>
     );
 }

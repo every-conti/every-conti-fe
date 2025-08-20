@@ -47,10 +47,6 @@ interface ContiSearchFiltersProps {
     selectedSongs: SongDetailDto[];
     setSelectedSongs: (songs: SongDetailDto[]) => void;
 
-    // 기타 필터
-    selectedSongType: SongTypeTypes | null;
-    setSelectedSongType: (selectedSongType: SongTypeTypes | null) => void;
-
     selectedPraiseTeam: PraiseTeamDto | null;
     setSelectedPraiseTeam: (selectedPraiseTeam: PraiseTeamDto | null) => void;
 
@@ -70,8 +66,6 @@ export default function ContiSearchFilters({
    debouncedSongSearchTerm,
    selectedSongs,
    setSelectedSongs,
-   selectedSongType,
-   setSelectedSongType,
    selectedPraiseTeam,
    setSelectedPraiseTeam,
    includePersonalConti,
@@ -122,7 +116,6 @@ export default function ContiSearchFilters({
     const resetFilters = () => {
         setSearchTerm(null);
         setSelectedPraiseTeam(null);
-        setSelectedSongType(null);
         setSongSearchTerm(null);
         setSelectedSongs([]); // 추가
         setDuration([MIN_TOTAL_DURATION, MAX_TOTAL_DURATION])
@@ -134,7 +127,7 @@ export default function ContiSearchFilters({
         let count = 0;
         if (searchTerm) count++;
         if (selectedPraiseTeam) count++;
-        if (selectedSongType) count++;
+        if (includePersonalConti) count++;
         if (selectedSongs.length > 0) count++; // 텍스트 대신 실제 선택 곡 기준
         if (duration[0] > MIN_TOTAL_DURATION || duration[1] < MAX_TOTAL_DURATION) count++;
         return count;
@@ -178,48 +171,38 @@ export default function ContiSearchFilters({
                             className="flex items-center gap-2 border rounded-md px-3 py-2 cursor-text"
                             onClick={() => setSongDropdownOpen(true)}
                         >
-                            <Music className="text-gray-400 w-4 h-4" />
+                            <Search className="text-gray-400 w-4 h-4" />
                             <Input
-                                placeholder={
-                                    selectedSongs.length
-                                        ? "추가로 검색하여 선택…"
-                                        : "포함된 곡 제목, 가사 검색…"
-                                }
+                                placeholder={selectedSongs.length ? "추가로 검색하여 선택…" : "찬양 제목을 검색하세요…"}
                                 value={songSearchTerm || ""}
                                 onChange={(e) => {
                                     setSongSearchTerm(e.target.value);
                                     if (!songDropdownOpen) setSongDropdownOpen(true);
                                 }}
-                                className="border-0 focus-visible:ring-0 p-0 h-5"
+                                className="border-0 focus-visible:ring-0 p-0 h-5 text-sm sm:text-base"
                             />
                         </div>
 
-                        {/* 드롭다운: 자동검색 결과 + 무한 스크롤 */}
+                        {/* 드롭다운: 제목 + 찬양팀 함께 표시 */}
                         {songDropdownOpen && (
                             <div
-                                className="absolute mt-2 w-full bg-white border rounded-md shadow-lg max-h-72 overflow-auto z-50"
+                                className="absolute mt-2 w-full bg-white border rounded-md shadow-lg max-h-64 sm:max-h-72 overflow-auto z-50"
                                 onScroll={(e) => {
                                     const el = e.currentTarget;
-                                    const nearBottom =
-                                        el.scrollTop + el.clientHeight >= el.scrollHeight - 16;
-                                    if (nearBottom && hasNextPage && !isFetchingNextPage)
-                                        fetchNextPage();
+                                    const nearBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 16;
+                                    if (nearBottom && hasNextPage && !isFetchingNextPage) fetchNextPage();
                                 }}
                             >
-                                {isLoading && (
-                                    <div className="p-4 text-sm text-gray-500">검색 중…</div>
-                                )}
+                                {isLoading && <div className="p-3 sm:p-4 text-xs sm:text-sm text-gray-500">검색 중…</div>}
 
                                 {!isLoading && isError && (
-                                    <div className="p-4 text-sm text-red-500">
+                                    <div className="p-3 sm:p-4 text-xs sm:text-sm text-red-500">
                                         곡을 불러오지 못했어요. 다시 시도해 주세요.
                                     </div>
                                 )}
 
                                 {!isLoading && !isError && searchedSongs.length === 0 && (
-                                    <div className="p-4 text-sm text-gray-500">
-                                        검색 결과가 없습니다.
-                                    </div>
+                                    <div className="p-3 sm:p-4 text-xs sm:text-sm text-gray-500">검색 결과가 없습니다.</div>
                                 )}
 
                                 {!isLoading &&
@@ -228,14 +211,19 @@ export default function ContiSearchFilters({
                                         <button
                                             key={song.id}
                                             type="button"
-                                            onClick={() =>
-                                                toggleSong(song)
-                                            }
+                                            onClick={() => toggleSong(song)}
                                             className="w-full text-left px-3 py-2 hover:bg-gray-50 flex items-center justify-between"
                                         >
-                                            <span className="truncate">{song.songName}</span>
+                                            <div className="min-w-0 pr-2">
+                                                <p className="text-sm leading-tight line-clamp-1">{song.songName}</p>
+                                                {song?.praiseTeam?.praiseTeamName && (
+                                                    <p className="text-[11px] sm:text-xs text-gray-600 leading-tight line-clamp-1">
+                                                        {song.praiseTeam.praiseTeamName}
+                                                    </p>
+                                                )}
+                                            </div>
                                             {isSongSelected(song.id) ? (
-                                                <Badge variant="secondary" className="text-[10px]">
+                                                <Badge variant="secondary" className="text-[10px] sm:text-xs whitespace-nowrap">
                                                     선택됨
                                                 </Badge>
                                             ) : null}
@@ -243,17 +231,11 @@ export default function ContiSearchFilters({
                                     ))}
 
                                 {isFetchingNextPage && (
-                                    <div className="p-3 text-center text-xs text-gray-400">
-                                        더 불러오는 중…
-                                    </div>
+                                    <div className="p-3 text-center text-[11px] sm:text-xs text-gray-400">더 불러오는 중…</div>
                                 )}
 
                                 <div className="sticky bottom-0 bg-white border-t p-2 flex justify-end gap-2">
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => setSongDropdownOpen(false)}
-                                    >
+                                    <Button variant="ghost" size="sm" onClick={() => setSongDropdownOpen(false)}>
                                         닫기
                                     </Button>
                                     <Button size="sm" onClick={() => setSongDropdownOpen(false)}>
@@ -424,12 +406,12 @@ export default function ContiSearchFilters({
                             </Badge>
                         )}
 
-                        {selectedSongType && (
+                        {includePersonalConti && (
                             <Badge variant="secondary" className="flex items-center space-x-1">
-                                <span>{SongTypeKorean[selectedSongType]}</span>
+                                <span>개인콘티 포함</span>
                                 <X
                                     className="w-3 h-3 cursor-pointer"
-                                    onClick={() => setSelectedSongType(null)}
+                                    onClick={() => setIncludePersonalConti(false)}
                                 />
                             </Badge>
                         )}

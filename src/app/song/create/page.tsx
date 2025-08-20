@@ -40,6 +40,7 @@ import {useRouter} from "next/navigation";
 import {SongDetailDto} from "src/dto/common/song-detail.dto";
 import {Popover, PopoverContent, PopoverTrigger} from "src/components/ui/popover";
 import PageTitle from "src/components/common/PageTitle";
+import {toast} from "sonner";
 
 
 function SongCreationPage() {
@@ -127,7 +128,7 @@ function SongCreationPage() {
             }
 
             if (prev.length >= 5) {
-                alert("최대 5개의 테마만 선택할 수 있습니다.");
+                toast.info("최대 5개의 테마만 선택할 수 있습니다.");
                 return prev;
             }
 
@@ -148,13 +149,13 @@ function SongCreationPage() {
         if (isThemeCompleted) return;
 
         if (!title.trim()) {
-            alert("제목을 먼저 입력해주세요.");
+            toast.info("제목을 먼저 입력해주세요.");
             setThemeMode("manual");
             return;
         }
 
         if (!lyrics.trim()) {
-            alert("가사를 먼저 입력해주세요.");
+            toast.info("가사를 먼저 입력해주세요.");
             setThemeMode("manual");
             return;
         }
@@ -181,7 +182,7 @@ function SongCreationPage() {
             setIsThemeCompleted(true);
         } catch (err) {
             console.error(err);
-            alert("AI 테마 분석에 실패했습니다.");
+            toast.info("AI 테마 분석에 실패했습니다.");
             setThemeMode("manual");
         }
 
@@ -218,7 +219,7 @@ function SongCreationPage() {
 
     const handleSave = async () => {
         if (!user){
-            alert("로그인 해야 합니다.");
+            toast.info("로그인 해야 합니다.");
             return;
         }
 
@@ -226,27 +227,27 @@ function SongCreationPage() {
         setIsSaving(true);
 
         if (!title.trim()) {
-            alert("제목은 필수입니다.");
+            toast.info("제목은 필수입니다.");
             return;
         }
 
         if (!youtubeVId) {
-            alert("유효한 유튜브 링크를 입력해주세요.");
+            toast.info("유효한 유튜브 링크를 입력해주세요.");
             return;
         }
 
         if (isYoutubeVIdExist?.data){
-            alert("이미 등록된 유튜브 링크입니다.");
+            toast.info("이미 등록된 유튜브 링크입니다.");
             return;
         }
 
         if (!selectedType) {
-            alert("장르를 선택해주세요.");
+            toast.info("장르를 선택해주세요.");
             return;
         }
 
         if (!praiseTeam) {
-            alert("찬양팀을 선택해주세요.");
+            toast.info("찬양팀을 선택해주세요.");
             return;
         }
 
@@ -271,8 +272,9 @@ function SongCreationPage() {
         try{
             const res: SongDetailDto = await fetchSongCreate(newSong);
             router.push(`/song/detail/${res.id}/${res.songName}`);
+            toast.success("찬양 등록에 성공했습니다.")
         } catch (e) {
-            alert("생성 오류 발생")
+            toast.error("찬양 등록에 실패했습니다.")
         } finally {
             setIsSaving(false);
         }
@@ -398,7 +400,7 @@ function SongCreationPage() {
                                     size="sm"
                                     onClick={() => {
                                         if (!title.trim()) {
-                                            alert("제목을 먼저 입력해주세요.");
+                                            toast.info("제목을 먼저 입력해주세요.");
                                             return;
                                         }
                                         const query = encodeURIComponent(`${title} 가사`);
@@ -634,7 +636,7 @@ function SongCreationPage() {
                                             size="sm"
                                             onClick={() => {
                                                 if (!title.trim()) {
-                                                    alert("제목을 먼저 입력해주세요.");
+                                                    toast.info("제목을 먼저 입력해주세요.");
                                                     return;
                                                 }
                                                 const query = encodeURIComponent(`${title} 원키`);

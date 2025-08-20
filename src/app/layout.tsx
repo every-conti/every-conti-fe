@@ -5,6 +5,7 @@ import Header from "src/components/common/header/Header";
 import Footer from "src/components/common/footer/Footer";
 import Providers from "src/utils/provider/Providers";
 import PlayerBar from "src/components/common/playerBar/PlayerBar";
+import {Toaster} from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,7 +34,10 @@ export default function RootLayout({
       >
         <Providers>
           <Header />
-          <main className="pt-16 bg-gray-50  w-[calc(100vw-8px)] flex-1">{children}</main>
+          <main className="pt-16 bg-gray-50  w-[calc(100vw-8px)] flex-1">
+            <Toaster position="bottom-left" richColors />
+            {children}
+          </main>
           <Footer />
           <PlayerBar />
         </Providers>

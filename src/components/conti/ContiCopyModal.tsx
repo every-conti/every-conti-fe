@@ -24,6 +24,7 @@ import {useInView} from "react-intersection-observer";
 import {parseSongDuration} from "src/utils/parseSongDuration";
 import {CreateContiDto} from "src/dto/conti/CreateContiDto";
 import { CopyContiDto } from "src/dto/conti/CopyContiDto";
+import {toast} from "sonner";
 
 interface SavedConti {
     id: string;
@@ -104,17 +105,17 @@ export default function ContiCopyModal({
 
     const handleSubmit = async () => {
         if (!user){
-            alert("로그인 해야 합니다.");
+            toast.info("로그인 해야 합니다.");
             return;
         }
         if (!conti){
-            alert("올바르지 않은 접근입니다.");
+            toast.info("올바르지 않은 접근입니다.");
             return;
         }
 
         if (copyMode === "new") {
             if (!title.trim()) {
-                alert("제목을 입력해주세요.");
+                toast.info("제목을 입력해주세요.");
                 return;
             }
 
@@ -125,8 +126,14 @@ export default function ContiCopyModal({
                 songIds: conti.songs.map(song => song.song.id),
                 memberId: user.id
             };
-            await fetchContiCreate(createContiDto);
 
+            try{
+                await fetchContiCreate(createContiDto);
+                toast.success("콘티가 생성되었습니다.")
+            } catch(e){
+                toast.error("콘티 생성에 실패했습니다.")
+                return;
+            }
         } else {
             if (!selectedContiId) {
                 alert("콘티를 선택해주세요.");
@@ -139,7 +146,13 @@ export default function ContiCopyModal({
                 memberId: user.id
             };
 
-            await fetchContiCopy(copyContiDto);
+            try{
+                await fetchContiCopy(copyContiDto);
+                toast.success("콘티가 복사되었습니다.")
+            } catch(e){
+                toast.error("콘티 복사에 실패했습니다.")
+                return;
+            }
         }
 
         // 폼 초기화
@@ -158,6 +171,10 @@ export default function ContiCopyModal({
                     <DialogTitle className="flex items-center space-x-2">
                         <Copy className="w-5 h-5" />
                         <span>콘티 복사</span>
+                        <button onClick={() => {
+                            toast("하하하하ㅏ하핳하ㅏ");
+                            console.log('흠')
+                        }}>button</button>
                     </DialogTitle>
                 </DialogHeader>
 
