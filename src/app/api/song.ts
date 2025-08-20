@@ -7,7 +7,6 @@ import { SearchPropertiesDto } from "src/dto/search/search-properties.dto";
 import { SearchSongQueriesDto } from "src/dto/search/request/search-song-queries.dto";
 import BibleChapterDto from "src/dto/common/bible-chapter.dto";
 import BibleVerseDto from "src/dto/common/bible-verse.dto";
-import { InfiniteSongSearchDto } from "src/dto/search/infinite-song-search.dto";
 import CommonResponseDto from "src/dto/common/common-response.dto";
 import {SongDetailDto} from "src/dto/common/song-detail.dto";
 import {REVALIDATE_TIME_ONE_HOUR} from "src/constant/numbers.constant";
@@ -16,6 +15,7 @@ import buildQueryParams from "src/utils/buildQueryParams";
 import ApiOptions from "src/app/api/ApiOptions";
 import {apiRequestWithRefresh} from "src/app/api/apiRequestWithRefresh";
 import {CreateSongDto} from "src/dto/song/CreateSongDto";
+import {CommonInfiniteSearchDto} from "src/dto/search/common-infinite-search.dto";
 
 export const fetchSongCreate = async (createSongDto :CreateSongDto) => {
   const apiOptions: ApiOptions = {
@@ -38,12 +38,12 @@ export const useInfiniteSearchSongQuery = (
     useCache: true,
   }
 
-  const { data, isLoading, ...rest } = useInfiniteQuery<InfiniteSongSearchDto>({
+  const { data, isLoading, ...rest } = useInfiniteQuery<CommonInfiniteSearchDto<SongDetailDto>>({
     queryKey: ["searchSongs", params],
     queryFn: async ({ pageParam = 0 }) => {
       const offset = pageParam as number;
       const fullParams: SearchSongQueriesDto = { ...params, offset };
-      const res: InfiniteSongSearchDto = await apiRequestWithRefresh(
+      const res: CommonInfiniteSearchDto<SongDetailDto> = await apiRequestWithRefresh(
           `/song/search?${buildQueryParams(fullParams)}`,
           apiOptions
       );

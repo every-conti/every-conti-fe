@@ -14,11 +14,10 @@ import shareContent from "src/utils/shareContent";
 import {useState} from "react";
 import {useAuthStore} from "src/store/useAuthStore";
 import PlayButton from "src/components/common/PlayButton";
-import {fetchContiCopy} from "src/app/api/conti";
 import Link from "next/link";
 import ContiWithSongDto from "src/dto/common/conti-with-song.dto";
 
-const ContiCard = ({ conti }: { conti: ContiWithSongDto }) => {
+const ContiCard = ({ conti, setModaledConti, setIsCopyModalOpen }: { conti: ContiWithSongDto, setModaledConti: (conti: ContiWithSongDto) => void, setIsCopyModalOpen: (isOpen: boolean) => void }) => {
     const [copying, setCopying] = useState(false);
     const { user } = useAuthStore();
 
@@ -32,13 +31,9 @@ const ContiCard = ({ conti }: { conti: ContiWithSongDto }) => {
 
 
     const handleCopyConti = async () => {
-        // if (!onCopyConti || !contiId) return;
         try {
             setCopying(true);
-            await fetchContiCopy(conti.id);
-            // toast?.({ description: "내 콘티로 복사되었어요." });
         } catch (e: any) {
-            // toast?.({ variant: "destructive", description: e?.message ?? "복사 중 오류가 발생했습니다." });
         } finally {
             setCopying(false);
         }
@@ -46,8 +41,6 @@ const ContiCard = ({ conti }: { conti: ContiWithSongDto }) => {
 
     return (
         <Card className="overflow-hidden hover:shadow-md transition-all duration-200 cursor-pointer group" >
-              {/*onClick={() => onViewContiDetail && onViewContiDetail(convertToContiDetail(conti))}>*/}
-
             {/* 썸네일 */}
             <PlayButton songs={conti.songs.map(s => s.song)}>
                 <div className="relative aspect-video overflow-hidden">
@@ -90,17 +83,27 @@ const ContiCard = ({ conti }: { conti: ContiWithSongDto }) => {
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end" className="w-44">
-                                    <DropdownMenuItem onClick={() => shareContent("conti")}>
+                                    <DropdownMenuItem onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        shareContent("conti", `/conti/detail/${conti.id}`, conti)
+                                    }}>
                                         <Share2 className="w-4 h-4 mr-2" />
                                         공유하기
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem
                                         disabled={!user || copying}
-                                        onClick={handleCopyConti}
+                                        onClick={(e) => {
+                                            setModaledConti(conti);
+                                            setIsCopyModalOpen(true);
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            handleCopyConti()}
+                                        }
                                     >
                                         <Plus className="w-4 h-4 mr-2" />
-                                        {copying ? "복사 중..." : "내 콘티로 복사"}
+                                        내 콘티로 복사
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>

@@ -18,7 +18,7 @@ import SongSeasonDto from "src/dto/common/song-season.dto";
 import SongThemeDto from "src/dto/common/song-theme.dto";
 import { SongKeyTypes } from "src/types/song/song-key.types";
 import { SongTempoTypes } from "src/types/song/song-tempo.types";
-import {SongTypeKorean, SongTypeTypes} from "src/types/song/song-type.types";
+import { SongTypeTypes} from "src/types/song/song-type.types";
 import PageTitle from "src/components/common/PageTitle";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {MIN_SONG_DURATION, MAX_SONG_DURATION} from "src/constant/conti/conti-search.constant";
