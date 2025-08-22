@@ -26,14 +26,14 @@ export default function shareContent(mode: ShareModeTypes, url?: string, data?: 
 
     switch (mode) {
         case "song":
-            shareData.text = `에브리콘티에서 찬양의 정보를 확인하고 콘티를 등록해보세요`;
+            shareData.text = `[에브리콘티]\n에브리콘티에서 찬양의 정보를 확인하고 콘티를 등록해보세요`;
             break;
         case "conti":
             if (data) {
                 const conti = data as ContiWithSongDto;
-                shareData.text = `🎵 콘티: ${conti.title}\n📅 날짜: ${conti.date}\n👤 작성자: ${conti.creator.nickname}\n🕒 총 길이: ${parseSongDuration(conti.songs.reduce((total, s) => total + s.song.duration, 0))}\n\n▷ 곡 리스트(${conti.songs.length}곡)\n${(conti.songs.map((s, idx) => `${idx+1}. ${s.song.songName} | ${parseSongDuration(s.song.duration)} | ${s.song.songKey ? `${s.song.songKey}키 |` : ""}${s.song.praiseTeam.praiseTeamName}\n🔗${getFullYoutubeURIByVId(s.song.youtubeVId)}\n`).join("\n"))}`
+                shareData.text = `[에브리콘티]\n🎵 콘티: ${conti.title}\n📅 날짜: ${conti.date}\n👤 작성자: ${conti.creator.nickname}\n🕒 총 길이: ${parseSongDuration(conti.songs.reduce((total, s) => total + s.song.duration, 0))}\n\n▷ 곡 리스트(${conti.songs.length}곡)\n${(conti.songs.map((s, idx) => `${idx+1}. ${s.song.songName} | ${parseSongDuration(s.song.duration)} | ${s.song.songKey ? `${s.song.songKey}키 |` : ""}${s.song.praiseTeam.praiseTeamName}\n🔗${getFullYoutubeURIByVId(s.song.youtubeVId)}\n`).join("\n"))}`
             } else {
-                shareData.text = `에브리콘티에서 콘티의 정보를 확인하고 콘티를 등록해보세요`;
+                shareData.text = `[에브리콘티]\n에브리콘티에서 콘티의 정보를 확인하고 콘티를 등록해보세요`;
             }
             break;
 

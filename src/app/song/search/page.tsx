@@ -54,7 +54,7 @@ export default function SearchDetail() {
     const [chapters, setChapters] = useState<BibleChapterDto[]>([]);
     const [verses, setVerses] = useState<BibleVerseDto[]>([]);
 
-  const { data: searchProperties } = useSongPropertiesQuery();
+  const { data: searchSongProperties } = useSongPropertiesQuery();
 
   const {
     data,
@@ -77,7 +77,7 @@ export default function SearchDetail() {
       bibleVerseId: selectedBibleVerse?.id,
       songKey: selectedKey ?? undefined,
       themeIds:
-        selectedThemes.length === 0 ? undefined : selectedThemes.map((t) => t.id),
+        selectedThemes.length > 0 ? selectedThemes.map((t) => t.id) : undefined,
     },
     {
       getNextPageParam: (lastPage: { nextOffset: number | null }) =>
@@ -101,7 +101,7 @@ export default function SearchDetail() {
 
     // URL -> State (첫 마운트 + 브라우저 뒤/앞 이동)
     useEffect(() => {
-        if (!searchProperties) return;
+        if (!searchSongProperties) return;
 
         // searchParams는 읽기 전용 스냅샷이라 매번 새로 읽어와야 함
         const text = searchParams.get("text");
@@ -131,12 +131,12 @@ export default function SearchDetail() {
         setSelectedKey(songKey ?? null);
 
         setSelectedPraiseTeam(
-            praiseTeam ? ( searchProperties?.praiseTeams.find(t => t.praiseTeamName === praiseTeam) as PraiseTeamDto) : null
+            praiseTeam ? ( searchSongProperties?.praiseTeams.find(t => t.praiseTeamName === praiseTeam) as PraiseTeamDto) : null
         );
-        setSelectedSeason(season ? (searchProperties?.seasons.find(s => s.seasonName === season) as SongSeasonDto) : null);
+        setSelectedSeason(season ? (searchSongProperties?.seasons.find(s => s.seasonName === season) as SongSeasonDto) : null);
         setDuration([minDuration ?? MIN_SONG_DURATION, maxDuration ?? MAX_SONG_DURATION]);
 
-        setSelectedBible(bible ? (searchProperties?.bibles.find(b => b.bibleKoName === bible) as BibleDto) : null);
+        setSelectedBible(bible ? (searchSongProperties?.bibles.find(b => b.bibleKoName === bible) as BibleDto) : null);
         setSelectedBibleChapter(
             chapters ? chapters.find(ch => ch.chapterNum === chapter) as BibleChapterDto : null
         );
@@ -146,14 +146,14 @@ export default function SearchDetail() {
 
         setSelectedThemes(
             themeIds.length > 0
-                ? searchProperties?.songThemes.filter((th) =>
+                ? searchSongProperties?.songThemes.filter((th) =>
                 themeIds.includes(String(th.themeName))
             ) ?? []
                 : []
         );
 
         setIsRestored(true);
-    }, [searchProperties, chapters, verses]);
+    }, [searchSongProperties, chapters, verses]);
 
     // State -> URL
     const serialized = useMemo(() => {
@@ -210,9 +210,9 @@ export default function SearchDetail() {
     <>
         <PageTitle title="찬양 검색" description="원하는 찬양을 필터를 통해 찬양팀, 장르, 주제 별로 찾아보세요" />
 
-      {searchProperties && (
+      {searchSongProperties && (
         <SearchFilters
-          searchProperties={searchProperties}
+          searchSongProperties={searchSongProperties}
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
           selectedKey={selectedKey}
@@ -250,27 +250,27 @@ export default function SearchDetail() {
             <div className="text-red-500 text-center py-8">
               <p>검색 중 오류가 발생했습니다. 다시 시도해주세요.</p>
             </div>
-          ) : songs.length === 0 ? (
-            <div className="text-center py-16">
-              <p className="text-gray-500 text-lg mb-2">검색 결과가 없습니다</p>
-              <p className="text-gray-400">다른 검색어나 필터를 시도해보세요</p>
-            </div>
+          ) : songs.length > 0 ? (
+              <div className="space-y-4">
+                  {songs.map((song, idx) => (
+                      <div key={song.id}>
+                          <WorshipSearchCard {...song} />
+                      </div>
+                  ))}
+
+                  <div ref={ref} />
+
+                  {isFetchingNextPage && (
+                      <div className="text-center py-4">
+                          <LoadingSpinner />
+                      </div>
+                  )}
+              </div>
           ) : (
-            <div className="space-y-4">
-              {songs.map((song, idx) => (
-                <div key={song.id}>
-                  <WorshipSearchCard {...song} />
-                </div>
-              ))}
-
-              <div ref={ref} />
-
-              {isFetchingNextPage && (
-                <div className="text-center py-4">
-                  <LoadingSpinner />
-                </div>
-              )}
-            </div>
+              <div className="text-center py-16">
+                  <p className="text-gray-500 text-lg mb-2">검색 결과가 없습니다</p>
+                  <p className="text-gray-400">다른 검색어나 필터를 시도해보세요</p>
+              </div>
           )}
         </div>
       </div>

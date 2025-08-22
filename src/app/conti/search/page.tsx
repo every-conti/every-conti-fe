@@ -37,7 +37,7 @@ export default function ContiFeedPage() {
     const [modaledConti, setModaledConti] = useState<ContiWithSongDto | null>(null);
     const [isCopyModalOpen, setIsCopyModalOpen] = useState<boolean>(false);
 
-    const { data: searchProperties } = useContiPropertiesQuery();
+    const { data: searchContiProperties } = useContiPropertiesQuery();
 
     const {
         data,
@@ -85,7 +85,7 @@ export default function ContiFeedPage() {
 
     // URL -> State (초기 + 앞으로/뒤로 이동)
     useEffect(() => {
-        if (!searchProperties) return;
+        if (!searchContiProperties) return;
 
         // 항상 최신 스냅샷에서 읽기
         const text = searchParams.get("text");
@@ -106,7 +106,7 @@ export default function ContiFeedPage() {
         setSongSearchTerm(songText ?? null);
         setSelectedPraiseTeam(
             praiseTeamName
-                ? (searchProperties?.praiseTeams.find((p) => p.praiseTeamName === praiseTeamName) as PraiseTeamDto)
+                ? (searchContiProperties?.praiseTeams.find((p) => p.praiseTeamName === praiseTeamName) as PraiseTeamDto)
                 : null
         );
         setDuration([min ?? MIN_TOTAL_DURATION, max ?? MAX_TOTAL_DURATION]);
@@ -125,7 +125,7 @@ export default function ContiFeedPage() {
 
         setIsRestored(true);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [searchProperties]);
+    }, [searchContiProperties]);
 
     // State -> URL
     const serialized = useMemo(() => {
@@ -181,9 +181,9 @@ export default function ContiFeedPage() {
         <>
             <PageTitle title="콘티 보기" description="다양한 찬양팀들의 콘티를 둘러보세요" />
 
-            {searchProperties && (
+            {searchContiProperties && (
                 <ContiSearchFilters
-                    searchProperties={searchProperties}
+                    searchContiProperties={searchContiProperties}
                     searchTerm={searchTerm}
                     setSearchTerm={setSearchTerm}
                     songSearchTerm={songSearchTerm}

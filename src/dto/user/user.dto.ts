@@ -5,4 +5,5 @@ export default interface UserDto extends UserSimpleDto {
   email: string;
   church: string;
   roles: UserRoleTypes[];
+  profileImage: string;
 }

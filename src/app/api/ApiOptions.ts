@@ -1,4 +1,4 @@
-type HttpMethod = "GET" | "POST" | "DELETE" | "PATCH";
+type HttpMethod = "GET" | "POST" | "DELETE" | "PATCH" | "PUT";
 
 export default interface ApiOptions {
     method?: HttpMethod;

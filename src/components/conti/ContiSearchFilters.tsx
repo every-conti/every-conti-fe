@@ -32,7 +32,7 @@ import {Badge} from "src/components/ui/badge";
 import {SongDetailDto} from "src/dto/common/song-detail.dto";
 
 interface ContiSearchFiltersProps {
-    searchProperties: SearchContiPropertiesDto;
+    searchContiProperties: SearchContiPropertiesDto;
 
     // 콘티 제목/작성자 검색
     searchTerm: string | null;
@@ -58,7 +58,7 @@ interface ContiSearchFiltersProps {
 }
 
 export default function ContiSearchFilters({
-   searchProperties,
+   searchContiProperties,
    searchTerm,
    setSearchTerm,
    songSearchTerm,
@@ -84,7 +84,7 @@ export default function ContiSearchFilters({
     }, [durationChanging]);
     const [isAdjustingDuration, setIsAdjustingDuration] = useState(false);
 
-    const praiseTeams = searchProperties.praiseTeams;
+    const praiseTeams = searchContiProperties.praiseTeams;
 
 
     // 곡 자동 검색 (무한스크롤)

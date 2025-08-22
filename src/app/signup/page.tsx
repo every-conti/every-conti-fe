@@ -37,6 +37,7 @@ export default function Signup() {
   );
   const [formData, setFormData] = useState({
     name: "",
+    nickname: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -85,6 +86,12 @@ export default function Signup() {
 
   const validateFromDatas = () => {
     if (formData.name.length < 3){
+      setError("이름은 3글자 이상이어야 합니다.");
+      setSending(false);
+      return false;
+    }
+
+    if (formData.nickname.length < 3){
       setError("닉네임은 3글자 이상이어야 합니다.");
       setSending(false);
       return false;
@@ -136,7 +143,8 @@ export default function Signup() {
       const result = await fetchSignup({
         email: formData.email,
         password: formData.password,
-        nickname: formData.name,
+        name: formData.name,
+        nickname: formData.nickname,
         church: formData.church,
       });
 
@@ -195,21 +203,38 @@ export default function Signup() {
               {step === "verification" && "이메일 인증을 완료해주세요"}
               {step === "verified" && "회원가입이 완료되었습니다!"}
             </CardDescription>
-            <Progress value={progressValue} className="mt-2" />
+            <Progress value={progressValue} className="mt-2 mb-2" />
           </CardHeader>
           <CardContent>
             {step === "form" && (
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">닉네임</Label>
+                  <Label htmlFor="name">이름</Label>
                   <div className="relative">
                     <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     <Input
-                      id="name"
-                      name="name"
+                        id="name"
+                        name="name"
+                        type="text"
+                        placeholder="이름을 입력하세요"
+                        value={formData.name}
+                        onChange={handleInputChange}
+                        className="pl-10"
+                        required
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="nickname">닉네임</Label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Input
+                      id="nickname"
+                      name="nickname"
                       type="text"
                       placeholder="닉네임을 입력하세요"
-                      value={formData.name}
+                      value={formData.nickname}
                       onChange={handleInputChange}
                       className="pl-10"
                       required

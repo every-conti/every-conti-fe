@@ -76,7 +76,7 @@ export const fetchSongProperties = async () => {
 
 export function useSongPropertiesQuery() {
   return useQuery<SearchPropertiesDto>({
-    queryKey: ["searchProperties"],
+    queryKey: ["searchSongProperties"],
     queryFn: fetchSongProperties,
     staleTime: Infinity, // 무조건 fresh로 간주
     cacheTime: REVALIDATE_TIME_ONE_HOUR, // 1시간 동안 캐시 유지 (컴포넌트 언마운트 이후에도)

@@ -13,6 +13,7 @@ import {CommonInfiniteSearchDto} from "src/dto/search/common-infinite-search.dto
 import ContiSimpleDto from "src/dto/home/conti-simple.dto";
 import {CreateContiDto} from "src/dto/conti/CreateContiDto";
 import {CopyContiDto} from "src/dto/conti/CopyContiDto";
+import {UpdateContiDto} from "src/dto/conti/UpdateContiDto";
 
 export const useInfiniteSearchContiQuery = (
     params: SearchContiQueriesDto,
@@ -59,6 +60,22 @@ export const fetchContiCreate = async (createContiDto :CreateContiDto) => {
     return data;
 }
 
+export const fetchContiUpdate = async (contiId: string, updateContiDto: UpdateContiDto) => {
+    const apiOptions: ApiOptions = {
+        method: "PUT",
+        data: updateContiDto,
+        requiresAuth: true,
+    }
+    const data: ContiSimpleDto = await apiRequestWithRefresh(
+        `/conti/${contiId}`,
+        apiOptions
+    );
+    return data;
+}
+// export const fetchContiDelete = async () => {
+//
+// }
+
 export const fetchContiDetail = async (contiId: string) => {
     const apiOptions: ApiOptions = {
         useCache: true,
@@ -94,7 +111,7 @@ export const fetchContiProperties = async () => {
 
 export function useContiPropertiesQuery() {
     return useQuery<SearchContiPropertiesDto>({
-        queryKey: ["searchProperties"],
+        queryKey: ["searchContiProperties"],
         queryFn: fetchContiProperties,
         staleTime: Infinity, // 무조건 fresh로 간주
         cacheTime: REVALIDATE_TIME_ONE_HOUR, // 1시간 동안 캐시 유지 (컴포넌트 언마운트 이후에도)

@@ -36,7 +36,7 @@ import {
 } from "src/constant/conti/conti-search.constant";
 
 interface SearchFiltersProps {
-  searchProperties: SearchPropertiesDto;
+    searchSongProperties: SearchPropertiesDto;
   searchTerm: string | null;
   setSearchTerm: (term: string) => void;
   selectedKey: SongKeyTypes | null;
@@ -66,7 +66,7 @@ interface SearchFiltersProps {
 }
 
 export default function SearchFilters({
-    searchProperties,
+    searchSongProperties,
     searchTerm,
     setSearchTerm,
     selectedKey,
@@ -97,13 +97,13 @@ export default function SearchFilters({
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
   const [openSelectId, setOpenSelectId] = useState<string | null>(null);
 
-  const keys = searchProperties.songKeys;
-  const songTypes = searchProperties.songTypes;
-  const praiseTeams = searchProperties.praiseTeams;
-  const bibles = searchProperties.bibles;
-  const songThemes = searchProperties.songThemes;
-  const songTempos = searchProperties.songTempos;
-  const seasons = searchProperties.seasons;
+  const keys = searchSongProperties.songKeys;
+  const songTypes = searchSongProperties.songTypes;
+  const praiseTeams = searchSongProperties.praiseTeams;
+  const bibles = searchSongProperties.bibles;
+  const songThemes = searchSongProperties.songThemes;
+  const songTempos = searchSongProperties.songTempos;
+  const seasons = searchSongProperties.seasons;
 
     const [durationChanging, setDurationChanging] = useState<[number, number]>(duration);
     const durationChangingRef = useRef<[number, number]>(durationChanging);
