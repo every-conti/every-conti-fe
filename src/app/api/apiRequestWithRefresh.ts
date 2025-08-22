@@ -87,7 +87,8 @@ export async function apiRequestWithRefresh(path: string, {
         }
     } else {
         const errorBody = await response.json().catch(() => null);
-        const error: any = new Error("API 요청 실패");
+
+        const error: any = new Error(errorBody.message);
         error.status = response.status;
         error.body = errorBody;
         throw error;

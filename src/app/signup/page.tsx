@@ -24,9 +24,9 @@ import {
 import {useRouter} from "next/navigation";
 import {
   fetchSendVerificationMail,
-  fetchSignup,
   fetchVerifyEmailCode,
 } from "src/app/api/auth";
+import {fetchSignup} from "src/app/api/user";
 
 
 export default function Signup() {

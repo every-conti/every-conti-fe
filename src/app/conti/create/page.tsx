@@ -26,12 +26,13 @@ import { CreateContiDto } from "src/dto/conti/CreateContiDto";
 import { fetchContiCreate } from "src/app/api/conti";
 import { useAuthStore } from "src/store/useAuthStore";
 import { useRouter } from "next/navigation";
+import withAuth from "src/components/common/withAuth";
 
 function SortableSongItem({
-                            song,
-                            index,
-                            onRemove,
-                          }: {
+  song,
+  index,
+  onRemove,
+}: {
   song: SongDetailDto;
   index: number;
   onRemove: (id: string) => void;
@@ -103,7 +104,7 @@ function SortableSongItem({
   );
 }
 
-export default function ContiCreationPage() {
+function ContiCreationPage() {
   const { user } = useAuthStore();
   const router = useRouter();
 
@@ -399,3 +400,5 @@ export default function ContiCreationPage() {
       </div>
   );
 }
+
+export default withAuth(ContiCreationPage);

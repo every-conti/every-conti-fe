@@ -1,5 +1,5 @@
 import {
-    useInfiniteQuery, useQuery, UseQueryOptions,
+    useInfiniteQuery, UseInfiniteQueryOptions, useQuery, UseQueryOptions,
 } from "@tanstack/react-query";
 import buildQueryParams from "src/utils/buildQueryParams";
 import {SearchContiQueriesDto} from "src/dto/search/request/search-conti-queries.dto";
@@ -14,6 +14,7 @@ import ContiSimpleDto from "src/dto/home/conti-simple.dto";
 import {CreateContiDto} from "src/dto/conti/CreateContiDto";
 import {CopyContiDto} from "src/dto/conti/CopyContiDto";
 import {UpdateContiDto} from "src/dto/conti/UpdateContiDto";
+import {DeleteContiDto} from "src/dto/conti/DeleteContiDto";
 
 export const useInfiniteSearchContiQuery = (
     params: SearchContiQueriesDto,
@@ -72,9 +73,18 @@ export const fetchContiUpdate = async (contiId: string, updateContiDto: UpdateCo
     );
     return data;
 }
-// export const fetchContiDelete = async () => {
-//
-// }
+export const fetchContiDelete = async (contiId: string, deleteContiDto: DeleteContiDto) => {
+    const apiOptions: ApiOptions = {
+        method: "DELETE",
+        data: deleteContiDto,
+        requiresAuth: true,
+    }
+    const data = await apiRequestWithRefresh(
+        `/conti/${contiId}`,
+        apiOptions
+    );
+    return data;
+}
 
 export const fetchContiDetail = async (contiId: string) => {
     const apiOptions: ApiOptions = {
@@ -120,29 +130,35 @@ export function useContiPropertiesQuery() {
     } as UseQueryOptions<SearchContiPropertiesDto>);
 }
 
-export const useInfiniteContiQuery = (
-    params: { memberId: string, enabled: boolean },
-    options = {}
+type Pages = CommonInfiniteSearchDto<ContiWithSongDto>;
+type QK = readonly ["myContis", string | undefined];
+type MyOptions = Omit<
+    UseInfiniteQueryOptions<Pages, Error, Pages, QK>,
+    "queryKey" | "queryFn" | "initialPageParam" | "getNextPageParam"
+>;
+export const useInfiniteMyContiQuery = (
+    params: { memberId: string | undefined },
+    options?: MyOptions
 ) => {
     const apiOptions: ApiOptions = {
         requiresAuth: true
     }
-    const { data, isLoading, ...rest } = useInfiniteQuery<CommonInfiniteSearchDto<ContiWithSongDto>>({
-        queryKey: ["myContis", params],
+    const { data, isLoading, ...rest } = useInfiniteQuery<Pages, Error, Pages, QK>({
+        queryKey: ["myContis", params.memberId] as const,
         queryFn: async ({ pageParam = 0 }) => {
             const offset = pageParam as number;
-            const res: CommonInfiniteSearchDto<ContiWithSongDto> = await apiRequestWithRefresh(
+            const res: Pages = await apiRequestWithRefresh(
                 `/conti/${params.memberId}/mine?offset=${offset}`,
                 apiOptions
             );
             return res;
         },
         initialPageParam: 0,
-        enabled: params.enabled ?? true,
         getNextPageParam: (lastPage) => lastPage?.nextOffset ?? undefined,
         // staleTime: 5 * 60 * 1000,
-        refetchOnWindowFocus: false,
-        refetchOnMount: false,
+        refetchOnWindowFocus: "always",
+        refetchOnMount: "always",
+        ...options,
     });
     return {
         data,
@@ -164,3 +180,16 @@ export const fetchContiCopy = async (copyContiDto: CopyContiDto) => {
     );
     return res;
 };
+
+export const fetchContiAddSongs = async (contiId: string, songId: string) => {
+    const apiOptions: ApiOptions = {
+        method: "POST",
+        requiresAuth: true
+    }
+
+    const res: CommonResponseDto<string> = await apiRequestWithRefresh(
+        `/conti/${contiId}/${songId}`,
+        apiOptions
+    );
+    return res;
+}

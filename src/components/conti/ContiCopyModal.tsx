@@ -19,12 +19,14 @@ import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
 import ContiWithSongDto from "src/dto/common/conti-with-song.dto";
 import SongSimpleDto from "src/dto/home/song-simple.dto";
 import {useAuthStore} from "src/store/useAuthStore";
-import {fetchContiCopy, fetchContiCreate, useInfiniteContiQuery} from "src/app/api/conti";
+import {fetchContiCopy, fetchContiCreate, useInfiniteMyContiQuery} from "src/app/api/conti";
 import {useInView} from "react-intersection-observer";
 import {parseSongDuration} from "src/utils/parseSongDuration";
 import {CreateContiDto} from "src/dto/conti/CreateContiDto";
 import { CopyContiDto } from "src/dto/conti/CopyContiDto";
 import {toast} from "sonner";
+import {InfiniteData} from "@tanstack/query-core";
+import {CommonInfiniteSearchDto} from "src/dto/search/common-infinite-search.dto";
 
 interface SavedConti {
     id: string;
@@ -65,17 +67,12 @@ export default function ContiCopyModal({
         isFetchingNextPage,
         isLoading,
         isError,
-    } = useInfiniteContiQuery(
-        {
-            memberId: user?.id ?? "",
-            enabled: canQuery,
-        },
-        {
-            getNextPageParam: (lastPage: { nextOffset: number | null }) =>
-                lastPage.nextOffset ?? undefined,
-        }
+    } = useInfiniteMyContiQuery(
+        { memberId: user?.id },
+        { enabled: canQuery }
     );
-    const contis = data?.pages.flatMap((page) => page.items) ?? [];
+
+    const contis: ContiWithSongDto[] = (data as InfiniteData<CommonInfiniteSearchDto<ContiWithSongDto>> | undefined)?.pages.flatMap((p) => p.items) ?? [];
     const { ref, inView } = useInView({ threshold: 1 });
 
     useEffect(() => {

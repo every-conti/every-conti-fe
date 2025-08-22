@@ -20,6 +20,7 @@ import ContiWithSongDto from "src/dto/common/conti-with-song.dto";
 const ContiCard = ({ conti, setModaledConti, setIsCopyModalOpen }: { conti: ContiWithSongDto, setModaledConti: (conti: ContiWithSongDto) => void, setIsCopyModalOpen: (isOpen: boolean) => void }) => {
     const [copying, setCopying] = useState(false);
     const { user } = useAuthStore();
+    const [moreOpen, setMoreOpen] = useState(false);
 
     const totalDuration = conti.songs.reduce((total, song) => total + song.song.duration, 0);
 
@@ -76,31 +77,35 @@ const ContiCard = ({ conti, setModaledConti, setIsCopyModalOpen }: { conti: Cont
                         {/* 액션 */}
                         <div className="flex items-center justify-between text-sm">
                             {/* 우측 메뉴 (공유 / 내 콘티로 복사) */}
-                            <DropdownMenu>
+                            <DropdownMenu open={moreOpen} onOpenChange={setMoreOpen}>
                                 <DropdownMenuTrigger asChild>
                                     <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
                                         <MoreHorizontal className="w-4 h-4" />
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end" className="w-44">
-                                    <DropdownMenuItem onClick={(e) => {
-                                        e.preventDefault();
-                                        e.stopPropagation();
-                                        shareContent("conti", `/conti/detail/${conti.id}`, conti)
-                                    }}>
+                                    <DropdownMenuItem
+                                        onClick={(e: any) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            shareContent("conti", `/conti/detail/${conti.id}`, conti);
+                                            setMoreOpen(false);
+                                        }}
+                                    >
                                         <Share2 className="w-4 h-4 mr-2" />
                                         공유하기
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem
                                         disabled={!user || copying}
-                                        onClick={(e) => {
-                                            setModaledConti(conti);
-                                            setIsCopyModalOpen(true);
+                                        onClick={(e: any) => {
                                             e.preventDefault();
                                             e.stopPropagation();
-                                            handleCopyConti()}
-                                        }
+                                            setModaledConti(conti);
+                                            setIsCopyModalOpen(true);
+                                            handleCopyConti();
+                                            setMoreOpen(false); // 보장용
+                                        }}
                                     >
                                         <Plus className="w-4 h-4 mr-2" />
                                         내 콘티로 복사

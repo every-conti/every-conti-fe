@@ -5,6 +5,7 @@ export const fetchFamousPraiseTeamsContis = async () => {
   const apiOptions: ApiOptions = {
     useCache: true,
   }
+
   return apiRequestWithRefresh("/conti/praise-teams/famous/last-conti", apiOptions);
 };
 

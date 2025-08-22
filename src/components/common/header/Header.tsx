@@ -1,7 +1,7 @@
 "use client";
-import {LogOut, Plus, Menu, X, User, Settings} from "lucide-react";
+import {LogOut, Plus, Menu, X, User, Settings, Music} from "lucide-react";
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {useEffect, useRef, useState} from "react";
 import { Button } from "src/components/ui/button";
 import { useAuthStore } from "src/store/useAuthStore";
@@ -36,6 +36,7 @@ const navItems = [
 
 export default function Header() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const router = useRouter();
   const { user, loading, logout } = useAuthStore();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -52,7 +53,11 @@ export default function Header() {
     };
   }, [menuOpen]);
 
-  const isActive = (path: string) => pathname === path;
+  const isActive = (path: string) => {
+    const query = searchParams.toString();
+    const fullPath = query ? `${pathname}?${query}` : pathname;
+    return fullPath === path;
+  };
   const isGroupActive = (children: { path: string }[]) => children.some((c) => isActive(c.path));
   const dropdownTimers = useRef<{ [key: string]: NodeJS.Timeout | null }>({});
 
@@ -164,11 +169,18 @@ export default function Header() {
                         </div>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
-                            onClick={() => router.push("/my-page")}
+                            onClick={() => router.push("/my-page?tab=contis")}
                             className="cursor-pointer"
                         >
-                          <User className="mr-2 h-4 w-4" />
-                          <span>마이페이지</span>
+                          <Music className="mr-2 h-4 w-4" />
+                          <span>내 콘티</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            onClick={() => router.push("/my-page?tab=settings")}
+                            className="cursor-pointer"
+                        >
+                          <Settings className="mr-2 h-4 w-4" />
+                          <span>설정</span>
                         </DropdownMenuItem>
                         {/*<DropdownMenuItem className="cursor-pointer">*/}
                         {/*  <Settings className="mr-2 h-4 w-4" />*/}
@@ -219,6 +231,31 @@ export default function Header() {
                       ))}
                     </div>
                 ))}
+                <div className="mb-3">
+                  <h3 className="text-sm font-semibold text-gray-500 mb-1">마이 페이지</h3>
+                  <button
+                      onClick={() => {
+                        router.push("/my-page?tab=contis");
+                        setMenuOpen(false);
+                      }}
+                      className={`block w-full text-left py-2 px-2 rounded hover:bg-gray-100 ${
+                          isActive("/my-page?tab=contis") ? "text-blue-600 font-semibold" : "text-gray-800"
+                      }`}
+                  >
+                    내 콘티
+                  </button>
+                  <button
+                      onClick={() => {
+                        router.push("/my-page?tab=settings");
+                        setMenuOpen(false);
+                      }}
+                      className={`block w-full text-left py-2 px-2 rounded hover:bg-gray-100 ${
+                          isActive("/my-page?tab=settings") ? "text-blue-600 font-semibold" : "text-gray-800"
+                      }`}
+                  >
+                    설정
+                  </button>
+                </div>
 
                 <hr className="my-4" />
 

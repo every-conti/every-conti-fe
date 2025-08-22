@@ -1,4 +1,6 @@
-import { Play, Clock, Share2 } from "lucide-react";
+"use client";
+
+import {Play, Clock, Share2, Plus} from "lucide-react";
 import { Card } from "src/components/ui/card";
 import { Badge } from "src/components/ui/badge";
 import { Button } from "src/components/ui/button";
@@ -10,8 +12,17 @@ import { SongTempoKorean } from "src/types/song/song-tempo.types";
 import Link from "next/link";
 import PlayButton from "src/components/common/PlayButton";
 import shareContent from "src/utils/shareContent";
+import {useAuthStore} from "src/store/useAuthStore";
+import {MinimumSongToPlayDto} from "src/dto/common/minimum-song-to-play.dto";
 
-export default function WorshipSearchCard(song: SongDetailDto) {
+export default function WorshipSearchCard({
+  song,
+  onModalBtnClick,
+}: {
+  song: SongDetailDto;
+  onModalBtnClick:(e: any, song: MinimumSongToPlayDto) => void;
+}) {
+  const {user} = useAuthStore();
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow">
       <div className="flex flex-col sm:flex-row">
@@ -85,6 +96,11 @@ export default function WorshipSearchCard(song: SongDetailDto) {
                   재생
                 </Button>
               </PlayButton>
+              {user?.id &&
+              <Button variant="outline" size="sm" onClick={(e) => onModalBtnClick(e, song)}>
+                <Plus className="w-4 h-4" />
+                내 콘티에 추가
+              </Button>}
               <Button variant="outline" size="sm" onClick={(e) => {
                 e.preventDefault();
                 shareContent("song");
@@ -95,7 +111,7 @@ export default function WorshipSearchCard(song: SongDetailDto) {
 
             {/* 오른쪽 등록자 */}
             <div className="text-sm text-gray-500 sm:text-right">
-              <p className="flex justify-end">등록자: {song.creatorNickname.nickname}</p>
+              <p className="flex justify-end">등록자: {song.creatorNickname ? song.creatorNickname.nickname : "에브리콘티"}</p>
             </div>
           </div>
         </div>

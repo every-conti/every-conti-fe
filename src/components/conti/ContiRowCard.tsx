@@ -39,7 +39,6 @@ import { toast } from "sonner";
 import { useDebounce } from "use-debounce";
 import { useInfiniteSearchSongQuery } from "src/app/api/song";
 
-// dnd-kit
 import {
     DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEndEvent,
 } from "@dnd-kit/core";
@@ -50,7 +49,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { restrictToVerticalAxis, restrictToFirstScrollableAncestor } from "@dnd-kit/modifiers";
 import { MinimumSongToPlayDto } from "src/dto/common/minimum-song-to-play.dto";
 import {UpdateContiDto} from "src/dto/conti/UpdateContiDto";
-import {fetchContiUpdate} from "src/app/api/conti";
+import {fetchContiDelete, fetchContiUpdate} from "src/app/api/conti";
 import {useAuthStore} from "src/store/useAuthStore";
 
 /** ▸ 커스텀 센서: data-dnd-zone="songs" 내부에서만 드래그 시작 허용 */
@@ -58,14 +57,22 @@ class ZonePointerSensor extends PointerSensor {
     static activators = [
         {
             eventName: "onPointerDown" as const,
-            handler: ({ nativeEvent }) => {
-                return !!(nativeEvent.target as HTMLElement)?.closest('[data-dnd-zone="songs"]');
-            },
+            handler: ({ nativeEvent }: { nativeEvent: PointerEvent }) => {
+                const el = nativeEvent.target as Element | null;
+                return !!el?.closest('[data-dnd-zone="songs"]');            },
         },
     ];
 }
 
-export default function ContiRowCard({ conti }: { conti: ContiWithSongDto }) {
+export default function ContiRowCard({
+    conti,
+    onUpdated,
+    onDeleted,
+}: {
+    conti: ContiWithSongDto,
+    onUpdated: (updated: ContiWithSongDto) => void
+    onDeleted: (deleted: ContiWithSongDto) => void
+}) {
     const {user} = useAuthStore();
     const totalSec = conti.songs.reduce((acc, s) => acc + s.song.duration, 0);
     const firstThumb = conti.songs[0]?.song.thumbnail;
@@ -83,6 +90,9 @@ export default function ContiRowCard({ conti }: { conti: ContiWithSongDto }) {
         conti.songs.map((cs) => cs.song)
     );
     const [saving, setSaving] = useState(false);
+
+    const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+    const [deleting, setDeleting] = useState(false);
 
     // 1) 배열 비교(순서까지 동일해야 true)
     const areArraysEqual = (a: string[], b: string[]) =>
@@ -106,6 +116,12 @@ export default function ContiRowCard({ conti }: { conti: ContiWithSongDto }) {
         setEditSongs(conti.songs.map((cs) => cs.song));
         setIsEditOpen(true);
     };
+    const openDelete = (e?: React.MouseEvent) => {
+        e?.preventDefault();
+        e?.stopPropagation();
+        setMenuOpen(false);
+        setIsDeleteOpen(true);
+    };
 
     const handleSave = async (e?: React.FormEvent) => {
         e?.preventDefault();
@@ -119,7 +135,9 @@ export default function ContiRowCard({ conti }: { conti: ContiWithSongDto }) {
                 memberId: user?.id ?? "",
             };
 
-            await fetchContiUpdate(conti.id, dto);
+            const updatedConti = await fetchContiUpdate(conti.id, dto);
+
+            onUpdated(updatedConti);
 
             setIsEditOpen(false);
             toast.success("콘티가 저장되었습니다!");
@@ -129,6 +147,21 @@ export default function ContiRowCard({ conti }: { conti: ContiWithSongDto }) {
             setSaving(false);
         }
     };
+    const handleConfirmDelete = async (e?: React.MouseEvent) => {
+        e?.preventDefault();
+        e?.stopPropagation();
+        try {
+            setDeleting(true);
+            await fetchContiDelete(conti.id, {memberId: user?.id ?? ""});
+            toast.success("콘티가 삭제되었습니다.");
+            setIsDeleteOpen(false);
+            onDeleted(conti);
+        } catch (err) {
+            toast.error("삭제에 실패했습니다.");
+        } finally {
+            setDeleting(false);
+        }
+    };
 
     return (
         <>
@@ -136,12 +169,9 @@ export default function ContiRowCard({ conti }: { conti: ContiWithSongDto }) {
                 <div className="flex flex-col sm:flex-row">
                     {/* 썸네일 */}
                     {playSongs.length > 0 ? (
-                        <PlayButton songs={playSongs}>
+                        <PlayButton songs={[...playSongs]}>
                             <div
                                 className="relative w-full sm:w-57 sm:h-auto flex-shrink-0"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                }}
                             >
                                 <ImageWithFallback
                                     src={firstThumb}
@@ -206,6 +236,13 @@ export default function ContiRowCard({ conti }: { conti: ContiWithSongDto }) {
                                                     <Pencil className="w-4 h-4 mr-2" />
                                                     수정
                                                 </DropdownMenuItem>
+
+                                                <DropdownMenuItem
+                                                    onClick={openDelete}
+                                                >
+                                                    <Trash2 className="w-4 h-4 mr-2 text-red-500" />
+                                                    삭제
+                                                </DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </div>
@@ -233,12 +270,12 @@ export default function ContiRowCard({ conti }: { conti: ContiWithSongDto }) {
                                     <div className="flex flex-col gap-1">
                                         {conti.songs.slice(0, 3).map((s, i) => (
                                             <div key={s.song.id} className="text-xs text-gray-600 flex justify-between">
-                        <span className="truncate w-56">
-                          {i + 1}. {s.song.songName}
-                        </span>
-                                                <span className="text-gray-400">
-                          {parseSongDuration(s.song.duration)}
-                        </span>
+                                                <span className="truncate w-56">
+                                                  {i + 1}. {s.song.songName}
+                                                </span>
+                                                                        <span className="text-gray-400">
+                                                  {parseSongDuration(s.song.duration)}
+                                                </span>
                                             </div>
                                         ))}
                                         {conti.songs.length > 3 && (
@@ -247,9 +284,9 @@ export default function ContiRowCard({ conti }: { conti: ContiWithSongDto }) {
                                     </div>
                                 ) : (
                                     <div>
-                    <span className="truncate w-56 text-xs text-gray-600">
-                      아직 곡이 등록되지 않았습니다.
-                    </span>
+                                        <span className="truncate w-56 text-xs text-gray-600">
+                                          아직 곡이 등록되지 않았습니다.
+                                        </span>
                                     </div>
                                 )}
                             </div>
@@ -258,7 +295,7 @@ export default function ContiRowCard({ conti }: { conti: ContiWithSongDto }) {
                 </div>
             </Card>
 
-            {/* ---- Edit Modal ---- */}
+            {/* 수정 모달 */}
             <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
                 <DialogContent
                     className="sm:max-w-2xl"
@@ -335,6 +372,41 @@ export default function ContiRowCard({ conti }: { conti: ContiWithSongDto }) {
                     </Tabs>
                 </DialogContent>
             </Dialog>
+
+            {/* 삭제 모달 */}
+            <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
+                <DialogContent className="sm:max-w-md" onClick={(e) => e.stopPropagation()}>
+                    <DialogHeader>
+                        <DialogTitle>정말 삭제할까요?</DialogTitle>
+                    </DialogHeader>
+
+                    <div className="text-sm text-gray-600">
+                        <p className="mb-2">
+                            “<span className="font-medium">{conti.title}</span>” 콘티가 영구 삭제됩니다.
+                        </p>
+                        <p>이 작업은 되돌릴 수 없습니다.</p>
+                    </div>
+
+                    <DialogFooter>
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            onClick={() => setIsDeleteOpen(false)}
+                            disabled={deleting}
+                        >
+                            취소
+                        </Button>
+                        <Button
+                            type="button"
+                            variant="destructive"
+                            onClick={handleConfirmDelete}
+                            disabled={deleting}
+                        >
+                            {deleting ? "삭제 중…" : "삭제"}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </>
     );
 }
@@ -382,16 +454,13 @@ function SongPickerAndList({
             : addSong(song as unknown as MinimumSongToPlayDto);
     };
 
-    // ✨ 리스트 스크롤 컨테이너 + 드래깅 상태
     const scrollRef = useRef<HTMLDivElement | null>(null);
     const [dragging, setDragging] = useState(false);
 
-    // ✨ 컨테이너 내부에서만 드래그 시작되는 커스텀 센서
     const sensors = useSensors(
         useSensor(ZonePointerSensor, { activationConstraint: { distance: 8 } })
     );
 
-    // ✨ 간단 autoscroll
     useEffect(() => {
         if (!dragging) return;
         const handleMove = (e: PointerEvent) => {
@@ -527,7 +596,7 @@ function SongPickerAndList({
                     </div>
                 </div>
 
-                {/* ✨ 이 컨테이너 안에서만 드래그 시작 가능 */}
+                {/* 이 컨테이너 안에서만 드래그 시작 가능 */}
                 <div
                     ref={scrollRef}
                     data-dnd-zone="songs"

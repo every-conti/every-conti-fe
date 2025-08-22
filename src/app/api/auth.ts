@@ -1,5 +1,4 @@
 import CommonResponseDto from "src/dto/common/common-response.dto";
-import SignupRequestDto from "src/dto/auth/signup-request.dto";
 import EmailCodeVerificationDto from "src/dto/auth/email-code-verification.dto";
 import LoginRequestDto from "src/dto/auth/login-request.dto";
 import {apiRequestWithRefresh} from "src/app/api/apiRequestWithRefresh";
@@ -31,15 +30,6 @@ export const fetchVerifyEmailCode = async (emailCodeVerificationDto: EmailCodeVe
     return res;
 }
 
-export const fetchSignup = async (signupRequestDto: SignupRequestDto) => {
-    const apiOptions: ApiOptions = {
-        method: "POST",
-        data: signupRequestDto,
-    }
-    const res: CommonResponseDto<string> = await apiRequestWithRefresh("/member", apiOptions);
-    return res;
-};
-
 export const fetchNewAccessToken = async () => {
     const apiOptions: ApiOptions = {
         requiresAuth: true,
@@ -48,16 +38,9 @@ export const fetchNewAccessToken = async () => {
     return data;
 }
 
-export const fetchMyUserInfo = async () => {
-    const apiOptions: ApiOptions = {
-        requiresAuth: true,
-    }
-    const data: UserDto = await apiRequestWithRefresh("/member/me", apiOptions);
-    return data;
-}
-
 export const fetchLogout = async () => {
     const apiOptions: ApiOptions = {
+        method: "POST",
         requiresAuth: true,
     }
     const data: UserDto = await apiRequestWithRefresh("/auth/logout", apiOptions);

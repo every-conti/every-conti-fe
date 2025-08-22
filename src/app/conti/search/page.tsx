@@ -236,14 +236,16 @@ export default function ContiFeedPage() {
             </div>
 
             {/* 콘티 복사 모달 */}
-            <ContiCopyModal
-                isOpen={isCopyModalOpen}
-                onClose={() => setIsCopyModalOpen(false)}
-                conti={modaledConti}
-                savedContis={[]}
-                onCreateNewConti={() => {}}
-                onAddToExistingConti={() => {}}
-            />
+            {isCopyModalOpen && (
+                <ContiCopyModal
+                    isOpen={isCopyModalOpen}
+                    onClose={() => setIsCopyModalOpen(false)}
+                    conti={modaledConti}
+                    savedContis={[]}
+                    onCreateNewConti={() => {}}
+                    onAddToExistingConti={() => {}}
+                />
+            )}
         </>
     );
 }

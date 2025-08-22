@@ -24,19 +24,17 @@ import {MinimumSongToPlayDto} from "src/dto/common/minimum-song-to-play.dto";
 import {useRouter} from "next/navigation";
 import {parseSongDuration} from "src/utils/parseSongDuration";
 import ContiCopyModal from "src/components/conti/ContiCopyModal";
-import ContiWithSongDto from "src/dto/common/conti-with-song.dto";
 
 export default function ContiDetailPage({ params }: { params: Promise<{ contiId: string; }> }) {
     const router = useRouter();
-    // const [isLiked, setIsLiked] = useState(false);
     const { isPlaying, enqueueAndPlay } = usePlayerStore()
     const currentSong = useCurrentSong();
     const { contiId } = use(params);
-
     const { data: conti } = useContiDetailQuery(contiId);
 
+    const songs = conti?.songs ?? [];
     // 총 재생 시간 계산
-    const totalDuration = conti ? conti.songs.reduce((total, song) => total + song.song.duration, 0) : 0;
+    const totalDuration = conti ? songs.reduce((total, song) => total + song.song.duration, 0) : 0;
 
     const [isCopyModalOpen, setIsCopyModalOpen] = useState<boolean>(false);
 
@@ -62,7 +60,7 @@ export default function ContiDetailPage({ params }: { params: Promise<{ contiId:
 
     const handlePlayAll = () => {
         if (!conti) return;
-        enqueueAndPlay(conti.songs.map(s => s.song));
+        enqueueAndPlay(songs.map(s => s.song));
     }
 
     // const handleLike = () => {
@@ -112,20 +110,20 @@ export default function ContiDetailPage({ params }: { params: Promise<{ contiId:
                             <div
                                 className="aspect-square w-full max-w-80 mx-auto lg:mx-0 relative overflow-hidden rounded-xl">
                                 <ImageWithFallback
-                                    src={conti.songs[0].song.thumbnail}
-                                    alt={conti.songs[0].song.songName}
+                                    src={songs.length > 0 ? songs[0].song.thumbnail : ""}
+                                    alt={songs.length > 0 ? songs[0].song.songName : "에브리콘티"}
                                     className="w-full h-full object-cover"
                                 />
-
+    
                                 {/* 재생 오버레이 */}
-                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                                {songs.length > 0 && <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                                     <Button
                                         onClick={handlePlayAll}
                                         className="w-16 h-16 rounded-full bg-white hover:bg-gray-100 text-black shadow-lg"
                                     >
                                         <Play className="w-7 h-7 ml-1"/>
                                     </Button>
-                                </div>
+                                </div>}
                             </div>
                         </div>
 
@@ -148,7 +146,7 @@ export default function ContiDetailPage({ params }: { params: Promise<{ contiId:
                                     </div>
                                     <div className="flex items-center">
                                         <Music className="w-4 h-4 mr-2"/>
-                                        <span>{conti.songs.length}곡</span>
+                                        <span>{songs.length}곡</span>
                                     </div>
                                     <div className="flex items-center">
                                         <Clock className="w-4 h-4 mr-2"/>
@@ -158,7 +156,7 @@ export default function ContiDetailPage({ params }: { params: Promise<{ contiId:
                             </div>
 
                             {/* 액션 버튼들 */}
-                            <div className="flex flex-wrap items-center gap-3">
+                            {songs.length > 0 && <div className="flex flex-wrap items-center gap-3">
                                 <Button
                                     onClick={handlePlayAll}
                                     className="bg-blue-600 hover:bg-blue-700"
@@ -185,7 +183,8 @@ export default function ContiDetailPage({ params }: { params: Promise<{ contiId:
                                 {/*    <Heart className={`w-4 h-4 mr-2 ${isLiked ? 'fill-current' : ''}`}/>*/}
                                 {/*    좋아요*/}
                                 {/*</Button>*/}
-                            </div>
+                            </div>}
+
                         </div>
                     </div>
                 </div>
@@ -196,7 +195,8 @@ export default function ContiDetailPage({ params }: { params: Promise<{ contiId:
                         <h2 className="text-xl mb-6">곡 목록</h2>
 
                         <div className="space-y-1">
-                            {conti.songs.map((song, index) => (
+                            {songs.length === 0 && <span>아직 등록된 곡이 없습니다.</span>}
+                            {songs.map((song, index) => (
                                 <div key={`${song.song.id}-${index}`}>
                                     <div
                                         className="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors group">
@@ -260,7 +260,7 @@ export default function ContiDetailPage({ params }: { params: Promise<{ contiId:
                                         </div>
                                     </div>
 
-                                    {/*{index < conti.songs.length - 1 && (*/}
+                                    {/*{index < songs.length - 1 && (*/}
                                     {/*    <Separator className="my-1"/>*/}
                                     {/*)}*/}
                                 </div>

@@ -1,4 +1,4 @@
-import { ChevronRight, Upload, Music, List, ArrowRight } from "lucide-react";
+import { ChevronRight, Music, List, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import ContiContentCard from "src/components/home/ContiContentCard";
 import HeroSection from "src/components/home/HeroSection";

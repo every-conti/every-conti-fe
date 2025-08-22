@@ -22,6 +22,8 @@ import { SongTypeTypes} from "src/types/song/song-type.types";
 import PageTitle from "src/components/common/PageTitle";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {MIN_SONG_DURATION, MAX_SONG_DURATION} from "src/constant/conti/conti-search.constant";
+import AddToContiModal from "src/components/song/AddToContiModal";
+import {MinimumSongToPlayDto} from "src/dto/common/minimum-song-to-play.dto";
 
 
 export default function SearchDetail() {
@@ -53,6 +55,10 @@ export default function SearchDetail() {
 
     const [chapters, setChapters] = useState<BibleChapterDto[]>([]);
     const [verses, setVerses] = useState<BibleVerseDto[]>([]);
+
+    const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
+    const [modaledSong, setModaledSong] = useState<MinimumSongToPlayDto | null>(null);
+
 
   const { data: searchSongProperties } = useSongPropertiesQuery();
 
@@ -206,6 +212,12 @@ export default function SearchDetail() {
         }
     }, [serialized, pathname, isRestored]);
 
+    const onModalBtnClick = (e:any, song: MinimumSongToPlayDto) => {
+        e.preventDefault();
+        setIsAddModalOpen(true);
+        setModaledSong(song);
+    }
+
   return (
     <>
         <PageTitle title="찬양 검색" description="원하는 찬양을 필터를 통해 찬양팀, 장르, 주제 별로 찾아보세요" />
@@ -254,7 +266,7 @@ export default function SearchDetail() {
               <div className="space-y-4">
                   {songs.map((song, idx) => (
                       <div key={song.id}>
-                          <WorshipSearchCard {...song} />
+                          <WorshipSearchCard song={song} onModalBtnClick={onModalBtnClick} />
                       </div>
                   ))}
 
@@ -274,6 +286,12 @@ export default function SearchDetail() {
           )}
         </div>
       </div>
+
+        <AddToContiModal
+            isOpen={isAddModalOpen}
+            onClose={() => setIsAddModalOpen(false)}
+            song={modaledSong}
+        />
     </>
   );
 }
