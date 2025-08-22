@@ -27,6 +27,7 @@ import { fetchContiCreate } from "src/app/api/conti";
 import { useAuthStore } from "src/store/useAuthStore";
 import { useRouter } from "next/navigation";
 import withAuth from "src/components/common/withAuth";
+import {MAX_SONGS_PER_CONTI} from "src/constant/conti/conti-create.constant";
 
 function SortableSongItem({
   song,
@@ -118,6 +119,10 @@ function ContiCreationPage() {
   const [selectedSongs, setSelectedSongs] = useState<SongDetailDto[]>([]);
   const isSongSelected = (id: string) => selectedSongs.some((s) => s.id === id);
   const addSong = (song: SongDetailDto) => {
+    if (selectedSongs.length >= MAX_SONGS_PER_CONTI) {
+      toast.info(`최대 ${MAX_SONGS_PER_CONTI}곡까지 추가할 수 있어요.`);
+      return;
+    }
     if (!isSongSelected(song.id)) setSelectedSongs([...selectedSongs, song]);
   };
   const removeSong = (id: string) => {
@@ -125,8 +130,15 @@ function ContiCreationPage() {
     setSelectedSongs(filtered.map((s, i) => ({ ...s, order: i })));
   };
   const toggleSong = (song: SongDetailDto) => {
-    isSongSelected(song.id) ? removeSong(song.id) : addSong(song);
-  };
+    if (isSongSelected(song.id)) {
+      removeSong(song.id);
+    } else {
+      if (selectedSongs.length >= MAX_SONGS_PER_CONTI) {
+        toast.info(`최대 ${MAX_SONGS_PER_CONTI}곡까지 추가할 수 있어요.`);
+        return;
+      }
+      addSong(song);
+    }  };
 
   // dnd sensors
   const sensors = useSensors(
@@ -180,6 +192,10 @@ function ContiCreationPage() {
     }
     if (!contiTitle.trim()) {
       toast.info("콘티 제목을 입력해주세요.");
+      return;
+    }
+    if (selectedSongs.length > MAX_SONGS_PER_CONTI) {
+      toast.error(`곡은 최대 ${MAX_SONGS_PER_CONTI}곡까지만 저장할 수 있어요.`);
       return;
     }
 
