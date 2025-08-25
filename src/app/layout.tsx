@@ -6,6 +6,7 @@ import Footer from "src/components/common/footer/Footer";
 import Providers from "src/utils/provider/Providers";
 import PlayerBar from "src/components/common/playerBar/PlayerBar";
 import {Toaster} from "sonner";
+import { GoogleAnalytics } from '@next/third-parties/google'
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -42,6 +43,7 @@ export default function RootLayout({
           <PlayerBar />
         </Providers>
       </body>
+      <GoogleAnalytics gaId="GTM-K27FMHMH" />
     </html>
   );
 }

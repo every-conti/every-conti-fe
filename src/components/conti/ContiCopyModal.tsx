@@ -19,7 +19,7 @@ import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
 import ContiWithSongDto from "src/dto/common/conti-with-song.dto";
 import SongSimpleDto from "src/dto/home/song-simple.dto";
 import {useAuthStore} from "src/store/useAuthStore";
-import {fetchContiCopy, fetchContiCreate, useInfiniteMyContiQuery} from "src/app/api/conti";
+import {fetchContiCopy, fetchContiCreate, useInfiniteMyContiQuery} from "src/app/api/conti/conti";
 import {useInView} from "react-intersection-observer";
 import {parseSongDuration} from "src/utils/parseSongDuration";
 import {CreateContiDto} from "src/dto/conti/CreateContiDto";
@@ -168,10 +168,6 @@ export default function ContiCopyModal({
                     <DialogTitle className="flex items-center space-x-2">
                         <Copy className="w-5 h-5" />
                         <span>콘티 복사</span>
-                        <button onClick={() => {
-                            toast("하하하하ㅏ하핳하ㅏ");
-                            console.log('흠')
-                        }}>button</button>
                     </DialogTitle>
                 </DialogHeader>
 

@@ -13,7 +13,7 @@ import { Card } from "src/components/ui/card";
 import { useAuthStore } from "src/store/useAuthStore";
 import { useInView } from "react-intersection-observer";
 import { toast } from "sonner";
-import {fetchContiAddSongs, useInfiniteMyContiQuery} from "src/app/api/conti";
+import {fetchContiAddSongs, useInfiniteMyContiQuery} from "src/app/api/conti/conti";
 import { parseSongDuration } from "src/utils/parseSongDuration";
 import ContiWithSongDto from "src/dto/common/conti-with-song.dto";
 import {InfiniteData} from "@tanstack/query-core";

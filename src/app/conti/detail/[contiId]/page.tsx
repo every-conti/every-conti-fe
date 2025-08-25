@@ -7,7 +7,6 @@ import {
     Clock,
     Music,
     Calendar,
-    Heart,
     Share2,
     Copy,
 } from "lucide-react";
@@ -16,7 +15,7 @@ import {ImageWithFallback} from "src/components/common/ImageWithFallback";
 import { Button } from "src/components/ui/button";
 import { Card } from "src/components/ui/card";
 import {Badge} from "src/components/ui/badge";
-import {useContiDetailQuery} from "src/app/api/conti";
+import {useContiDetailQuery} from "src/app/api/conti/conti";
 import {usePlayerStore} from "src/store/usePlayerStore";
 import shareContent from "src/utils/shareContent";
 import {useCurrentSong} from "src/store/useCurrentSong";

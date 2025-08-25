@@ -3,7 +3,7 @@
 import {
     Heart, Music, Pause, Play, Plus, Shuffle,
     SkipBack, SkipForward, Volume2, ChevronDown,
-    List, MoreHorizontal, Share2
+    List, MoreHorizontal, Share2, Text
 } from "lucide-react";
 import { useState } from "react";
 import { ImageWithFallback } from "../ImageWithFallback";
@@ -24,7 +24,7 @@ function QueueItem({
     return (
         <div
             key={`queue-${song.id ?? index}`}
-            className={`w-full max-w-full flex justify-between items-center space-x-2 sm:space-x-3 p-2 sm:p-3 rounded-lg transition-colors ${                isActive ? "bg-white/20 border border-white/30" : "hover:bg-white/10"
+            className={`w-full max-w-full flex justify-between items-center space-x-2 sm:space-x-3 p-2 sm:p-3 rounded-lg transition-colors ${isActive ? "bg-white/20 border border-white/30" : "hover:bg-white/10"
             }`}
         >
             <div className="relative w-11 h-11 sm:w-12 sm:h-12 rounded-md overflow-hidden flex-shrink-0">
@@ -146,7 +146,7 @@ export default function FullScreenMusicPlayer(props: MusicPlayerPropsDto) {
                             className={`text-white hover:bg-white/20 ${viewMode === "lyrics" ? "text-blue-300" : ""}`}
                             title={viewMode === "lyrics" ? "가사 닫기" : "가사 전체화면"}
                         >
-                            <Music className="w-5 h-5" />
+                            <Text className="w-5 h-5" />
                         </Button>
 
                         {/* 대기열 토글 */}

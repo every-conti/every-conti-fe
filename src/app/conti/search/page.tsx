@@ -1,7 +1,7 @@
 "use client";
 import PageTitle from "src/components/common/PageTitle";
 import ContiCard from "src/components/conti/ContiCard";
-import { useContiPropertiesQuery, useInfiniteSearchContiQuery } from "src/app/api/conti";
+import { useContiPropertiesQuery, useInfiniteSearchContiQuery } from "src/app/api/conti/conti";
 import LoadingSpinner from "src/components/common/LoadingSpinner";
 import { useInView } from "react-intersection-observer";
 import ContiSearchFilters from "src/components/conti/ContiSearchFilters";

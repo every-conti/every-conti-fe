@@ -24,6 +24,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {MIN_SONG_DURATION, MAX_SONG_DURATION} from "src/constant/conti/conti-search.constant";
 import AddToContiModal from "src/components/song/AddToContiModal";
 import {MinimumSongToPlayDto} from "src/dto/common/minimum-song-to-play.dto";
+import LyricsModal from "src/components/song/LyricsModal";
 
 
 export default function SearchDetail() {
@@ -31,8 +32,9 @@ export default function SearchDetail() {
     const pathname = usePathname();
     const searchParams = useSearchParams();
 
-  const [searchTerm, setSearchTerm] = useState<string | null>(null);
-  const [debouncedSearchTerm] = useDebounce(searchTerm, 400);
+    const initialText = useMemo(() => searchParams.get("text"), []);
+    const [searchTerm, setSearchTerm] = useState<string | null>(initialText ?? null);
+    const [debouncedSearchTerm] = useDebounce(searchTerm, 400);
   const [selectedKey, setSelectedKey] = useState<SongKeyTypes | null>(null);
   const [selectedSongType, setSelectedSongType] =
     useState<SongTypeTypes | null>(null);
@@ -58,58 +60,100 @@ export default function SearchDetail() {
 
     const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
     const [modaledSong, setModaledSong] = useState<MinimumSongToPlayDto | null>(null);
+    const [lyricsOpen, setLyricsOpen] = useState(false);
 
-
-  const { data: searchSongProperties } = useSongPropertiesQuery();
-
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isLoading,
-    isError,
-  } = useInfiniteSearchSongQuery(
-    {
-      text: debouncedSearchTerm ?? undefined,
-      songType: selectedSongType ?? undefined,
-      praiseTeamId: selectedPraiseTeam?.id,
-      tempo: selectedTempo ?? undefined,
-      seasonId: selectedSeason?.id,
-      minDuration: durationChanged ? duration[0] * 60 : undefined,
-      maxDuration: durationChanged ? duration[1] * 60 : undefined,
-      bibleId: selectedBible?.id,
-      bibleChapterId: selectedBibleChapter?.id,
-      bibleVerseId: selectedBibleVerse?.id,
-      songKey: selectedKey ?? undefined,
-      themeIds:
-        selectedThemes.length > 0 ? selectedThemes.map((t) => t.id) : undefined,
-    },
-    {
-      getNextPageParam: (lastPage: { nextOffset: number | null }) =>
-        lastPage.nextOffset ?? undefined,
-    }
-  );
-
-  const { ref, inView } = useInView({ threshold: 1 });
-
-  const songs = data?.pages.flatMap((page) => page.items) ?? [];
+    const { ref, inView } = useInView({ threshold: 1 });
     const [isRestored, setIsRestored] = useState(false);
+    const { data: searchSongProperties } = useSongPropertiesQuery();
 
-  useEffect(() => {
-    if (inView && hasNextPage) {
-      fetchNextPage();
-    }
-  }, [inView, hasNextPage, fetchNextPage]);
+    const normalize = (s: string) =>
+        s.split("&").filter(Boolean).sort().join("&");
+    // State -> URL
+    const serialized = useMemo(() => {
+        const params = new URLSearchParams();
+
+        const set = (k: string, v: string | number | null | undefined) => {
+            if (v === null || v === undefined || v === "") return;
+            params.set(k, String(v));
+        };
+
+        set("text", debouncedSearchTerm ?? undefined);
+        set("songType", selectedSongType ?? undefined);
+        set("tempo", selectedTempo ?? undefined);
+        set("songKey", selectedKey ?? undefined);
+        set("praiseTeam", selectedPraiseTeam?.praiseTeamName);
+        set("season", selectedSeason?.seasonName);
+        set("min", durationChanged ? duration[0] : undefined);
+        set("max", durationChanged ? duration[1] : undefined);
+        set("bible", selectedBible?.bibleKoName);
+        set("chapter", selectedBibleChapter?.chapterNum);
+        set("verse", selectedBibleVerse?.verseNum);
+
+        if (selectedThemes.length > 0) {
+            set("themes", selectedThemes.map((th) => th.themeName).join(","));
+        }
+
+        return params.toString();
+    }, [
+        debouncedSearchTerm,
+        selectedSongType,
+        selectedTempo,
+        selectedKey,
+        selectedPraiseTeam,
+        selectedSeason,
+        duration,
+        selectedBible,
+        selectedBibleChapter,
+        selectedBibleVerse,
+        selectedThemes,
+    ]);
+    const ready =
+        !!searchSongProperties &&
+        normalize(serialized) === normalize(searchParams.toString());
+
+    const queryParams = useMemo(() => ({
+        text: debouncedSearchTerm ?? undefined,
+        songType: selectedSongType ?? undefined,
+        praiseTeamId: selectedPraiseTeam?.id,
+        tempo: selectedTempo ?? undefined,
+        seasonId: selectedSeason?.id,
+        minDuration: durationChanged ? duration[0] * 60 : undefined,
+        maxDuration: durationChanged ? duration[1] * 60 : undefined,
+        bibleId: selectedBible?.id,
+        bibleChapterId: selectedBibleChapter?.id,
+        bibleVerseId: selectedBibleVerse?.verseNum ? selectedBibleVerse.id : undefined,
+        songKey: selectedKey ?? undefined,
+        themeIds: selectedThemes.length ? selectedThemes.map(t => t.id) : undefined,
+    }), [
+        debouncedSearchTerm, selectedSongType, selectedPraiseTeam, selectedTempo,
+        selectedSeason, durationChanged, duration, selectedBible,
+        selectedBibleChapter, selectedBibleVerse, selectedKey, selectedThemes
+    ]);
+
+    const {
+        data,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        isLoading,
+        isError,
+    } = useInfiniteSearchSongQuery(
+        queryParams,
+        { enabled: ready }
+    );
+  const songs = data?.pages.flatMap((page) => page.items) ?? [];
+
+    useEffect(() => {
+        if (!ready) return;
+        if (inView && hasNextPage) fetchNextPage();
+    }, [inView, hasNextPage, fetchNextPage, ready]);
 
     const parseIntOrNull = (v?: string | null) =>
         v != null && v !== "" && !Number.isNaN(Number(v)) ? Number(v) : null;
 
-    // URL -> State (첫 마운트 + 브라우저 뒤/앞 이동)
     useEffect(() => {
         if (!searchSongProperties) return;
 
-        // searchParams는 읽기 전용 스냅샷이라 매번 새로 읽어와야 함
         const text = searchParams.get("text");
         const songType = searchParams.get("songType") as SongTypeTypes | null;
         const tempo = searchParams.get("tempo") as SongTempoTypes | null;
@@ -129,8 +173,6 @@ export default function SearchDetail() {
                 .split(",")
             : [];
 
-
-        // 문자열들은 그대로, 숫자 id들은 필요한 최소 필드만 세팅
         setSearchTerm(text ?? null);
         setSelectedSongType(songType ? songType : null);
         setSelectedTempo(tempo ?? null);
@@ -161,46 +203,6 @@ export default function SearchDetail() {
         setIsRestored(true);
     }, [searchSongProperties, chapters, verses]);
 
-    // State -> URL
-    const serialized = useMemo(() => {
-        const params = new URLSearchParams();
-
-        const set = (k: string, v: string | number | null | undefined) => {
-            if (v === null || v === undefined || v === "") return;
-            params.set(k, String(v));
-        };
-
-        set("text", debouncedSearchTerm ?? undefined);
-        set("songType", selectedSongType ?? undefined);
-        set("tempo", selectedTempo ?? undefined);
-        set("songKey", selectedKey ?? undefined);
-        set("praiseTeam", selectedPraiseTeam?.praiseTeamName);
-        set("season", selectedSeason?.seasonName);
-        set("min", duration[0] ?? undefined);
-        set("max", duration[1] ?? undefined);
-        set("bible", selectedBible?.bibleKoName);
-        set("chapter", selectedBibleChapter?.chapterNum);
-        set("verse", selectedBibleVerse?.verseNum);
-
-        if (selectedThemes.length > 0) {
-            set("themes", selectedThemes.map((th) => th.themeName).join(","));
-        }
-
-        return params.toString();
-    }, [
-        debouncedSearchTerm,
-        selectedSongType,
-        selectedTempo,
-        selectedKey,
-        selectedPraiseTeam,
-        selectedSeason,
-        duration,
-        selectedBible,
-        selectedBibleChapter,
-        selectedBibleVerse,
-        selectedThemes,
-    ]);
-
     useEffect(() => {
         if (!isRestored) return; // 최초 복원 전에는 URL 갱신 안 함
         const next = serialized ? `${pathname}?${serialized}` : pathname;
@@ -212,11 +214,18 @@ export default function SearchDetail() {
         }
     }, [serialized, pathname, isRestored]);
 
-    const onModalBtnClick = (e:any, song: MinimumSongToPlayDto) => {
+    const onAddModalBtnClick = (e:any, song: MinimumSongToPlayDto) => {
         e.preventDefault();
+        e.stopPropagation?.();
         setIsAddModalOpen(true);
         setModaledSong(song);
     }
+    const onLyricsModalClick = (e: any, song: MinimumSongToPlayDto) => {
+        e.preventDefault();
+        e.stopPropagation?.();
+        setModaledSong(song);
+        setLyricsOpen(true);
+    };
 
   return (
     <>
@@ -266,7 +275,7 @@ export default function SearchDetail() {
               <div className="space-y-4">
                   {songs.map((song, idx) => (
                       <div key={song.id}>
-                          <WorshipSearchCard song={song} onModalBtnClick={onModalBtnClick} />
+                          <WorshipSearchCard song={song} onAddModalBtnClick={onAddModalBtnClick} onLyricsModalClick={onLyricsModalClick} />
                       </div>
                   ))}
 
@@ -290,6 +299,12 @@ export default function SearchDetail() {
         <AddToContiModal
             isOpen={isAddModalOpen}
             onClose={() => setIsAddModalOpen(false)}
+            song={modaledSong}
+        />
+
+        <LyricsModal
+            open={lyricsOpen}
+            onOpenChange={setLyricsOpen}
             song={modaledSong}
         />
     </>

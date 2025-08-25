@@ -23,7 +23,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 
 import { CreateContiDto } from "src/dto/conti/CreateContiDto";
-import { fetchContiCreate } from "src/app/api/conti";
+import { fetchContiCreate } from "src/app/api/conti/conti";
 import { useAuthStore } from "src/store/useAuthStore";
 import { useRouter } from "next/navigation";
 import withAuth from "src/components/common/withAuth";
@@ -180,7 +180,6 @@ function ContiCreationPage() {
     isError,
   } = useInfiniteSearchSongQuery(
       { text: q || undefined, enabled: q.length > 0 },
-      { getNextPageParam: (lastPage: { nextOffset: number | null }) => lastPage.nextOffset ?? undefined }
   );
   const searchedSongs = data?.pages.flatMap((page: any) => page.items) ?? [];
 

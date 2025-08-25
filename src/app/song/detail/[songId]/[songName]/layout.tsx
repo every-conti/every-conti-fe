@@ -1,4 +1,3 @@
-import {notFound} from "next/navigation";
 import {fetchSongDetail} from "src/app/api/song";
 import {REVALIDATE_TIME_ONE_DAY} from "src/constant/numbers.constant";
 
@@ -10,7 +9,7 @@ export async function generateMetadata({ params }: { params: Promise<{ songId: s
     const song = await fetchSongDetail(songId);
 
     const {id, songName, lyrics, youtubeVId, songType, praiseTeam, thumbnail, creatorNickname, songThemes, tempo, season, songKey, duration, bible, bibleChapter, bibleVerse} = song;
-    const previewLyrics = lyrics.replace(/\n/g, '').slice(0, 30);
+    const previewLyrics = lyrics?.replace(/\n/g, '').slice(0, 30);
 
     return {
         title: `${songName} | ${praiseTeam.praiseTeamName}`,
@@ -36,7 +35,7 @@ export async function generateMetadata({ params }: { params: Promise<{ songId: s
             images: thumbnail,
         },
         alternates: {
-            canonical: `/every-conti/song/detail/${id}/${songName}`,
+            canonical: `${process.env.NEXT_PUBLIC_FRONT_URL}/song/detail/${id}/${songName}`,
         },
     };
 }

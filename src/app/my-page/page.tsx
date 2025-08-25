@@ -17,7 +17,7 @@ import {useAuthStore} from "src/store/useAuthStore";
 import ContiWithSongDto from "src/dto/common/conti-with-song.dto";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import basicProfile from "src/assets/basic-profile.png";
-import {useInfiniteMyContiQuery} from "src/app/api/conti";
+import {useInfiniteMyContiQuery} from "src/app/api/conti/conti";
 import { useInView } from "react-intersection-observer";
 import ContiRowCard from "src/components/conti/ContiRowCard";
 import {useQueryClient} from "@tanstack/react-query";

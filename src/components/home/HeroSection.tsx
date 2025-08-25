@@ -4,9 +4,11 @@ import { Search } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import {useRouter} from "next/navigation";
+import {useState} from "react";
 
 export default function HeroSection() {
   const router = useRouter();
+  const [searchText, setSearchText] = useState("");
   return (
       <section className="py-10 sm:py-16 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto text-center">
@@ -22,12 +24,13 @@ export default function HeroSection() {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <Input
+                    onChange={(e) => setSearchText(e.target.value)}
                     placeholder="찬양 제목이나 가사로 검색하세요..."
                     className="pl-10 py-2 sm:py-3 text-sm sm:text-base"
                 />
               </div>
               <Button className="bg-blue-500 hover:bg-blue-600 px-4 sm:px-6 text-sm sm:text-base" onClick={() => {
-                router.push("/song/search");
+                router.push(`/song/search${searchText && `?text=${searchText}`}`);
               }}>
                 검색
               </Button>

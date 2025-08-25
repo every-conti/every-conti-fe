@@ -2,6 +2,7 @@ import {ShareModeTypes} from "src/types/share-mode.types";
 import ContiWithSongDto from "src/dto/common/conti-with-song.dto";
 import {parseSongDuration} from "src/utils/parseSongDuration";
 import {getFullYoutubeURIByVId} from "src/utils/youtubeVIdUtils";
+import {MinimumSongToPlayDto} from "src/dto/common/minimum-song-to-play.dto";
 
 function handleUnsupportedShare(shareData: any) {
     if (shareData.url) {
@@ -27,6 +28,14 @@ export default function shareContent(mode: ShareModeTypes, url?: string, data?: 
     switch (mode) {
         case "song":
             shareData.text = `[에브리콘티]\n에브리콘티에서 찬양의 정보를 확인하고 콘티를 등록해보세요`;
+            break;
+        case "lyrics":
+            if (data) {
+                const song = data as MinimumSongToPlayDto;
+                shareData.text = `[에브리콘티]\n${song.songName}가사:\n\n${song.lyrics}}`;
+            } else {
+                shareData.text = `[에브리콘티]\n에브리콘티에서 곡의 가사를 확인해보세요`;
+            }
             break;
         case "conti":
             if (data) {

@@ -27,9 +27,11 @@ import {usePlayerStore} from "src/store/usePlayerStore";
 import {MinimumSongToPlayDto} from "src/dto/common/minimum-song-to-play.dto";
 import {useCurrentSong} from "src/store/useCurrentSong";
 import AddToContiModal from "src/components/song/AddToContiModal";
+import {useAuthStore} from "src/store/useAuthStore";
 
 export default function Page({ params }: { params: Promise<{ songId: string; songName: string }> }) {
     const router = useRouter();
+    const {user} = useAuthStore();
     const { songId, songName } = use(params);
     const {isPlaying, setIsPlaying, enqueueAndPlay} = usePlayerStore();
     const currentSong = useCurrentSong();
@@ -74,9 +76,9 @@ export default function Page({ params }: { params: Promise<{ songId: string; son
                                 <Button variant="ghost" size="sm" onClick={() => shareContent("song")}>
                                     <Share2 className="w-4 h-4"/>
                                 </Button>
-                                <Button variant="ghost" size="sm">
-                                    <MoreVertical className="w-4 h-4"/>
-                                </Button>
+                                {/*<Button variant="ghost" size="sm">*/}
+                                {/*    <MoreVertical className="w-4 h-4"/>*/}
+                                {/*</Button>*/}
                             </div>
                         </div>
                     </div>
@@ -188,7 +190,7 @@ export default function Page({ params }: { params: Promise<{ songId: string; son
                                 {/*</div>*/}
 
                                 {/* 액션 버튼 */}
-                                <div className="flex flex-wrap gap-2">
+                                {user?.id && <div className="flex flex-wrap gap-2">
                                     <Button
                                         onClick={handleAddToConti}
                                         // disabled={isInConti}
@@ -217,7 +219,8 @@ export default function Page({ params }: { params: Promise<{ songId: string; son
                                     {/*    <Heart className={`w-4 h-4 mr-1 ${isLiked ? 'fill-current' : ''}`} />*/}
                                     {/*    좋아요*/}
                                     {/*</Button>*/}
-                                </div>
+                                </div>}
+
                             </div>
                         </div>
                     </Card>

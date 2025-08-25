@@ -15,6 +15,8 @@ import {CreateContiDto} from "src/dto/conti/CreateContiDto";
 import {CopyContiDto} from "src/dto/conti/CopyContiDto";
 import {UpdateContiDto} from "src/dto/conti/UpdateContiDto";
 import {DeleteContiDto} from "src/dto/conti/DeleteContiDto";
+import {useMemo} from "react";
+import {qk} from "src/app/api/conti/qk";
 
 export const useInfiniteSearchContiQuery = (
     params: SearchContiQueriesDto,
@@ -23,9 +25,13 @@ export const useInfiniteSearchContiQuery = (
     const apiOptions: ApiOptions = {
         useCache: true,
     }
+    const keyPart = useMemo(
+        () => buildQueryParams({ ...params, offset: undefined }),
+        [params]
+    );
 
     const { data, isLoading, ...rest } = useInfiniteQuery<CommonInfiniteSearchDto<ContiWithSongDto>>({
-        queryKey: ["searchContis", params],
+        queryKey: qk.searchContis(keyPart),
         queryFn: async ({ pageParam = 0 }) => {
             const offset = pageParam as number;
             const fullParams: SearchContiQueriesDto = { ...params, offset }; // ✅ offset 추가
@@ -101,7 +107,7 @@ export const useContiDetailQuery = (contiId: string) => {
     return useQuery<ContiWithSongDto>({
         queryKey: ["conti", contiId],
         queryFn: () => fetchContiDetail(contiId),
-        staleTime: Infinity, // 무조건 fresh로 간주
+        staleTime: 5 * 60 * 1000, // 무조건 fresh로 간주
         cacheTime: REVALIDATE_TIME_ONE_HOUR, // 1시간 동안 캐시 유지 (컴포넌트 언마운트 이후에도)
         refetchOnMount: false, // 마운트될 때 다시 요청 안 함
         refetchOnWindowFocus: false, // 창 포커스해도 재요청 안 함
@@ -155,7 +161,7 @@ export const useInfiniteMyContiQuery = (
         },
         initialPageParam: 0,
         getNextPageParam: (lastPage) => lastPage?.nextOffset ?? undefined,
-        // staleTime: 5 * 60 * 1000,
+        staleTime: 5 * 60 * 1000,
         refetchOnWindowFocus: "always",
         refetchOnMount: "always",
         ...options,

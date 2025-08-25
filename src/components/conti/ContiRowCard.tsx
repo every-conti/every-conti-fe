@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
     Play, Clock, Share2, Calendar, MoreVertical, Pencil, GripVertical, Trash2, Search,
 } from "lucide-react";
-
+import { useUpdateContiMutation, useDeleteContiMutation } from "src/app/api/conti/conti-mutations";
 import { Card } from "src/components/ui/card";
 import { Badge } from "src/components/ui/badge";
 import { Button } from "src/components/ui/button";
@@ -49,7 +49,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { restrictToVerticalAxis, restrictToFirstScrollableAncestor } from "@dnd-kit/modifiers";
 import { MinimumSongToPlayDto } from "src/dto/common/minimum-song-to-play.dto";
 import {UpdateContiDto} from "src/dto/conti/UpdateContiDto";
-import {fetchContiDelete, fetchContiUpdate} from "src/app/api/conti";
+import {fetchContiDelete, fetchContiUpdate} from "src/app/api/conti/conti";
 import {useAuthStore} from "src/store/useAuthStore";
 
 /** ▸ 커스텀 센서: data-dnd-zone="songs" 내부에서만 드래그 시작 허용 */
@@ -74,6 +74,8 @@ export default function ContiRowCard({
     onDeleted: (deleted: ContiWithSongDto) => void
 }) {
     const {user} = useAuthStore();
+    const updateConti = useUpdateContiMutation();
+    const deleteConti = useDeleteContiMutation();
     const totalSec = conti.songs.reduce((acc, s) => acc + s.song.duration, 0);
     const firstThumb = conti.songs[0]?.song.thumbnail;
     const playSongs = conti.songs.map((s) => s.song);
@@ -126,41 +128,46 @@ export default function ContiRowCard({
     const handleSave = async (e?: React.FormEvent) => {
         e?.preventDefault();
         setSaving(true);
-        try {
-            const dto: UpdateContiDto = {
-                title: editTitle === conti.title ? undefined : editTitle,
-                date: editDate === conti.date ? undefined : new Date(editDate),
-                description: editDesc === conti.description ? undefined : editDesc,
-                songIds: songIdsChanged ? nextSongIds : undefined,
-                memberId: user?.id ?? "",
-            };
-
-            const updatedConti = await fetchContiUpdate(conti.id, dto);
-
-            onUpdated(updatedConti);
-
-            setIsEditOpen(false);
-            toast.success("콘티가 저장되었습니다!");
-        } catch (err) {
-            toast.error("저장에 실패했습니다.");
-        } finally {
-            setSaving(false);
-        }
+        const dto: UpdateContiDto = {
+            title: editTitle === conti.title ? undefined : editTitle,
+            date: editDate === conti.date ? undefined : new Date(editDate),
+            description: editDesc === conti.description ? undefined : editDesc,
+            songIds: songIdsChanged ? nextSongIds : undefined,
+            memberId: user?.id ?? "",
+        };
+        updateConti.mutate(
+            { id: conti.id, dto },
+            {
+              onSuccess: (updated) => {
+                onUpdated(updated); // 부모 리스트 캐시 갱신
+                setIsEditOpen(false);
+                toast.success("콘티가 저장되었습니다!");
+              },
+              onError: () => {
+                toast.error("저장에 실패했습니다.");
+              },
+              onSettled: () => setSaving(false),
+            }
+        );
     };
-    const handleConfirmDelete = async (e?: React.MouseEvent) => {
+    const handleConfirmDelete = (e?: React.MouseEvent) => {
         e?.preventDefault();
         e?.stopPropagation();
-        try {
-            setDeleting(true);
-            await fetchContiDelete(conti.id, {memberId: user?.id ?? ""});
-            toast.success("콘티가 삭제되었습니다.");
-            setIsDeleteOpen(false);
-            onDeleted(conti);
-        } catch (err) {
-            toast.error("삭제에 실패했습니다.");
-        } finally {
-            setDeleting(false);
-        }
+        setDeleting(true);
+        deleteConti.mutate(
+              { id: conti.id, dto: { memberId: user?.id ?? "" } },
+              {
+                onSuccess: () => {
+                  toast.success("콘티가 삭제되었습니다.");
+                  setIsDeleteOpen(false);
+                  onDeleted(conti); // 부모 리스트 캐시에서 제거
+                },
+                onError: () => {
+                    toast.error("삭제에 실패했습니다.");
+                },
+                onSettled: () => setDeleting(false),
+              }
+        );
     };
 
     return (
@@ -499,7 +506,6 @@ function SongPickerAndList({
         isError,
     } = useInfiniteSearchSongQuery(
         { text: q || undefined, enabled: q.length > 0 },
-        { getNextPageParam: (lastPage: { nextOffset: number | null }) => lastPage.nextOffset ?? undefined }
     );
     const searchedSongs = data?.pages.flatMap((page: any) => page.items) ?? [];
 

@@ -1,6 +1,6 @@
 "use client";
 
-import {Play, Clock, Share2, Plus} from "lucide-react";
+import {Play, Clock, Share2, Plus, Text} from "lucide-react";
 import { Card } from "src/components/ui/card";
 import { Badge } from "src/components/ui/badge";
 import { Button } from "src/components/ui/button";
@@ -17,10 +17,12 @@ import {MinimumSongToPlayDto} from "src/dto/common/minimum-song-to-play.dto";
 
 export default function WorshipSearchCard({
   song,
-  onModalBtnClick,
+  onAddModalBtnClick,
+  onLyricsModalClick
 }: {
   song: SongDetailDto;
-  onModalBtnClick:(e: any, song: MinimumSongToPlayDto) => void;
+  onAddModalBtnClick:(e: any, song: MinimumSongToPlayDto) => void;
+  onLyricsModalClick:(e: any, song: MinimumSongToPlayDto) => void;
 }) {
   const {user} = useAuthStore();
   return (
@@ -96,10 +98,13 @@ export default function WorshipSearchCard({
                   재생
                 </Button>
               </PlayButton>
+              <Button variant="outline" size="sm" onClick={(e) => onLyricsModalClick(e, song)}>
+                <Text className="w-4 h-4" />
+              </Button>
               {user?.id &&
-              <Button variant="outline" size="sm" onClick={(e) => onModalBtnClick(e, song)}>
+              <Button variant="outline" size="sm" onClick={(e) => onAddModalBtnClick(e, song)}>
                 <Plus className="w-4 h-4" />
-                내 콘티에 추가
+                콘티에 추가
               </Button>}
               <Button variant="outline" size="sm" onClick={(e) => {
                 e.preventDefault();

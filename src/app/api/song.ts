@@ -32,7 +32,7 @@ export const fetchSongCreate = async (createSongDto :CreateSongDto) => {
 
 export const useInfiniteSearchSongQuery = (
   params: SearchSongQueriesDto,
-  options = {}
+  options: { enabled?: boolean } = {}
 ) => {
   const apiOptions: ApiOptions = {
     useCache: true,
@@ -50,10 +50,12 @@ export const useInfiniteSearchSongQuery = (
       return res;
     },
     initialPageParam: 0,
-    enabled: params.enabled ?? true,
+    enabled: options.enabled ?? true,
     getNextPageParam: (lastPage) => lastPage?.nextOffset ?? undefined,
     staleTime: 5 * 60 * 1000,
+    // gcTime: REVALIDATE_TIME_ONE_HOUR,
     refetchOnWindowFocus: false,
+    // refetchOnReconnect: false,
     refetchOnMount: false,
   });
   return {
