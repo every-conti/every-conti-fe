@@ -94,10 +94,6 @@ export default function ContiSearchFilters({
                 text: q || undefined,
                 enabled: q.length > 0,
             },
-            {
-                getNextPageParam: (lastPage: { nextOffset: number | null }) =>
-                    lastPage.nextOffset ?? undefined,
-            }
         );
     const searchedSongs = data?.pages.flatMap((page: any) => page.items) ?? [];
 
