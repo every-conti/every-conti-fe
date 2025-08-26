@@ -132,10 +132,10 @@ export default function FullScreenMusicPlayer(props: MusicPlayerPropsDto) {
     isInConti,
   } = props;
 
-  if (!currentSong) return null;
-
   // 배경 스크롤 잠금
   useScrollLock(true);
+
+  if (!currentSong) return null;
 
   return (
     <div

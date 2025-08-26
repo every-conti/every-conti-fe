@@ -1,4 +1,4 @@
-export default function buildQueryParams(params: Object) {
+export default function buildQueryParams(params: object) {
   const searchParams = new URLSearchParams();
 
   for (const [key, value] of Object.entries(params)) {
