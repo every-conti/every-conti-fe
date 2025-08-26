@@ -10,8 +10,19 @@ import { MinimumSongToPlayDto } from "src/dto/common/minimum-song-to-play.dto";
 import ContiWithSongDto from "src/dto/common/conti-with-song.dto";
 
 export default async function App() {
-  const famousContis: ContiWithSongDto[] = await fetchFamousPraiseTeamsContis();
-  const lastSongs: MinimumSongToPlayDto[] = await fetchLastSongs();
+  let famousContis: ContiWithSongDto[] = [];
+  try {
+    famousContis = await fetchFamousPraiseTeamsContis();
+  } catch {
+    famousContis = [];
+  }
+
+  let lastSongs: MinimumSongToPlayDto[] = [];
+  try {
+    lastSongs = await fetchLastSongs();
+  } catch {
+    lastSongs = [];
+  }
 
   return (
     <>
