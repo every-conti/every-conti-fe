@@ -27,6 +27,7 @@ import {
   fetchVerifyEmailCode,
 } from "src/app/api/auth";
 import {fetchSignup} from "src/app/api/user";
+import {toast} from "sonner";
 
 
 export default function Signup() {
@@ -125,14 +126,14 @@ export default function Signup() {
     setSending(true);
     try {
       await fetchSendVerificationMail(formData.email);
-      alert("인증 이메일이 전송되었습니다.");
+      toast.success("인증 이메일이 전송되었습니다.");
       setEmailSent(true);
       setStep("verification");
 
       setTimeLeft(180);
       setTimerActive(true);
     } catch (e) {
-      setError("이메일 발송 실패했습니다.");
+      toast.error("이메일 발송 실패했습니다.");
     } finally {
       setSending(false);
     }

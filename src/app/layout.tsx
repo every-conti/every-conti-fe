@@ -7,6 +7,7 @@ import Providers from "src/utils/provider/Providers";
 import PlayerBar from "src/components/common/playerBar/PlayerBar";
 import {Toaster} from "sonner";
 import { GoogleAnalytics } from '@next/third-parties/google'
+import {Suspense} from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,7 +35,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
       >
         <Providers>
-          <Header />
+          <Suspense>
+            <Header />
+          </Suspense>
           <main className="pt-16 bg-gray-50  w-[calc(100vw-8px)] flex-1">
             <Toaster position="bottom-left" richColors />
             {children}
