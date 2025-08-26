@@ -1,8 +1,4 @@
-import { REVALIDATE_TIME_ONE_DAY } from "src/constant/numbers.constant";
 import logo from "src/assets/logo.png";
-
-export let revalidate: number;
-revalidate = REVALIDATE_TIME_ONE_DAY;
 
 export async function generateMetadata() {
   return {

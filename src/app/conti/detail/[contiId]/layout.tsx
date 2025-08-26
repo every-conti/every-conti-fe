@@ -2,9 +2,6 @@ import { REVALIDATE_TIME_ONE_DAY } from "src/constant/numbers.constant";
 import { fetchContiDetail } from "src/app/api/conti/conti";
 import logo from "src/assets/logo.png";
 
-export let revalidate: number;
-revalidate = REVALIDATE_TIME_ONE_DAY;
-
 export async function generateMetadata({ params }: { params: Promise<{ contiId: string }> }) {
   const { contiId } = await params;
   const conti = await fetchContiDetail(contiId);

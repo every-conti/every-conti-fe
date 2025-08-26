@@ -1,8 +1,4 @@
 import { fetchSongDetail } from "src/app/api/song";
-import { REVALIDATE_TIME_ONE_DAY } from "src/constant/numbers.constant";
-
-export let revalidate: number;
-revalidate = REVALIDATE_TIME_ONE_DAY;
 
 export async function generateMetadata({
   params,
