@@ -6,11 +6,11 @@ import ApiOptions from "src/app/api/ApiOptions";
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 async function fetchWithTimeout(url: string, options: RequestInit, timeout = 20000) {
-    const controller = new AbortController();
-    const id = setTimeout(() => controller.abort(), timeout);
-    const res = await fetch(url, { ...options, signal: controller.signal });
-    clearTimeout(id);
-    return res;
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeout);
+  const res = await fetch(url, { ...options, signal: controller.signal });
+  clearTimeout(id);
+  return res;
 }
 
 export async function apiRequestWithRefresh(path: string, {
@@ -88,7 +88,9 @@ export async function apiRequestWithRefresh(path: string, {
     } else {
         const errorBody = await response.json().catch(() => null);
 
-        const error: any = new Error(errorBody.message);
+        const errorMessage = errorBody?.message || `Request failed with status ${response.status}`;
+
+        const error: any = new Error(errorMessage);
         error.status = response.status;
         error.body = errorBody;
         throw error;
