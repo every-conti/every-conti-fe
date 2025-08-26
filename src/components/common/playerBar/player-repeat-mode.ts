@@ -1,1 +1,1 @@
-export type PlayerRepeatMode = "off" | "all" | "one"
+export type PlayerRepeatMode = "off" | "all" | "one";

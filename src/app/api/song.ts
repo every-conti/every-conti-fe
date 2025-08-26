@@ -1,34 +1,27 @@
-import {
-  useInfiniteQuery,
-  useQuery,
-  UseQueryOptions,
-} from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery, UseQueryOptions } from "@tanstack/react-query";
 import { SearchPropertiesDto } from "src/dto/search/search-properties.dto";
 import { SearchSongQueriesDto } from "src/dto/search/request/search-song-queries.dto";
 import BibleChapterDto from "src/dto/common/bible-chapter.dto";
 import BibleVerseDto from "src/dto/common/bible-verse.dto";
 import CommonResponseDto from "src/dto/common/common-response.dto";
-import {SongDetailDto} from "src/dto/common/song-detail.dto";
-import {REVALIDATE_TIME_ONE_HOUR} from "src/constant/numbers.constant";
-import {CoUsedSongDto} from "src/dto/song/CoUsedSongDto";
+import { SongDetailDto } from "src/dto/common/song-detail.dto";
+import { REVALIDATE_TIME_ONE_HOUR } from "src/constant/numbers.constant";
+import { CoUsedSongDto } from "src/dto/song/CoUsedSongDto";
 import buildQueryParams from "src/utils/buildQueryParams";
 import ApiOptions from "src/app/api/ApiOptions";
-import {apiRequestWithRefresh} from "src/app/api/apiRequestWithRefresh";
-import {CreateSongDto} from "src/dto/song/CreateSongDto";
-import {CommonInfiniteSearchDto} from "src/dto/search/common-infinite-search.dto";
+import { apiRequestWithRefresh } from "src/app/api/apiRequestWithRefresh";
+import { CreateSongDto } from "src/dto/song/CreateSongDto";
+import { CommonInfiniteSearchDto } from "src/dto/search/common-infinite-search.dto";
 
-export const fetchSongCreate = async (createSongDto :CreateSongDto) => {
+export const fetchSongCreate = async (createSongDto: CreateSongDto) => {
   const apiOptions: ApiOptions = {
     method: "POST",
     data: createSongDto,
     requiresAuth: true,
-  }
-  const data: SongDetailDto = await apiRequestWithRefresh(
-      "/song",
-      apiOptions
-  );
+  };
+  const data: SongDetailDto = await apiRequestWithRefresh("/song", apiOptions);
   return data;
-}
+};
 
 export const useInfiniteSearchSongQuery = (
   params: SearchSongQueriesDto,
@@ -36,7 +29,7 @@ export const useInfiniteSearchSongQuery = (
 ) => {
   const apiOptions: ApiOptions = {
     useCache: true,
-  }
+  };
 
   const { data, isLoading, ...rest } = useInfiniteQuery<CommonInfiniteSearchDto<SongDetailDto>>({
     queryKey: ["searchSongs", params],
@@ -44,8 +37,8 @@ export const useInfiniteSearchSongQuery = (
       const offset = pageParam as number;
       const fullParams: SearchSongQueriesDto = { ...params, offset };
       const res: CommonInfiniteSearchDto<SongDetailDto> = await apiRequestWithRefresh(
-          `/song/search?${buildQueryParams(fullParams)}`,
-          apiOptions
+        `/song/search?${buildQueryParams(fullParams)}`,
+        apiOptions
       );
       return res;
     },
@@ -68,11 +61,8 @@ export const useInfiniteSearchSongQuery = (
 export const fetchSongProperties = async () => {
   const apiOptions: ApiOptions = {
     useCache: true,
-  }
-  const data: SearchPropertiesDto = await apiRequestWithRefresh(
-    "/song/properties",
-    apiOptions
-  );
+  };
+  const data: SearchPropertiesDto = await apiRequestWithRefresh("/song/properties", apiOptions);
   return data;
 };
 
@@ -90,9 +80,10 @@ export function useSongPropertiesQuery() {
 export const fetchBibleChapter = async (bibleId: string) => {
   const apiOptions: ApiOptions = {
     useCache: true,
-  }
+  };
   const data: BibleChapterDto[] = await apiRequestWithRefresh(
-    `/bible/${bibleId}/chapters`, apiOptions
+    `/bible/${bibleId}/chapters`,
+    apiOptions
   );
   return data;
 };
@@ -100,9 +91,10 @@ export const fetchBibleChapter = async (bibleId: string) => {
 export const fetchBibleVerse = async (bibleChapterId: string) => {
   const apiOptions: ApiOptions = {
     useCache: true,
-  }
+  };
   const data: BibleVerseDto[] = await apiRequestWithRefresh(
-    `/bible/${bibleChapterId}/verses`, apiOptions
+    `/bible/${bibleChapterId}/verses`,
+    apiOptions
   );
   return data;
 };
@@ -110,14 +102,13 @@ export const fetchBibleVerse = async (bibleChapterId: string) => {
 export const fetchYoutubeVIdCheck = async (youtubeVId: string) => {
   const apiOptions: ApiOptions = {
     useCache: true,
-  }
+  };
   const data: CommonResponseDto<boolean> = await apiRequestWithRefresh(
-      `/song/youtube-v-id/check/${youtubeVId}`,
-      apiOptions
+    `/song/youtube-v-id/check/${youtubeVId}`,
+    apiOptions
   );
   return data;
 };
-
 
 export function useYoutubeVIdCheck(youtubeVId: string | null) {
   return useQuery<CommonResponseDto<boolean>>({
@@ -130,12 +121,10 @@ export function useYoutubeVIdCheck(youtubeVId: string | null) {
 export const fetchSongDetail = async (songId: string) => {
   const apiOptions: ApiOptions = {
     useCache: true,
-  }
-  const data: SongDetailDto = await apiRequestWithRefresh(
-      `/song/detail/${songId}`, apiOptions
-  );
+  };
+  const data: SongDetailDto = await apiRequestWithRefresh(`/song/detail/${songId}`, apiOptions);
   return data;
-}
+};
 
 export function useSongDetailQuery(songId: string) {
   return useQuery<SongDetailDto>({
@@ -151,12 +140,13 @@ export function useSongDetailQuery(songId: string) {
 export const fetchCoUsedSongs = async (songId: string) => {
   const apiOptions: ApiOptions = {
     useCache: true,
-  }
+  };
   const data: CoUsedSongDto[] = await apiRequestWithRefresh(
-      `/recommendation/co-used-songs/${songId}`, apiOptions
+    `/recommendation/co-used-songs/${songId}`,
+    apiOptions
   );
   return data;
-}
+};
 
 export function useCoUsedSongsQuery(songId: string) {
   return useQuery<CoUsedSongDto[]>({

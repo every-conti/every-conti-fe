@@ -32,23 +32,21 @@ export default function SearchableSelect({
   const [search, setSearch] = useState("");
 
   const filteredOptions = useMemo(() => {
-    return options.filter((opt) =>
-      opt.label.toLowerCase().includes(search.toLowerCase())
-    );
+    return options.filter((opt) => opt.label.toLowerCase().includes(search.toLowerCase()));
   }, [search, options]);
 
   return (
-      <Select
-          value={selected?.id ?? ""}
-          onValueChange={(val) => {
-            if (val === "" || val === defaultLabel) {
-              onSelect(null);
-            } else {
-              const selectedOption = options.find((opt) => opt.id === val);
-              if (selectedOption) onSelect(selectedOption);
-            }
-          }}
-      >
+    <Select
+      value={selected?.id ?? ""}
+      onValueChange={(val) => {
+        if (val === "" || val === defaultLabel) {
+          onSelect(null);
+        } else {
+          const selectedOption = options.find((opt) => opt.id === val);
+          if (selectedOption) onSelect(selectedOption);
+        }
+      }}
+    >
       <SelectTrigger className={className}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
@@ -62,9 +60,7 @@ export default function SearchableSelect({
           />
         </div>
 
-        {includeDefaultOption && (
-          <SelectItem value={`${defaultLabel}`}>{defaultLabel}</SelectItem>
-        )}
+        {includeDefaultOption && <SelectItem value={`${defaultLabel}`}>{defaultLabel}</SelectItem>}
 
         {filteredOptions.length > 0 ? (
           filteredOptions.map((opt) => (
@@ -73,9 +69,7 @@ export default function SearchableSelect({
             </SelectItem>
           ))
         ) : (
-          <div className="px-3 py-2 text-sm text-muted-foreground">
-            검색 결과 없음
-          </div>
+          <div className="px-3 py-2 text-sm text-muted-foreground">검색 결과 없음</div>
         )}
       </SelectContent>
     </Select>

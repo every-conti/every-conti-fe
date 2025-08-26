@@ -1,10 +1,10 @@
 import { create } from "zustand";
-import {MinimumSongToPlayDto} from "src/dto/common/minimum-song-to-play.dto";
+import { MinimumSongToPlayDto } from "src/dto/common/minimum-song-to-play.dto";
 
 interface PlayerStore {
   isPlaying: boolean;
   setIsPlaying: (isPlaying: boolean) => void;
-  playlist: MinimumSongToPlayDto[]
+  playlist: MinimumSongToPlayDto[];
   setPlayList: (playlist: MinimumSongToPlayDto[]) => void;
   currentSongIndex: number | null;
   setCurrentSongIndex: (currentSongIndex: number | null) => void;

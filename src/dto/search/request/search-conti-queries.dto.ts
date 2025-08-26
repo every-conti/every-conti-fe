@@ -1,4 +1,4 @@
-import {SongTypeTypes} from "src/types/song/song-type.types";
+import { SongTypeTypes } from "src/types/song/song-type.types";
 
 export interface SearchContiQueriesDto {
   offset?: number | null;

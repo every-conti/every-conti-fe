@@ -1,41 +1,43 @@
-import {REVALIDATE_TIME_ONE_DAY} from "src/constant/numbers.constant";
+import { REVALIDATE_TIME_ONE_DAY } from "src/constant/numbers.constant";
 import logo from "src/assets/logo.png";
 
 export let revalidate: number;
 revalidate = REVALIDATE_TIME_ONE_DAY;
 
 export async function generateMetadata() {
-    return {
-        title: `콘티 등록`,
-        description: `에브리콘티에서 콘티를 간편하게 등록하고 공유 해보세요.`,
-        keywords: `콘티 등록, 콘티, 찬양 등록, 찬양, 찬양 검색, 찬양팀, 가사, 원키`,
-        openGraph: {
-            title: `콘티 등록`,
-            description: `에브리콘티에서 콘티를 간편하게 등록하고 공유 해보세요.`,
-            url: `${process.env.NEXT_PUBLIC_FRONT_URL}/conti/create`,
-            images: [
-                {
-                    url: logo.src,
-                    width: 1200,
-                    height: 630,
-                    alt: `에브리콘티 이미지`,
-                },
-            ],
+  return {
+    title: `콘티 등록`,
+    description: `에브리콘티에서 콘티를 간편하게 등록하고 공유 해보세요.`,
+    keywords: `콘티 등록, 콘티, 찬양 등록, 찬양, 찬양 검색, 찬양팀, 가사, 원키`,
+    openGraph: {
+      title: `콘티 등록`,
+      description: `에브리콘티에서 콘티를 간편하게 등록하고 공유 해보세요.`,
+      url: `${process.env.NEXT_PUBLIC_FRONT_URL}/conti/create`,
+      images: [
+        {
+          url: logo.src,
+          width: 1200,
+          height: 630,
+          alt: `에브리콘티 이미지`,
         },
-        twitter: {
-            card: "summary_large_image",
-            title: `콘티 등록`,
-            description: `에브리콘티에서 콘티를 간편하게 등록하고 공유 해보세요.`,
-            images: logo.src,
-        },
-        alternates: {
-            canonical: `${process.env.NEXT_PUBLIC_FRONT_URL}/conti/create`,
-        },
-    };
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `콘티 등록`,
+      description: `에브리콘티에서 콘티를 간편하게 등록하고 공유 해보세요.`,
+      images: logo.src,
+    },
+    alternates: {
+      canonical: `${process.env.NEXT_PUBLIC_FRONT_URL}/conti/create`,
+    },
+  };
 }
 
-export default async function SongDetailLayout({children}: Readonly<{
-    children: React.ReactNode;
+export default async function SongDetailLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
 }>) {
-    return <>{children}</>;
+  return <>{children}</>;
 }

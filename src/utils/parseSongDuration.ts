@@ -3,9 +3,10 @@ export function parseSongDuration(seconds: number): string {
   const minutes = Math.floor((seconds % 3600) / 60);
   const remainingSeconds = Math.floor(seconds % 60);
 
-  return `${hours !== 0 ? `${String(hours).padStart(2, "0")}:` : ""}${String(
-    minutes
-  ).padStart(2, "0")}:${String(remainingSeconds).padStart(2, "0")}`;
+  return `${hours !== 0 ? `${String(hours).padStart(2, "0")}:` : ""}${String(minutes).padStart(
+    2,
+    "0"
+  )}:${String(remainingSeconds).padStart(2, "0")}`;
 }
 
 export function formatYoutubeDuration(isoDuration: string): string {
@@ -20,8 +21,8 @@ export function formatYoutubeDuration(isoDuration: string): string {
   const pad = (num: number) => num.toString().padStart(2, "0");
 
   return hours > 0
-      ? `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`
-      : `${pad(minutes)}:${pad(seconds)}`;
+    ? `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`
+    : `${pad(minutes)}:${pad(seconds)}`;
 }
 
 export function parseYoutubeDurationToSeconds(isoDuration: string): number {

@@ -57,9 +57,7 @@ export default function MultiSelect({
     }
   };
 
-  const filtered = options.filter((opt) =>
-    opt.label.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = options.filter((opt) => opt.label.toLowerCase().includes(search.toLowerCase()));
 
   return (
     <div className="relative" ref={ref}>
@@ -68,13 +66,13 @@ export default function MultiSelect({
         className="justify-between w-40 md:w-60"
         onClick={() => setOpen((prev) => !prev)}
       >
-        <span className={cn(
+        <span
+          className={cn(
             "truncate overflow-hidden whitespace-nowrap max-w-[calc(100%-1.5rem)] text-left",
             selected.length === 0 && "text-muted-foreground"
-        )}>
-          {selected.length > 0
-            ? selected.map((s) => s.label).join(", ")
-            : placeholder}
+          )}
+        >
+          {selected.length > 0 ? selected.map((s) => s.label).join(", ") : placeholder}
         </span>
 
         <ChevronDownIcon className="ml-2 h-4 w-4 opacity-50" />
@@ -106,9 +104,7 @@ export default function MultiSelect({
                 </button>
               ))
             ) : (
-              <div className="px-2 py-2 text-sm text-gray-400">
-                검색 결과 없음
-              </div>
+              <div className="px-2 py-2 text-sm text-gray-400">검색 결과 없음</div>
             )}
           </div>
         </div>

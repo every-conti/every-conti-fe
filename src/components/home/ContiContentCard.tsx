@@ -5,9 +5,13 @@ import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import ContiWithSongDto from "src/dto/common/conti-with-song.dto";
 
-export default function ContiContentCard({ contiWithSongDto }: { contiWithSongDto: ContiWithSongDto }) {
-    const { id, date, songs, creator } = contiWithSongDto;
-    const { praiseTeam } = creator;
+export default function ContiContentCard({
+  contiWithSongDto,
+}: {
+  contiWithSongDto: ContiWithSongDto;
+}) {
+  const { id, date, songs, creator } = contiWithSongDto;
+  const { praiseTeam } = creator;
 
   return (
     <Card className="p-6 space-y-4 hover:shadow-lg transition-shadow">
@@ -37,14 +41,11 @@ export default function ContiContentCard({ contiWithSongDto }: { contiWithSongDt
         ))}
       </div>
 
-        <Link href={`/conti/detail/${id}`} >
-          <Button
-            variant="link"
-            className="w-full justify-center text-blue-600 p-0"
-          >
-            더보기 <ChevronRight className="w-4 h-4 ml-1" />
-          </Button>
-        </Link>
+      <Link href={`/conti/detail/${id}`}>
+        <Button variant="link" className="w-full justify-center text-blue-600 p-0">
+          더보기 <ChevronRight className="w-4 h-4 ml-1" />
+        </Button>
+      </Link>
     </Card>
   );
 }

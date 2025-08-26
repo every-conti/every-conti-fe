@@ -1,32 +1,32 @@
 "use client";
 
 import { Play } from "lucide-react";
-import {MinimumSongToPlayDto} from "src/dto/common/minimum-song-to-play.dto";
-import {usePlayerStore} from "src/store/usePlayerStore";
-import {ReactNode} from "react";
+import { MinimumSongToPlayDto } from "src/dto/common/minimum-song-to-play.dto";
+import { usePlayerStore } from "src/store/usePlayerStore";
+import { ReactNode } from "react";
 
 interface PlayButtonProps {
-    songs: MinimumSongToPlayDto[];
-    children?: ReactNode;
+  songs: MinimumSongToPlayDto[];
+  children?: ReactNode;
 }
 
 export default function PlayButton({ songs, children }: PlayButtonProps) {
-    const enqueueAndPlay = usePlayerStore((s) => s.enqueueAndPlay); // 또는 playOne
+  const enqueueAndPlay = usePlayerStore((s) => s.enqueueAndPlay); // 또는 playOne
 
-    const handlePlay = () => {
-        enqueueAndPlay(songs);
-    };
+  const handlePlay = () => {
+    enqueueAndPlay(songs);
+  };
 
-    return (
-        <div
-            onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                handlePlay();
-            }}
-            className="cursor-pointer"
-        >
-            {children ?? <Play className="w-6 h-6 text-gray-800 ml-1" />}
-        </div>
-    );
+  return (
+    <div
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        handlePlay();
+      }}
+      className="cursor-pointer"
+    >
+      {children ?? <Play className="w-6 h-6 text-gray-800 ml-1" />}
+    </div>
+  );
 }

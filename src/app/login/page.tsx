@@ -3,19 +3,13 @@
 import React, { useState } from "react";
 import { Input } from "src/components/ui/input";
 import { Label } from "src/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "src/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "src/components/ui/card";
 import { Alert, AlertDescription } from "src/components/ui/alert";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { Button } from "src/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "src/store/useAuthStore";
-import {fetchLogin} from "src/app/api/auth";
+import { fetchLogin } from "src/app/api/auth";
 import LoginRequestDto from "src/dto/auth/login-request.dto";
 
 export default function Login() {
@@ -111,11 +105,7 @@ export default function Login() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
             </div>

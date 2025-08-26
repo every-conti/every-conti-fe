@@ -4,8 +4,8 @@ import SongThemeDto from "./song-theme.dto";
 import BibleDto from "./bible.dto";
 import { SongKeyTypes } from "src/types/song/song-key.types";
 import SongSeasonDto from "src/dto/common/song-season.dto";
-import {SongTypeTypes} from "src/types/song/song-type.types";
-import {MinimumSongToPlayDto} from "src/dto/common/minimum-song-to-play.dto";
+import { SongTypeTypes } from "src/types/song/song-type.types";
+import { MinimumSongToPlayDto } from "src/dto/common/minimum-song-to-play.dto";
 
 export interface SongDetailDto extends MinimumSongToPlayDto {
   creatorNickname: {

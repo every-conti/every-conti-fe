@@ -1,4 +1,4 @@
 export interface CommonInfiniteSearchDto<T> {
-    items: T[];
-    nextOffset: number | null;
+  items: T[];
+  nextOffset: number | null;
 }

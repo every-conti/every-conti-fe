@@ -1,41 +1,21 @@
 "use client";
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "src/components/ui/button";
 import { Input } from "src/components/ui/input";
 import { Label } from "src/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "src/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "src/components/ui/card";
 import { Alert, AlertDescription } from "src/components/ui/alert";
 import { Progress } from "src/components/ui/progress";
-import {
-  Eye,
-  EyeOff,
-  Mail,
-  Lock,
-  User,
-  CheckCircle,
-  Clock, Church,
-} from "lucide-react";
-import {useRouter} from "next/navigation";
-import {
-  fetchSendVerificationMail,
-  fetchVerifyEmailCode,
-} from "src/app/api/auth";
-import {fetchSignup} from "src/app/api/user";
-import {toast} from "sonner";
-
+import { Eye, EyeOff, Mail, Lock, User, CheckCircle, Clock, Church } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { fetchSendVerificationMail, fetchVerifyEmailCode } from "src/app/api/auth";
+import { fetchSignup } from "src/app/api/user";
+import { toast } from "sonner";
 
 export default function Signup() {
   const router = useRouter();
 
-  const [step, setStep] = useState<"form" | "verification" | "verified">(
-    "form"
-  );
+  const [step, setStep] = useState<"form" | "verification" | "verified">("form");
   const [formData, setFormData] = useState({
     name: "",
     nickname: "",
@@ -47,8 +27,8 @@ export default function Signup() {
   const [verificationCode, setVerificationCode] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [sending, setSending] = useState(false);       // 이메일 재전송 중
-  const [verifying, setVerifying] = useState(false);   // 인증 코드 검증 중
+  const [sending, setSending] = useState(false); // 이메일 재전송 중
+  const [verifying, setVerifying] = useState(false); // 인증 코드 검증 중
 
   const [error, setError] = useState("");
   const [emailSent, setEmailSent] = useState(false);
@@ -84,15 +64,14 @@ export default function Signup() {
     sendEmailCode();
   };
 
-
   const validateFromDatas = () => {
-    if (formData.name.length < 3){
+    if (formData.name.length < 3) {
       setError("이름은 3글자 이상이어야 합니다.");
       setSending(false);
       return false;
     }
 
-    if (formData.nickname.length < 3){
+    if (formData.nickname.length < 3) {
       setError("닉네임은 3글자 이상이어야 합니다.");
       setSending(false);
       return false;
@@ -117,7 +96,7 @@ export default function Signup() {
     }
 
     return true;
-  }
+  };
 
   const sendEmailCode = async () => {
     const validation = validateFromDatas();
@@ -169,7 +148,7 @@ export default function Signup() {
     setError("");
 
     try {
-      const res = await fetchVerifyEmailCode({email: formData.email, userCode: verificationCode})
+      const res = await fetchVerifyEmailCode({ email: formData.email, userCode: verificationCode });
       if (res.success) {
         completeSignup();
       } else {
@@ -190,11 +169,10 @@ export default function Signup() {
     if (error) setError("");
   };
 
-  const progressValue =
-    step === "form" ? 33 : step === "verification" ? 66 : 100;
+  const progressValue = step === "form" ? 33 : step === "verification" ? 66 : 100;
 
   return (
-     <div className="flex items-center justify-center min-h-[calc(100vh-192px)] bg-gradient-to-br from-purple-50 to-indigo-100">
+    <div className="flex items-center justify-center min-h-[calc(100vh-192px)] bg-gradient-to-br from-purple-50 to-indigo-100">
       <div className="flex items-center justify-center w-full max-w-md">
         <Card className="w-full">
           <CardHeader className="text-center">
@@ -214,14 +192,14 @@ export default function Signup() {
                   <div className="relative">
                     <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     <Input
-                        id="name"
-                        name="name"
-                        type="text"
-                        placeholder="이름을 입력하세요"
-                        value={formData.name}
-                        onChange={handleInputChange}
-                        className="pl-10"
-                        required
+                      id="name"
+                      name="name"
+                      type="text"
+                      placeholder="이름을 입력하세요"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      className="pl-10"
+                      required
                     />
                   </div>
                 </div>
@@ -279,11 +257,7 @@ export default function Signup() {
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
                     >
-                      {showPassword ? (
-                        <EyeOff className="h-4 w-4" />
-                      ) : (
-                        <Eye className="h-4 w-4" />
-                      )}
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
                 </div>
@@ -304,9 +278,7 @@ export default function Signup() {
                     />
                     <button
                       type="button"
-                      onClick={() =>
-                        setShowConfirmPassword(!showConfirmPassword)
-                      }
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                       className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
                     >
                       {showConfirmPassword ? (
@@ -323,30 +295,25 @@ export default function Signup() {
                   <div className="relative">
                     <Church className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     <Input
-                        id="church"
-                        name="church"
-                        type="text"
-                        placeholder="수원 아바교회"
-                        value={formData.church}
-                        onChange={handleInputChange}
-                        className="pl-10 pr-10"
-                        required
+                      id="church"
+                      name="church"
+                      type="text"
+                      placeholder="수원 아바교회"
+                      value={formData.church}
+                      onChange={handleInputChange}
+                      className="pl-10 pr-10"
+                      required
                     />
                   </div>
                 </div>
 
                 {error && (
-                    <Alert variant="destructive">
-                      <AlertDescription>{error}</AlertDescription>
-                    </Alert>
+                  <Alert variant="destructive">
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
                 )}
 
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={sending}
-                  onClick={sendEmailCode}
-                >
+                <Button type="submit" className="w-full" disabled={sending} onClick={sendEmailCode}>
                   {sending ? (
                     <div className="flex items-center space-x-2">
                       <Clock className="h-4 w-4 animate-spin" />
@@ -385,15 +352,13 @@ export default function Signup() {
                   <Alert className="mb-4 bg-blue-50 border-blue-200">
                     <Mail className="h-4 w-4 text-blue-600" />
                     <AlertDescription className="text-blue-800">
-                      <strong>{formData.email}</strong>로 인증 이메일이
-                      전송되었습니다.
+                      <strong>{formData.email}</strong>로 인증 이메일이 전송되었습니다.
                     </AlertDescription>
                   </Alert>
 
                   <p className="text-sm text-gray-600 mb-4">
                     이메일함을 확인하여 6자리 인증 코드를 입력해주세요.
                   </p>
-
                 </div>
 
                 {error && (
@@ -408,11 +373,12 @@ export default function Signup() {
                       <Label htmlFor="verification">인증 코드</Label>
                       <p className="text-sm text-gray-500">
                         유효 시간:{" "}
-                          <span className="font-semibold text-gray-800">
-                      {Math.floor(timeLeft / 60)
-                          .toString()
-                          .padStart(1, "0")} : {(timeLeft % 60).toString().padStart(2, "0")}
-                    </span>
+                        <span className="font-semibold text-gray-800">
+                          {Math.floor(timeLeft / 60)
+                            .toString()
+                            .padStart(1, "0")}{" "}
+                          : {(timeLeft % 60).toString().padStart(2, "0")}
+                        </span>
                       </p>
                     </div>
                     <Input
@@ -427,7 +393,6 @@ export default function Signup() {
                     />
                   </div>
 
-
                   <Button
                     type="submit"
                     className="w-full"
@@ -437,23 +402,21 @@ export default function Signup() {
                   </Button>
 
                   <div className="text-center space-y-2">
-                    <p className="text-xs text-gray-500">
-                      이메일을 받지 못하셨나요?
-                    </p>
+                    <p className="text-xs text-gray-500">이메일을 받지 못하셨나요?</p>
                     <Button
-                        type="button"
-                        className="w-full"
-                        variant="outline"
-                        onClick={sendEmailCode}
-                        disabled={sending}
+                      type="button"
+                      className="w-full"
+                      variant="outline"
+                      onClick={sendEmailCode}
+                      disabled={sending}
                     >
                       {sending ? (
-                          <div className="flex items-center space-x-2">
-                            <Clock className="h-4 w-4 animate-spin" />
-                            <span>이메일 재전송 중...</span>
-                          </div>
+                        <div className="flex items-center space-x-2">
+                          <Clock className="h-4 w-4 animate-spin" />
+                          <span>이메일 재전송 중...</span>
+                        </div>
                       ) : (
-                          "인증 이메일 다시 보내기"
+                        "인증 이메일 다시 보내기"
                       )}
                     </Button>
                   </div>

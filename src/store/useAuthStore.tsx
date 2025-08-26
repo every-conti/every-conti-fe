@@ -1,8 +1,8 @@
 import AccessTokenDto from "src/dto/auth/access-token.dto";
 import UserDto from "src/dto/user/user.dto";
 import { create } from "zustand";
-import {fetchLogout, fetchNewAccessToken} from "src/app/api/auth";
-import {fetchMyUserInfo} from "src/app/api/user";
+import { fetchLogout, fetchNewAccessToken } from "src/app/api/auth";
+import { fetchMyUserInfo } from "src/app/api/user";
 
 interface AuthStore {
   user: UserDto | null;

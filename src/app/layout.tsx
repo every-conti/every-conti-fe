@@ -5,9 +5,9 @@ import Header from "src/components/common/header/Header";
 import Footer from "src/components/common/footer/Footer";
 import Providers from "src/utils/provider/Providers";
 import PlayerBar from "src/components/common/playerBar/PlayerBar";
-import {Toaster} from "sonner";
-import { GoogleAnalytics } from '@next/third-parties/google'
-import {Suspense} from "react";
+import { Toaster } from "sonner";
+import { GoogleAnalytics } from "@next/third-parties/google";
+import { Suspense } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

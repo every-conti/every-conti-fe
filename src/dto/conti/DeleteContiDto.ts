@@ -1,3 +1,3 @@
 export type DeleteContiDto = {
-    memberId: string;
+  memberId: string;
 };
