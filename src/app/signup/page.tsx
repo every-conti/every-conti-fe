@@ -11,6 +11,15 @@ import { useRouter } from "next/navigation";
 import { fetchSendVerificationMail, fetchVerifyEmailCode } from "src/app/api/auth";
 import { fetchSignup } from "src/app/api/user";
 import { toast } from "sonner";
+import {Checkbox} from "src/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from "src/components/ui/dialog";
 
 export default function Signup() {
   const router = useRouter();
@@ -35,6 +44,9 @@ export default function Signup() {
 
   const [timeLeft, setTimeLeft] = useState(180); // 3분
   const [timerActive, setTimerActive] = useState(false);
+
+  const [agreed, setAgreed] = useState(false);
+  const [policyOpen, setPolicyOpen] = useState(false);
 
   useEffect(() => {
     if (!timerActive || timeLeft <= 0) return;
@@ -91,6 +103,12 @@ export default function Signup() {
 
     if (formData.church.length < 1) {
       setError("교회 이름을 입력해주세요.");
+      setSending(false);
+      return false;
+    }
+
+    if (!agreed) {
+      setError("이용 정책에 동의해야 회원가입을 진행할 수 있습니다.");
       setSending(false);
       return false;
     }
@@ -298,12 +316,93 @@ export default function Signup() {
                       id="church"
                       name="church"
                       type="text"
-                      placeholder="수원 아바교회"
+                      placeholder="서울 OO교회"
                       value={formData.church}
                       onChange={handleInputChange}
                       className="pl-10 pr-10"
                       required
                     />
+                  </div>
+                </div>
+
+                <div className="rounded-md border p-3 bg-gray-50">
+                  <div className="flex items-start gap-3">
+                    <Checkbox
+                        id="agreed"
+                        checked={agreed}
+                        onCheckedChange={(v: boolean) => setAgreed(!!v)}
+                        className="mt-1"
+                    />
+                    <div className="space-y-1">
+                      <Label  htmlFor="agreed" className="cursor-pointer leading-relaxed">
+                        에브리콘티는 올바른 신앙고백 위에 선 건강한 교회와 크리스천을 돕기 위해 만들어진 서비스이며, 이단의 활동과 가입을 금합니다. 이에 해당되는 활동 발견 시 관리자에 의해 제재될 수 있습니다.
+                      </Label>
+
+                      <div className="text-xs text-gray-600">
+                        <Dialog open={policyOpen} onOpenChange={setPolicyOpen}>
+                          <DialogTrigger asChild>
+                            <button type="button" className="text-primary underline underline-offset-2">
+                              자세히 보기
+                            </button>
+                          </DialogTrigger>
+                          <DialogContent className="sm:max-w-lg">
+                            <DialogHeader>
+                              <DialogTitle>이용 정책 안내</DialogTitle>
+                              <DialogDescription>
+                                에브리콘티는 올바른 신앙고백 위에 선 건강한 교회들의 신앙 전통을 존중합니다. 이단성 징후, 선전/모집,
+                                커뮤니티 교란, 허위 정보 유포 등의 활동은 금지되며, 위반 시 사전 통지 없이 이용 제한,
+                                계정 정지, 콘텐츠 삭제 등의 조치가 취해질 수 있습니다.
+                              </DialogDescription>
+                            </DialogHeader>
+
+                            <div className="space-y-3 text-sm mt-2">
+                              <p className="font-medium">참고 사이트</p>
+                              <ul className="list-disc pl-5 space-y-1">
+                                <li>
+                                  <a
+                                      href="http://www.hdjongkyo.co.kr/m/"
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-primary hover:underline"
+                                  >
+                                    현대 종교 (hdjongkyo.co.kr)
+                                  </a>
+                                </li>
+                                <li>
+                                  <a
+                                      href="http://www.jesus114.net/main/main.html"
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-primary hover:underline"
+                                  >
+                                    한국기독교이단상담소협회 (jesus114.net)
+                                  </a>
+                                </li>
+                              </ul>
+
+                              <p className="text-gray-600">
+                                위 자료는 참고용이며, 최종 판단은 각 교단/교회의 공식 입장과 담임교역자의 안내를 따르시길 권합니다.
+                              </p>
+                            </div>
+
+                            <div className="flex justify-end gap-2 pt-2">
+                              <Button variant="outline" onClick={() => setPolicyOpen(false)}>
+                                닫기
+                              </Button>
+                              <Button
+                                  onClick={() => {
+                                    setAgreed(true);
+                                    setPolicyOpen(false);
+                                    toast.success("이용 정책에 동의하셨습니다.");
+                                  }}
+                              >
+                                내용 확인 및 동의
+                              </Button>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
