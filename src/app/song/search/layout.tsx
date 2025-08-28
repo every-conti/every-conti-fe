@@ -30,7 +30,7 @@ export async function generateMetadata() {
   };
 }
 
-export default async function SongDetailLayout({
+export default async function SongSearchLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
