@@ -49,13 +49,13 @@ export default function SimpleBottomBar(props: MusicPlayerPropsDto) {
     progress,
     setProgress,
     onPlayPause,
-    handleLike,
+    // handleLike,
     handleProgress,
     handleAddToConti,
     handleSeek,
 
     onClose,
-    isLiked,
+    // isLiked,
   } = props;
 
   const barObserverRef = useRef<ResizeObserver | null>(null);
@@ -346,9 +346,9 @@ export default function SimpleBottomBar(props: MusicPlayerPropsDto) {
                       />
                     </div>
 
-                    <Button variant="ghost" size="sm" className="w-8 h-8 p-0" onClick={handleLike}>
-                      <Heart className={`w-4 h-4 ${isLiked ? "fill-current text-red-500" : ""}`} />
-                    </Button>
+                    {/*<Button variant="ghost" size="sm" className="w-8 h-8 p-0" onClick={handleLike}>*/}
+                    {/*  <Heart className={`w-4 h-4 ${isLiked ? "fill-current text-red-500" : ""}`} />*/}
+                    {/*</Button>*/}
 
                     <Button
                       variant="ghost"

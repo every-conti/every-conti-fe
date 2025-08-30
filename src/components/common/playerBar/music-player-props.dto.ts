@@ -32,11 +32,11 @@ export interface MusicPlayerPropsDto {
   setProgress: (progress: number) => void;
 
   onPlayPause: () => void;
-  handleLike: () => void;
+  // handleLike: () => void;
   handleProgress: () => void;
   handleAddToConti: () => void;
   handleSeek: (value: number[]) => void;
 
-  isLiked: boolean;
+  // isLiked: boolean;
   onClose: () => void;
 }

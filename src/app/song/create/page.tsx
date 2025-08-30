@@ -230,6 +230,13 @@ function SongCreationPage() {
       return;
     }
 
+    const invalidCharRegex = /[^a-zA-Z0-9가-힣\s.,!?()\-_'&]/;
+    if (invalidCharRegex.test(title)) {
+      toast.error("제목에 허용되지 않는 특수문자가 포함되어 있습니다.");
+      setIsSaving(false);
+      return;
+    }
+
     if (!youtubeVId) {
       toast.info("유효한 유튜브 링크를 입력해주세요.");
       return;

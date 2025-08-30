@@ -299,7 +299,7 @@ export default function Page({
                     <div className="flex justify-between">
                       <span className="text-gray-600">키</span>
                       {song?.songKey ? (
-                        <span>song?.songKey</span>
+                        <span>{song.songKey}</span>
                       ) : (
                         <span className="text-gray-500">정보 없음</span>
                       )}

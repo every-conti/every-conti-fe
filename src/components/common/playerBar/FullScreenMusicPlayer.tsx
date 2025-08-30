@@ -125,10 +125,10 @@ export default function FullScreenMusicPlayer(props: MusicPlayerPropsDto) {
     isSeeking,
     progress,
     onPlayPause,
-    handleLike,
+    // handleLike,
     handleAddToConti,
     handleSeek,
-    isLiked,
+    // isLiked,
     isInConti,
   } = props;
 
@@ -416,14 +416,14 @@ export default function FullScreenMusicPlayer(props: MusicPlayerPropsDto) {
 
                 {/* 추가 액션 + 볼륨 */}
                 <div className="flex items-center gap-4 w-full max-w-full justify-center">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={handleLike}
-                    className="text-white hover:bg-white/20"
-                  >
-                    <Heart className={`w-5 h-5 ${isLiked ? "fill-current text-red-400" : ""}`} />
-                  </Button>
+                  {/*<Button*/}
+                  {/*  variant="ghost"*/}
+                  {/*  size="icon"*/}
+                  {/*  onClick={handleLike}*/}
+                  {/*  className="text-white hover:bg-white/20"*/}
+                  {/*>*/}
+                  {/*  <Heart className={`w-5 h-5 ${isLiked ? "fill-current text-red-400" : ""}`} />*/}
+                  {/*</Button>*/}
 
                   <Button
                     variant="ghost"
@@ -450,14 +450,14 @@ export default function FullScreenMusicPlayer(props: MusicPlayerPropsDto) {
                       sliderBarBG="bg-blue-500"
                       variant="thin"
                       className="
-                                                w-28 sm:w-32 h-6
-                                                [--slider-track-height:6px]
-                                                [&_.slider-track]:bg-white/30
-                                                [&_.slider-range]:bg-blue-400
-                                                [&_.slider-thumb]:bg-white
-                                                [&_.slider-thumb]:ring-2
-                                                [&_.slider-thumb]:ring-blue-400/60
-                                              "
+                        w-28 sm:w-32 h-6
+                        [--slider-track-height:6px]
+                        [&_.slider-track]:bg-white/30
+                        [&_.slider-range]:bg-blue-400
+                        [&_.slider-thumb]:bg-white
+                        [&_.slider-thumb]:ring-2
+                        [&_.slider-thumb]:ring-blue-400/60
+                      "
                     />
                   </div>
                 </div>

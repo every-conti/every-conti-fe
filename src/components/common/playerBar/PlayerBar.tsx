@@ -18,7 +18,7 @@ export default function PlayerBar() {
     usePlayerStore();
   const playerRef = useRef<HTMLVideoElement | null>(null);
 
-  const [isLiked, setIsLiked] = useState(false);
+  // const [isLiked, setIsLiked] = useState(false);
   const [showVolumeControl, setShowVolumeControl] = useState(false);
   const [isInConti, setIsInConti] = useState(false);
 
@@ -203,10 +203,10 @@ export default function PlayerBar() {
     setCurrentSongIndex(null);
   };
 
-  const handleLike = () => {
-    setIsLiked(!isLiked);
+  // const handleLike = () => {
+    // setIsLiked(!isLiked);
     // toast.success(isLiked ? "좋아요를 취소했습니다" : "좋아요를 눌렀습니다");
-  };
+  // };
 
   const handleProgress = () => {
     const player = playerRef.current;
@@ -277,13 +277,13 @@ export default function PlayerBar() {
     progress,
     setProgress,
     onPlayPause,
-    handleLike,
+    // handleLike,
     handleProgress,
     handleAddToConti,
     handleSeek,
 
     onClose,
-    isLiked,
+    // isLiked,
   };
 
   return (
