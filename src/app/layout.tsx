@@ -54,7 +54,7 @@ export default function RootLayout({
           <PlayerBar />
         </Providers>
       </body>
-      <GoogleAnalytics gaId="GTM-K27FMHMH" />
+      <GoogleAnalytics gaId="G-DSXXR2WPPC" />
     </html>
   );
 }
