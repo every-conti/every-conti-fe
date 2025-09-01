@@ -353,11 +353,11 @@ export default function SimpleBottomBar(props: MusicPlayerPropsDto) {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className={`w-8 h-8 p-0 ${isInConti ? "text-green-600" : ""}`}
-                      onClick={handleAddToConti}
+                      className={`w-8 h-8 p-0`}
+                      onClick={() => handleAddToConti(currentSong)}
                       disabled={isInConti}
                     >
-                      {isInConti ? <Music className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+                      {<Plus className="w-4 h-4" />}
                     </Button>
 
                     <Button

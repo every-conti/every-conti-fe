@@ -11,6 +11,8 @@ import { getFullYoutubeURIByVId } from "src/utils/youtubeVIdUtils";
 import { ReactPlayerStateDto } from "src/components/common/playerBar/react-player-state.dto";
 import { MusicPlayerPropsDto } from "src/components/common/playerBar/music-player-props.dto";
 import FullScreenMusicPlayer from "src/components/common/playerBar/FullScreenMusicPlayer";
+import AddToContiModal from "src/components/song/AddToContiModal";
+import {MinimumSongToPlayDto} from "src/dto/common/minimum-song-to-play.dto";
 
 export default function PlayerBar() {
   const currentSong = useCurrentSong();
@@ -169,6 +171,9 @@ export default function PlayerBar() {
   const [isSeeking, setIsSeeking] = useState(false);
   const [progress, setProgress] = useState(0);
 
+  const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
+  const [modaledSong, setModaledSong] = useState<MinimumSongToPlayDto | null>(null);
+
   const handleTimeUpdate = () => {
     if (!playerRef.current || isSeeking) return;
 
@@ -219,10 +224,9 @@ export default function PlayerBar() {
     }));
   };
 
-  const handleAddToConti = () => {
-    // if (currentSong) {
-    //     onAddToConti(currentSong);
-    // }
+  const handleAddToConti = (song: MinimumSongToPlayDto) => {
+    setModaledSong(song);
+    setIsAddModalOpen(!isAddModalOpen);
   };
 
   const handleSeek = (value: number[]) => {
@@ -308,6 +312,12 @@ export default function PlayerBar() {
           style={{ display: "none" }}
         />
       </div>
+
+      <AddToContiModal
+          isOpen={isAddModalOpen}
+          onClose={() => setIsAddModalOpen(false)}
+          song={modaledSong}
+      />
     </>
   );
 }

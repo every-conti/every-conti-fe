@@ -6,6 +6,8 @@ import { SongKeyTypes } from "src/types/song/song-key.types";
 import SongSeasonDto from "src/dto/common/song-season.dto";
 import { SongTypeTypes } from "src/types/song/song-type.types";
 import { MinimumSongToPlayDto } from "src/dto/common/minimum-song-to-play.dto";
+import BibleChapterDto from "src/dto/common/bible-chapter.dto";
+import BibleVerseDto from "src/dto/common/bible-verse.dto";
 
 export interface SongDetailDto extends MinimumSongToPlayDto {
   creatorNickname: {
@@ -15,7 +17,7 @@ export interface SongDetailDto extends MinimumSongToPlayDto {
   tempo: SongTempoTypes | null;
   season: SongSeasonDto | null;
   bible: BibleDto | null;
-  bibleChapter: string | null;
-  bibleVerse: string | null;
+  bibleChapter: BibleChapterDto | null;
+  bibleVerse: BibleVerseDto | null;
   createdAt: string;
 }

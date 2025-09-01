@@ -246,33 +246,33 @@ export default function Header() {
                 ))}
               </div>
             ))}
-            <div className="mb-3">
+            {user?.id && <div className="mb-3">
               <h3 className="text-sm font-semibold text-gray-500 mb-1">마이 페이지</h3>
               <button
-                onClick={() => {
-                  router.push("/my-page?tab=contis");
-                  setMenuOpen(false);
-                }}
-                className={`block w-full text-left py-2 px-2 rounded hover:bg-gray-100 ${
-                  isActive("/my-page?tab=contis") ? "text-blue-600 font-semibold" : "text-gray-800"
-                }`}
+                  onClick={() => {
+                    router.push("/my-page?tab=contis");
+                    setMenuOpen(false);
+                  }}
+                  className={`block w-full text-left py-2 px-2 rounded hover:bg-gray-100 ${
+                      isActive("/my-page?tab=contis") ? "text-blue-600 font-semibold" : "text-gray-800"
+                  }`}
               >
                 내 콘티
               </button>
               <button
-                onClick={() => {
-                  router.push("/my-page?tab=settings");
-                  setMenuOpen(false);
-                }}
-                className={`block w-full text-left py-2 px-2 rounded hover:bg-gray-100 ${
-                  isActive("/my-page?tab=settings")
-                    ? "text-blue-600 font-semibold"
-                    : "text-gray-800"
-                }`}
+                  onClick={() => {
+                    router.push("/my-page?tab=settings");
+                    setMenuOpen(false);
+                  }}
+                  className={`block w-full text-left py-2 px-2 rounded hover:bg-gray-100 ${
+                      isActive("/my-page?tab=settings")
+                          ? "text-blue-600 font-semibold"
+                          : "text-gray-800"
+                  }`}
               >
                 설정
               </button>
-            </div>
+            </div>}
 
             <hr className="my-4" />
 

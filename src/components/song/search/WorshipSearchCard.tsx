@@ -14,6 +14,7 @@ import PlayButton from "src/components/common/PlayButton";
 import shareContent from "src/utils/shareContent";
 import { useAuthStore } from "src/store/useAuthStore";
 import { MinimumSongToPlayDto } from "src/dto/common/minimum-song-to-play.dto";
+import {SongTypeKorean} from "src/types/song/song-type.types";
 
 export default function WorshipSearchCard({
   song,
@@ -57,7 +58,7 @@ export default function WorshipSearchCard({
               <div className="flex items-center flex-wrap gap-1 mb-3 text-sm">
                 <p className="text-gray-600 pr-2">{song.praiseTeam.praiseTeamName}</p>
                 <Badge variant="outline" className="text-xs">
-                  {song.songType}
+                  {SongTypeKorean[song.songType]}
                 </Badge>
                 {song.songKey && (
                   <Badge variant="outline" className="text-xs">
@@ -108,7 +109,7 @@ export default function WorshipSearchCard({
                   size="sm"
                   onClick={(e) => {
                     e.preventDefault();
-                    shareContent("song");
+                    shareContent("song", `/song/detail/${song.id}/${song.songName}`, song);
                   }}
                 >
                   <Share2 className="w-4 h-4" />

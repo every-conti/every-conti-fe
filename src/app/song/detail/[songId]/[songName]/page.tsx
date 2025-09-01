@@ -73,7 +73,7 @@ export default function Page({
               </Button>
 
               <div className="flex items-center space-x-2">
-                <Button variant="ghost" size="sm" onClick={() => shareContent("song")}>
+                <Button variant="ghost" size="sm" onClick={() => shareContent("song", window.location.href, song)}>
                   <Share2 className="w-4 h-4" />
                 </Button>
                 {/*<Button variant="ghost" size="sm">*/}
@@ -178,7 +178,7 @@ export default function Page({
                         <BookOpen className="w-4 h-4 text-blue-600" />
                         <span className="text-sm text-blue-800">관련 성경 구절</span>
                       </div>
-                      <p className="text-blue-700">{song?.bible.bibleKoName}</p>
+                      <p className="text-blue-700">{song?.bible.bibleKoName}{song?.bibleChapter && " " + song?.bibleChapter.chapterNum + "장"}{song?.bibleVerse && " " + song?.bibleVerse.verseNum + "절"}</p>
                     </div>
                   )}
                 </div>

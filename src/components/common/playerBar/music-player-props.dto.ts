@@ -1,6 +1,7 @@
 import { Dispatch, JSX, SetStateAction } from "react";
 import { ReactPlayerStateDto } from "src/components/common/playerBar/react-player-state.dto";
 import { PlayerRepeatMode } from "src/components/common/playerBar/player-repeat-mode";
+import {MinimumSongToPlayDto} from "src/dto/common/minimum-song-to-play.dto";
 
 export interface MusicPlayerPropsDto {
   showVolumeControl: boolean;
@@ -34,7 +35,7 @@ export interface MusicPlayerPropsDto {
   onPlayPause: () => void;
   // handleLike: () => void;
   handleProgress: () => void;
-  handleAddToConti: () => void;
+  handleAddToConti: (song: MinimumSongToPlayDto) => void;
   handleSeek: (value: number[]) => void;
 
   // isLiked: boolean;

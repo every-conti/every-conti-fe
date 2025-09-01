@@ -14,6 +14,7 @@ import { MinimumSongToPlayDto } from "src/dto/common/minimum-song-to-play.dto";
 import { useRouter } from "next/navigation";
 import { parseSongDuration } from "src/utils/parseSongDuration";
 import ContiCopyModal from "src/components/conti/ContiCopyModal";
+import {SongKeyKorean} from "src/types/song/song-key.types";
 
 export default function ContiDetailPage({ params }: { params: Promise<{ contiId: string }> }) {
   const router = useRouter();
@@ -76,7 +77,7 @@ export default function ContiDetailPage({ params }: { params: Promise<{ contiId:
             </Button>
 
             <div className="flex items-center space-x-2">
-              <Button variant="ghost" size="sm" onClick={() => shareContent("conti")}>
+              <Button variant="ghost" size="sm" onClick={() => shareContent("conti", `/conti/detail/${conti.id}`, conti)}>
                 <Share2 className="w-4 h-4" />
               </Button>
               {/*<Button variant="ghost" size="sm">*/}
@@ -235,9 +236,9 @@ export default function ContiDetailPage({ params }: { params: Promise<{ contiId:
 
                     {/* 키와 시간 */}
                     <div className="flex items-center space-x-3 ml-4">
-                      <Badge variant="outline" className="text-xs">
-                        {song.song.songKey}
-                      </Badge>
+                      {song.song.songKey && <Badge variant="outline" className="text-xs">
+                        {SongKeyKorean[song.song.songKey]}
+                      </Badge>}
                       <span className="text-sm text-gray-500 w-10 text-right">
                         {parseSongDuration(song.song.duration)}
                       </span>

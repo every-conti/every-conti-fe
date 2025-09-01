@@ -230,10 +230,15 @@ function SongCreationPage() {
       return;
     }
 
-    const invalidCharRegex = /[^a-zA-Z0-9가-힣\s.,!?()\-_'&]/;
-    if (invalidCharRegex.test(title)) {
+    const invalidCharRegex = /[^a-zA-Z0-9가-힣 .,!?()_'&:;~/-]/;
+    if (invalidCharRegex.test(title.trim())) {
       toast.error("제목에 허용되지 않는 특수문자가 포함되어 있습니다.");
       setIsSaving(false);
+      return;
+    }
+
+    if (!selectedThemes){
+      toast.error("찬양 관련 주제는 필수입니다.");
       return;
     }
 

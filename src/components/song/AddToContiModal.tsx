@@ -22,6 +22,7 @@ import { parseSongDuration } from "src/utils/parseSongDuration";
 import ContiWithSongDto from "src/dto/common/conti-with-song.dto";
 import { InfiniteData } from "@tanstack/query-core";
 import { CommonInfiniteSearchDto } from "src/dto/search/common-infinite-search.dto";
+import {useAddSongToContiMutation} from "src/app/api/conti/conti-mutations";
 
 type SongLike = {
   id: string;
@@ -40,6 +41,7 @@ interface AddToContiModalProps {
 export default function AddToContiModal({ isOpen, onClose, song }: AddToContiModalProps) {
   const { user } = useAuthStore();
   const [selectedContiId, setSelectedContiId] = useState<string>("");
+  const { mutateAsync: addSongToConti, isPending } = useAddSongToContiMutation();
 
   const canQuery = Boolean(isOpen && user?.id);
 
@@ -51,6 +53,9 @@ export default function AddToContiModal({ isOpen, onClose, song }: AddToContiMod
       (p) => p.items
     ) ?? [];
   const { ref, inView } = useInView({ threshold: 1 });
+  const selectedConti = contis.find((c) => c.id === selectedContiId);
+  const isSongAlreadyInConti =
+      !!song && !!selectedConti && selectedConti.songs.some((s) => s.song?.id === song.id);
 
   useEffect(() => {
     if (!canQuery) return;
@@ -85,9 +90,13 @@ export default function AddToContiModal({ isOpen, onClose, song }: AddToContiMod
       toast.info("추가할 콘티를 선택하세요.");
       return;
     }
+    if (isSongAlreadyInConti) {
+      toast.info("이미 해당 곡이 콘티에 있습니다.");
+      return;
+    }
 
     try {
-      await fetchContiAddSongs(selectedContiId, song.id);
+      await addSongToConti({ contiId: selectedContiId, songId: song.id });
       toast.success("콘티에 곡이 추가되었습니다.");
       onClose();
     } catch (e: any) {
@@ -143,18 +152,26 @@ export default function AddToContiModal({ isOpen, onClose, song }: AddToContiMod
                 <SelectValue placeholder="콘티를 선택하세요" />
               </SelectTrigger>
               <SelectContent className="max-h-72 overflow-auto">
-                {contis.map((c: any) => (
-                  <SelectItem key={c.id} value={c.id}>
-                    <div className="flex items-center justify-between w-full">
-                      <div>
-                        <div className="font-medium">{c.title}</div>
-                        <div className="text-xs text-gray-500">
-                          {c.date} • {c.songs.length}곡 • {getTotalDuration(c.songs)}
+                {contis.map((c: any) => {
+                  const alreadyIn = song && c.songs.some((s: any) => s.song?.id === song.id);
+                  return (
+                      <SelectItem key={c.id} value={c.id} disabled={alreadyIn}>
+                        <div className="flex items-center justify-between w-full">
+                          <div>
+                            <div className="font-medium">{c.title}</div>
+                            <div className="text-xs text-gray-500">
+                              {c.date} • {c.songs.length}곡 • {getTotalDuration(c.songs)}
+                            </div>
+                          </div>
+                          {alreadyIn && (
+                              <Badge variant="outline" className="ml-2 text-gray-500 border-gray-300">
+                                이미 추가됨
+                              </Badge>
+                          )}
                         </div>
-                      </div>
-                    </div>
-                  </SelectItem>
-                ))}
+                      </SelectItem>
+                  );
+                })}
                 {hasNextPage && <div ref={ref} className="h-6" />}
                 {isFetchingNextPage && (
                   <div className="px-3 py-2 text-xs text-gray-500">더 불러오는 중…</div>

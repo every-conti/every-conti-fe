@@ -4,6 +4,9 @@ import { Button } from "../ui/button";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import ContiWithSongDto from "src/dto/common/conti-with-song.dto";
+import {SongKeyKorean} from "src/types/song/song-key.types";
+import basicProfile from "src/assets/basic-profile.png";
+import {ImageWithFallback} from "src/components/common/ImageWithFallback";
 
 export default function ContiContentCard({
   contiWithSongDto,
@@ -11,13 +14,17 @@ export default function ContiContentCard({
   contiWithSongDto: ContiWithSongDto;
 }) {
   const { id, date, songs, creator } = contiWithSongDto;
-  const { praiseTeam } = creator;
+  const { praiseTeam, profileImage } = creator;
 
   return (
     <Card className="p-6 space-y-4 hover:shadow-lg transition-shadow">
       <div className="flex items-center space-x-3">
-        <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-          <span className="text-xl">{praiseTeam.previewImg}</span>
+        <div className="w-10 h-10 rounded-full flex items-center justify-center">
+            <ImageWithFallback
+                src={profileImage ?? basicProfile.src}
+                alt={praiseTeam.praiseTeamName}
+                className="h-8 w-8 rounded-full object-cover"
+            />
         </div>
         <div>
           <h3 className="text-lg">{praiseTeam.praiseTeamName}</h3>
@@ -34,7 +41,7 @@ export default function ContiContentCard({
             </div>
             {song.song.songKey && (
               <Badge variant="secondary" className="text-xs">
-                {song.song.songKey} Key
+                {SongKeyKorean[song.song.songKey]} 키
               </Badge>
             )}
           </div>

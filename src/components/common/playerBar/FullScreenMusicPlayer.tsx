@@ -34,15 +34,18 @@ function QueueItem({
   index,
   isActive,
   isPlaying,
+  setCurrentSongIndex,
 }: {
   song: any;
   index: number;
   isActive: boolean;
   isPlaying: boolean;
+  setCurrentSongIndex: (idx: number) => void;
 }) {
   return (
     <div
       key={`queue-${song.id ?? index}`}
+      onClick={() => setCurrentSongIndex(index)}
       className={`w-full max-w-full flex justify-between items-center space-x-2 sm:space-x-3 p-2 sm:p-3 rounded-lg transition-colors ${
         isActive ? "bg-white/20 border border-white/30" : "hover:bg-white/10"
       }`}
@@ -103,7 +106,7 @@ function QueueItem({
 }
 
 export default function FullScreenMusicPlayer(props: MusicPlayerPropsDto) {
-  const { isPlaying, playlist, currentSongIndex } = usePlayerStore();
+  const { isPlaying, playlist, currentSongIndex, setCurrentSongIndex } = usePlayerStore();
   const currentSong = useCurrentSong();
 
   // 가사/대기열/기본 뷰 전환
@@ -236,6 +239,7 @@ export default function FullScreenMusicPlayer(props: MusicPlayerPropsDto) {
                           index={index}
                           isActive={index === (currentSongIndex ?? -1)}
                           isPlaying={isPlaying}
+                          setCurrentSongIndex={setCurrentSongIndex}
                         />
                       ))}
                     </div>
