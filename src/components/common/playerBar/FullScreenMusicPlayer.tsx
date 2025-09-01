@@ -432,7 +432,7 @@ export default function FullScreenMusicPlayer(props: MusicPlayerPropsDto) {
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={handleAddToConti}
+                    onClick={() => handleAddToConti(currentSong)}
                     disabled={isInConti}
                     className={`text-white hover:bg-white/20 ${isInConti ? "text-green-400" : ""}`}
                   >
