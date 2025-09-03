@@ -20,6 +20,7 @@ import { CopyContiDto } from "src/dto/conti/CopyContiDto";
 import { toast } from "sonner";
 import { InfiniteData } from "@tanstack/query-core";
 import { CommonInfiniteSearchDto } from "src/dto/search/common-infinite-search.dto";
+import {SongKeyKorean} from "src/types/song/song-key.types";
 
 interface SavedConti {
   id: string;
@@ -304,7 +305,7 @@ export default function ContiCopyModal({ isOpen, onClose, conti }: ContiCopyModa
                         return selected ? (
                           <div>
                             <div className="font-medium text-sm mb-1">{selected.title}</div>
-                            <div className="text-xs text-gray-600 mb-2">{selected.description}</div>
+                            <div className="text-xs text-gray-600 mb-2 whitespace-pre-line">{selected.description}</div>
                             <div className="flex items-center space-x-3 text-xs text-gray-500">
                               <span>{selected.songs.length}곡</span>
                               <span>{getTotalDuration(selected.songs)}</span>
@@ -342,7 +343,7 @@ export default function ContiCopyModal({ isOpen, onClose, conti }: ContiCopyModa
                   <div className="flex items-center space-x-2">
                     {song.song.songKey && (
                       <Badge variant="outline" className="text-xs">
-                        {song.song.songKey}
+                        {SongKeyKorean[song.song.songKey]}
                       </Badge>
                     )}
                     <span className="text-xs text-gray-500">

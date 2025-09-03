@@ -195,7 +195,7 @@ export default function FullScreenMusicPlayer(props: MusicPlayerPropsDto) {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => shareContent("song")}
+              onClick={() => shareContent("song", `/song/detail/${currentSong.id}/${currentSong?.songName}`, currentSong)}
               className="text-white hover:bg-white/20"
             >
               <Share2 className="w-5 h-5" />

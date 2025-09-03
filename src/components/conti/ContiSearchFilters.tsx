@@ -9,7 +9,12 @@ import PraiseTeamDto from "src/dto/common/praise-team.dto";
 import { SongTypeKorean, SongTypeTypes } from "src/types/song/song-type.types";
 import SearchableSelect from "src/components/song/search/SearchableSelect";
 import { SearchContiPropertiesDto } from "src/dto/conti/search-conti-properties.dto";
-import { MAX_TOTAL_DURATION, MIN_TOTAL_DURATION } from "src/constant/conti/conti-search.constant";
+import {
+  MAX_SONG_DURATION,
+  MAX_TOTAL_DURATION,
+  MIN_SONG_DURATION,
+  MIN_TOTAL_DURATION
+} from "src/constant/conti/conti-search.constant";
 import { useInfiniteSearchSongQuery } from "src/app/api/song";
 import { Button } from "src/components/ui/button";
 import { Badge } from "src/components/ui/badge";
@@ -404,15 +409,15 @@ export default function ContiSearchFilters({
             )}
 
             {(duration[0] > MIN_TOTAL_DURATION || duration[1] < MAX_TOTAL_DURATION) && (
-              <Badge variant="secondary" className="flex items-center space-x-1">
+              <Badge variant="secondary" className="flex items-center space-x-1" onClick={() => {
+                setDurationChanging([MIN_TOTAL_DURATION, MAX_TOTAL_DURATION]);
+                setDuration([MIN_TOTAL_DURATION, MAX_TOTAL_DURATION]);
+              }}>
                 <span>
                   길이: {duration[0]}분-{duration[1]}분
                 </span>
                 <X
                   className="w-3 h-3 cursor-pointer"
-                  onClick={() => {
-                    setDuration([MIN_TOTAL_DURATION, MAX_TOTAL_DURATION]);
-                  }}
                 />
               </Badge>
             )}

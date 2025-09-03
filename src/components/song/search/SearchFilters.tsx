@@ -606,15 +606,12 @@ export default function SearchFilters({
             )}
 
             {(duration[0] > MIN_SONG_DURATION || duration[1] < MAX_SONG_DURATION) && (
-              <Badge variant="secondary" className="flex items-center space-x-1">
+              <Badge variant="secondary" className="flex items-center space-x-1" onClick={() => setDuration([MIN_SONG_DURATION, MAX_SONG_DURATION])}>
                 <span>
                   길이: {duration[0]}분-{duration[1]}분
                 </span>
                 <X
                   className="w-3 h-3 cursor-pointer"
-                  onClick={() => {
-                    setDuration([MIN_SONG_DURATION, MAX_SONG_DURATION]);
-                  }}
                 />
               </Badge>
             )}

@@ -123,7 +123,7 @@ export default function ContiDetailPage({ params }: { params: Promise<{ contiId:
 
                 {conti.description ? (
                   <div className="mb-3">
-                    <p>{conti.description}</p>
+                    <p className="whitespace-pre-line">{conti.description}</p>
                   </div>
                 ) : (
                   <></>

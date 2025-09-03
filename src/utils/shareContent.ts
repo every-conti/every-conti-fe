@@ -33,8 +33,6 @@ export default function shareContent(mode: ShareModeTypes, url?: string, data?: 
       } else {
         shareData.text = `[에브리콘티]\n에브리콘티에서 콘티의 정보를 확인하고 콘티를 등록해보세요`;
       }
-
-      shareData.text = `[에브리콘티]\n에브리콘티에서 찬양의 정보를 확인하고 콘티를 등록해보세요`;
       break;
     case "lyrics":
       if (data) {

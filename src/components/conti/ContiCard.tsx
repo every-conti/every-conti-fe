@@ -120,7 +120,7 @@ const ContiCard = ({
                 </DropdownMenu>
               </div>
             </div>
-            <p className="text-sm text-gray-600 line-clamp-2">{conti.description}</p>
+            <p className="text-sm text-gray-600 line-clamp-2 whitespace-pre-line">{conti.description}</p>
           </div>
 
           {/* 작성자 찬양팀 정보 */}
