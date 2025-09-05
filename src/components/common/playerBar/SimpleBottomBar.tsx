@@ -125,72 +125,45 @@ export default function SimpleBottomBar(props: MusicPlayerPropsDto) {
 
               {/* 오른쪽: 이전 / 재생 / 다음 / 토글 */}
               <div className="flex items-center gap-1.5 shrink-0">
-                <Button variant="ghost" size="sm" className="w-9 h-9 p-0">
+                <Button variant="ghost" size="sm" className="w-9 h-9 p-0" disabled={!hasPrev} onClick={(e) => {
+                  e.stopPropagation();
+                  prevSong();
+                }}>
                   <SkipBack className="w-5 h-5" />
                 </Button>
 
                 <Button
                   size="sm"
-                  onClick={onPlayPause}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onPlayPause();
+                  }}
                   className="w-10 h-10 p-0 rounded-full bg-blue-600 text-white hover:bg-blue-700"
                   aria-label={isPlaying ? "일시정지" : "재생"}
                 >
                   {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
                 </Button>
 
-                <Button variant="ghost" size="sm" className="w-9 h-9 p-0">
+                <Button variant="ghost" size="sm" className="w-9 h-9 p-0" disabled={!hasNext} onClick={(e) => {
+                  e.stopPropagation();
+                  nextSong();
+                }}>
+
                   <SkipForward className="w-5 h-5" />
                 </Button>
 
                 {/* 토글 버튼 */}
                 <div className="relative">
-                  {/*<Button*/}
-                  {/*    variant="ghost"*/}
-                  {/*    size="sm"*/}
-                  {/*    className="w-9 h-9 p-0"*/}
-                  {/*    onClick={() => setShowMobileMenu(v => !v)}*/}
-                  {/*    aria-label="추가 메뉴"*/}
-                  {/*>*/}
-                  {/*    <ListMusic className="w-5 h-5" />*/}
-                  {/*</Button>*/}
-
                   <button
                     className="w-full flex items-center gap-2 px-2 py-2 rounded hover:bg-gray-50 disabled:opacity-60"
-                    // onClick={() => { handleAddToConti(); setShowMobileMenu(false); }}
+                    onClick={(e: any) => {
+                      e.stopPropagation();
+                      handleAddToConti(currentSong);
+                    }}
                     disabled={isInConti}
                   >
                     {isInConti ? <Music className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
-                    {/*<span className="text-sm">콘티</span>*/}
                   </button>
-                  {/*{showMobileMenu && (*/}
-                  {/*    // <div className="absolute bottom-full right-0 mb-2 w-44 rounded-lg bg-white text-gray-900 border shadow-lg p-1.5 z-50">*/}
-                  {/*    <div className="fixed bottom-[72px] right-6 w-44 rounded-lg bg-white text-gray-900 border shadow-lg p-1.5 z-50">*/}
-                  {/*    <button*/}
-                  {/*            className="w-full flex items-center gap-2 px-2 py-2 rounded hover:bg-gray-50"*/}
-                  {/*            onClick={() => { handleLike(); setShowMobileMenu(false); }}*/}
-                  {/*        >*/}
-                  {/*            <Heart className={`w-4 h-4 ${isLiked ? "fill-current text-red-500" : ""}`} />*/}
-                  {/*            <span className="text-sm">좋아요</span>*/}
-                  {/*        </button>*/}
-
-                  {/*        <button*/}
-                  {/*            className="w-full flex items-center gap-2 px-2 py-2 rounded hover:bg-gray-50 disabled:opacity-60"*/}
-                  {/*            onClick={() => { handleAddToConti(); setShowMobileMenu(false); }}*/}
-                  {/*            disabled={isInConti}*/}
-                  {/*        >*/}
-                  {/*            {isInConti ? <Music className="w-4 h-4" /> : <Plus className="w-4 h-4" />}*/}
-                  {/*            <span className="text-sm">{isInConti ? "콘티에 추가됨" : "콘티에 추가"}</span>*/}
-                  {/*        </button>*/}
-
-                  {/*        <button*/}
-                  {/*            className="w-full flex items-center gap-2 px-2 py-2 rounded hover:bg-gray-50 text-gray-600"*/}
-                  {/*            onClick={() => { onClose(); setShowMobileMenu(false); }}*/}
-                  {/*        >*/}
-                  {/*            <X className="w-4 h-4" />*/}
-                  {/*            <span className="text-sm">닫기</span>*/}
-                  {/*        </button>*/}
-                  {/*    </div>*/}
-                  {/*)}*/}
                 </div>
               </div>
             </div>

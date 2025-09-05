@@ -13,10 +13,10 @@ export default function HeroSection() {
     <section className="py-10 sm:py-16 px-4 sm:px-6">
       <div className="max-w-4xl mx-auto text-center">
         <h1 className="text-3xl sm:text-5xl mb-4 sm:mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-          콘티 생성, 찬양 검색 플랫폼
+          콘티 등록, 찬양 검색 플랫폼
         </h1>
         <p className="text-base sm:text-xl text-gray-600 mb-8 sm:mb-12 max-w-3xl mx-auto">
-          다른 찬양팀 콘티 확인, 예배 콘티 등록, 찬양 검색과 등록까지 한 곳에서
+          다른 찬양팀 콘티 검색, 콘티 등록, 찬양 검색까지 한 곳에서
         </p>
 
         <div className="max-w-2xl mx-auto">
