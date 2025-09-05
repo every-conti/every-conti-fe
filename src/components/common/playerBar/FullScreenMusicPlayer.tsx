@@ -28,6 +28,8 @@ import { useCurrentSong } from "src/store/useCurrentSong";
 import { parseSongDuration } from "src/utils/parseSongDuration";
 import shareContent from "src/utils/shareContent";
 import { useScrollLock } from "src/hooks/useScrollLock";
+import {SongKeyKorean} from "src/types/song/song-key.types";
+import {MinimumSongToPlayDto} from "src/dto/common/minimum-song-to-play.dto";
 
 function QueueItem({
   song,
@@ -36,7 +38,7 @@ function QueueItem({
   isPlaying,
   setCurrentSongIndex,
 }: {
-  song: any;
+  song: MinimumSongToPlayDto;
   index: number;
   isActive: boolean;
   isPlaying: boolean;
@@ -96,7 +98,7 @@ function QueueItem({
             variant="outline"
             className="bg-white/10 text-white border-white/20 text-[10px] sm:text-xs"
           >
-            {song.songKey}
+            {SongKeyKorean[song.songKey]}
           </Badge>
         )}
         <span className="text-xs sm:text-sm text-gray-300">{parseSongDuration(song.duration)}</span>
