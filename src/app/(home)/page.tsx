@@ -8,6 +8,8 @@ import { Card } from "src/components/ui/card";
 import { fetchFamousPraiseTeamsContis, fetchLastSongs } from "src/app/api/home";
 import { MinimumSongToPlayDto } from "src/dto/common/minimum-song-to-play.dto";
 import ContiWithSongDto from "src/dto/common/conti-with-song.dto";
+import {ImageWithFallback} from "src/components/common/ImageWithFallback";
+import ContiDemoVideo from "src/components/home/ContiDemoVideo";
 
 export default async function App() {
   let famousContis: ContiWithSongDto[] = [];
@@ -29,40 +31,35 @@ export default async function App() {
       <section className="py-12 px-4 sm:px-6 bg-gradient-to-br from-blue-50 via-white to-purple-50">
         <HeroSection />
 
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
-          <Link href="/conti/create" className="block">
-            <Card className="p-6 sm:p-8 hover:shadow-xl transition border hover:border-blue-300 group">
-              <div className="text-center">
-                <div className="w-14 h-14 sm:w-16 sm:h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition">
-                  <List className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
-                </div>
-                <h3 className="text-lg sm:text-2xl font-semibold text-gray-800 mb-2">콘티 등록</h3>
-                <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">
-                  예배에 사용할 콘티를 손쉽게 등록해보세요.
-                </p>
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base px-6 py-2 sm:px-8 sm:py-3 rounded-full">
-                  콘티 만들기 <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </div>
-            </Card>
-          </Link>
+        {/* Demo Videos Section */}
+        <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+          {/* 카카오톡 공유 데모 */}
+          <Card className="items-center p-6 hover:shadow-xl transition-all duration-300 border-2 hover:border-blue-300 group">
+            <div className="text-center mb-6">
+              <h3 className="text-2xl mb-3 text-gray-800">콘티 공유하기</h3>
+              <p className="text-gray-600 leading-relaxed">
+                우리 교회 찬양팀의 콘티를 등록하고, 공유해보세요.
+              </p>
+            </div>
+            <video width="320" autoPlay muted loop preload="auto">
+              <source src="https://everycontistorage.blob.core.windows.net/public-assets/sharing-content.mp4" type="video/mp4" />
+              <track
+                  src="/path/to/captions.vtt"
+                  kind="subtitles"
+                  srcLang="en"
+                  label="English"
+              />
+              Your browser does not support the video tag.
+            </video>
+            <Link href="/conti/create" className="mt-4">
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base px-6 py-2 sm:px-8 sm:py-3 rounded-full">
+                콘티 등록하러 가기 <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </Link>
+          </Card>
 
-          <Link href="/song/create" className="block">
-            <Card className="p-6 sm:p-8 hover:shadow-xl transition border hover:border-purple-300 group">
-              <div className="text-center">
-                <div className="w-14 h-14 sm:w-16 sm:h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition">
-                  <Music className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
-                </div>
-                <h3 className="text-lg sm:text-2xl font-semibold text-gray-800 mb-2">찬양 등록</h3>
-                <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">
-                  새로운 찬양을 직접 등록하고 관리해보세요.
-                </p>
-                <Button className="bg-purple-600 hover:bg-purple-700 text-white text-sm sm:text-base px-6 py-2 sm:px-8 sm:py-3 rounded-full">
-                  찬양 만들기 <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </div>
-            </Card>
-          </Link>
+          {/* 콘티 재생 데모 */}
+          <ContiDemoVideo />
         </div>
       </section>
 

@@ -25,7 +25,7 @@ export default function HeroSection() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <Input
                 onChange={(e) => setSearchText(e.target.value)}
-                placeholder="찬양 제목이나 가사로 검색하세요..."
+                placeholder="등록된 찬양을 찾아보세요"
                 className="pl-10 py-2 sm:py-3 text-sm sm:text-base"
               />
             </div>
