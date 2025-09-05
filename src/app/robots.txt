@@ -1,0 +1,9 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+Disallow: /my-page/
+Disallow: /login/
+Disallow: /signup/
+
+Sitemap: https://www.everyconti.com/sitemap.xml
