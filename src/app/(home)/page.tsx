@@ -41,7 +41,7 @@ export default async function App() {
                 우리 교회 찬양팀의 콘티를 등록하고, 공유해보세요.
               </p>
             </div>
-            <video width="320" autoPlay muted loop preload="auto">
+            <video width="320" autoPlay muted loop preload="auto" playsInline>
               <source src="https://everycontistorage.blob.core.windows.net/public-assets/sharing-content.mp4" type="video/mp4" />
               <track
                   src="/path/to/captions.vtt"
