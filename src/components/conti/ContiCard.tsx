@@ -16,6 +16,7 @@ import { useAuthStore } from "src/store/useAuthStore";
 import PlayButton from "src/components/common/PlayButton";
 import Link from "next/link";
 import ContiWithSongDto from "src/dto/common/conti-with-song.dto";
+import basicProfile from "src/assets/basic-profile.png";
 
 const ContiCard = ({
   conti,
@@ -127,7 +128,7 @@ const ContiCard = ({
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center space-x-2">
               <ImageWithFallback
-                src={conti.creator.profileImage ?? ""}
+                src={conti.creator.profileImage ?? basicProfile.src}
                 alt={conti.creator.nickname}
                 className="w-6 h-6 rounded-full object-cover"
               />
