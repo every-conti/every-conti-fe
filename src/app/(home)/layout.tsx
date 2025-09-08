@@ -25,7 +25,7 @@ export async function generateMetadata() {
       images: preview.src,
     },
     alternates: {
-      canonical: `${process.env.NEXT_PUBLIC_FRONT_URL}/conti/create`,
+      canonical: `${process.env.NEXT_PUBLIC_FRONT_URL}`,
     },
   };
 }
