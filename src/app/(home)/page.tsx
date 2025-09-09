@@ -67,6 +67,14 @@ export default async function App() {
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8">
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">주요 찬양팀 콘티</h2>
+            <Link href="/conti/search">
+              <Button
+                variant="outline"
+                className="mt-2 sm:mt-0 text-sm sm:text-base hover:bg-blue-50 hover:border-blue-300"
+              >
+                전체보기 <ChevronRight className="w-4 h-4 ml-2" />
+              </Button>
+            </Link>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

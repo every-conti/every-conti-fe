@@ -223,43 +223,34 @@ export default function ContiDetailPage({ params }: { params: Promise<{ contiId:
                     </div>
 
                     {/* 곡 정보 */}
-                    <div className="flex-1 min-w-0">
-                      <h3
-                        className={`truncate ${isCurrentSongPlaying(song.song) ? "text-blue-600" : "text-gray-900"}`}
-                      >
-                        {song.song.songName}
-                      </h3>
-                      <p className="text-sm text-gray-600 truncate">
-                        {song.song.praiseTeam.praiseTeamName}
-                      </p>
-                    </div>
+                    <div onClick={(e) => {
+                        e.stopPropagation();
+                        router.push(`/song/detail/${song.song.id}/${song.song.songName}`);
+                    }}
+                         className="flex flex-1 justify-between"
+                    >
+                      <div>
+                        <h3
+                          className={`truncate ${isCurrentSongPlaying(song.song) ? "text-blue-600" : "text-gray-900"}`}
+                        >
+                          {song.song.songName}
+                        </h3>
+                        <p className="text-sm text-gray-600 truncate">
+                          {song.song.praiseTeam.praiseTeamName}
+                        </p>
+                      </div>
 
-                    {/* 키와 시간 */}
-                    <div className="flex items-center space-x-3 ml-4">
-                      {song.song.songKey && <Badge variant="outline" className="text-xs">
-                        {SongKeyKorean[song.song.songKey]}
-                      </Badge>}
-                      <span className="text-sm text-gray-500 w-10 text-right">
-                        {parseSongDuration(song.song.duration)}
-                      </span>
-
-                      {/* 추가 버튼 */}
-                      {/*{onAddSongToConti && (*/}
-                      {/*    <Button*/}
-                      {/*        variant="ghost"*/}
-                      {/*        size="sm"*/}
-                      {/*        onClick={() => onAddSongToConti(song)}*/}
-                      {/*        className="w-8 h-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"*/}
-                      {/*    >*/}
-                      {/*        <Plus className="w-4 h-4"/>*/}
-                      {/*    </Button>*/}
-                      {/*)}*/}
+                      {/* 키와 시간 */}
+                      <div className="flex items-center space-x-3 ml-4">
+                        {song.song.songKey && <Badge variant="outline" className="text-xs">
+                          {SongKeyKorean[song.song.songKey]}
+                        </Badge>}
+                        <span className="text-sm text-gray-500 w-10 text-right">
+                          {parseSongDuration(song.song.duration)}
+                        </span>
+                      </div>
                     </div>
                   </div>
-
-                  {/*{index < songs.length - 1 && (*/}
-                  {/*    <Separator className="my-1"/>*/}
-                  {/*)}*/}
                 </div>
               ))}
             </div>
