@@ -1,4 +1,5 @@
 import preview from "public/preview.png";
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 export async function generateMetadata() {
   return {
@@ -29,7 +30,6 @@ export async function generateMetadata() {
     },
   };
 }
-
 
 export default async function HomeLayout({
   children,
