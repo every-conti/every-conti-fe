@@ -8,6 +8,7 @@ import PlayerBar from "src/components/common/playerBar/PlayerBar";
 import { Toaster } from "sonner";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { Suspense } from "react";
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -49,6 +50,7 @@ export default function RootLayout({
           <main className="pt-16 bg-gray-50  w-[calc(100vw-8px)] flex-1">
             <Toaster position="bottom-left" richColors />
             {children}
+            <SpeedInsights/>
           </main>
           <Footer />
           <PlayerBar />
