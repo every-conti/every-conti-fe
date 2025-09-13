@@ -1,6 +1,4 @@
 import {
-  REVALIDATE_TIME_ONE_DAY,
-  REVALIDATE_TIME_SIX_HOUR,
   REVALIDATE_TIME_THREE_HOUR
 } from "src/constant/numbers.constant";
 import { useAuthStore } from "src/store/useAuthStore";
