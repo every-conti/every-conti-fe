@@ -1,5 +1,4 @@
 import preview from "public/preview.png";
-import { SpeedInsights } from "@vercel/speed-insights/next"
 
 export async function generateMetadata() {
   return {
