@@ -1,4 +1,8 @@
-import { REVALIDATE_TIME_ONE_DAY } from "src/constant/numbers.constant";
+import {
+  REVALIDATE_TIME_ONE_DAY,
+  REVALIDATE_TIME_SIX_HOUR,
+  REVALIDATE_TIME_THREE_HOUR
+} from "src/constant/numbers.constant";
 import { useAuthStore } from "src/store/useAuthStore";
 import AccessTokenDto from "src/dto/auth/access-token.dto";
 import ApiOptions from "src/app/api/ApiOptions";
@@ -34,7 +38,7 @@ export async function apiRequestWithRefresh(
     fetchOptions.body = JSON.stringify(data);
   }
   if (isSSG) {
-    (fetchOptions as any).next = { revalidate: REVALIDATE_TIME_ONE_DAY };
+    (fetchOptions as any).next = { revalidate: REVALIDATE_TIME_THREE_HOUR };
   } else {
     fetchOptions.cache = useCache ? "force-cache" : "no-cache";
   }
