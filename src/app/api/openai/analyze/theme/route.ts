@@ -1,15 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { AzureOpenAI } from "openai";
 import * as process from "node:process";
-import SongThemeDto from "src/dto/common/song-theme.dto";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
-  const { themes, title, lyrics } = body as {
-    themes: SongThemeDto[];
-    title: string;
-    lyrics: string;
-  };;
+  const { themes, title, lyrics } = body;
   const endpoint = process.env.AZURE_OPENAI_ENDPOINT;
   const apiKey = process.env.AZURE_OPENAI_API_KEY;
   const deployment = process.env.AZURE_OPENAI_DEPLOYMENT;

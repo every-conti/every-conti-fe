@@ -23,7 +23,6 @@ export default function shareContent(mode: ShareModeTypes, url?: string, data?: 
   const shareData = {
     title: "",
     text: "",
-    url: url ?? `${window.location.href}`,
   };
 
   switch (mode) {
