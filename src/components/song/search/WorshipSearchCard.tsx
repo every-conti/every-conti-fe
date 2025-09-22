@@ -109,7 +109,7 @@ export default function WorshipSearchCard({
                   size="sm"
                   onClick={(e) => {
                     e.preventDefault();
-                    shareContent("song", `/song/detail/${song.id}/${song.songName}`, song);
+                    shareContent("song", `${process.env.NEXT_PUBLIC_FRONT_URL}/song/detail/${song.id}/${song.songName}`, song);
                   }}
                 >
                   <Share2 className="w-4 h-4" />

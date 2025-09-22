@@ -77,7 +77,7 @@ export default function ContiDetailPage({ params }: { params: Promise<{ contiId:
             </Button>
 
             <div className="flex items-center space-x-2">
-              <Button variant="ghost" size="sm" onClick={() => shareContent("conti", `/conti/detail/${conti.id}`, conti)}>
+              <Button variant="ghost" size="sm" onClick={() => shareContent("conti", `${process.env.NEXT_PUBLIC_FRONT_URL}/conti/detail/${conti.id}`, conti)}>
                 <Share2 className="w-4 h-4" />
               </Button>
               {/*<Button variant="ghost" size="sm">*/}

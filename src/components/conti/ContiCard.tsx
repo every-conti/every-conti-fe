@@ -96,7 +96,7 @@ const ContiCard = ({
                       onClick={(e: any) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        shareContent("conti", `/conti/detail/${conti.id}`, conti);
+                        shareContent("conti", `${process.env.NEXT_PUBLIC_FRONT_URL}/conti/detail/${conti.id}`, conti);
                         setMoreOpen(false);
                       }}
                     >
