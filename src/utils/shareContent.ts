@@ -35,6 +35,8 @@ export default function shareContent(
       if (data) {
         const song = data as MinimumSongToPlayDto;
         shareData.text = `[에브리콘티]\n🎵 찬양: ${song.songName}\n👤 찬양팀: ${song.praiseTeam.praiseTeamName}\n🕒 총 길이: ${parseSongDuration(song.duration)}\n${song.songKey && `${SongKeyKorean[song.songKey]}키 |\n`}${url && `🔗${url}\n`}유튜브🔗${getFullYoutubeURIByVId(song.youtubeVId)})`;
+      } else {
+        shareData.text = `[에브리콘티]\n에브리콘티에서 콘티의 정보를 확인하고 콘티를 등록해보세요`;
       }
       break;
     case "lyrics":
