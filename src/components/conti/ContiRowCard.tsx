@@ -65,7 +65,6 @@ import { CSS } from "@dnd-kit/utilities";
 import { restrictToVerticalAxis, restrictToFirstScrollableAncestor } from "@dnd-kit/modifiers";
 import { MinimumSongToPlayDto } from "src/dto/common/minimum-song-to-play.dto";
 import { UpdateContiDto } from "src/dto/conti/UpdateContiDto";
-import { fetchContiDelete, fetchContiUpdate } from "src/app/api/conti/conti";
 import { useAuthStore } from "src/store/useAuthStore";
 
 /** ▸ 커스텀 센서: data-dnd-zone="songs" 내부에서만 드래그 시작 허용 */
@@ -244,7 +243,11 @@ export default function ContiRowCard({
                             e.preventDefault();
                             e.stopPropagation();
                             setMenuOpen(false);
-                            shareContent("conti");
+                            shareContent(
+                              "conti",
+                              conti,
+                              `${process.env.NEXT_PUBLIC_FRONT_URL}/conti/detail/${conti.id}`
+                            );
                           }}
                         >
                           <Share2 className="w-4 h-4 mr-2" />

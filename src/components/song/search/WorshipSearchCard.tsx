@@ -14,7 +14,7 @@ import PlayButton from "src/components/common/PlayButton";
 import shareContent from "src/utils/shareContent";
 import { useAuthStore } from "src/store/useAuthStore";
 import { MinimumSongToPlayDto } from "src/dto/common/minimum-song-to-play.dto";
-import {SongTypeKorean} from "src/types/song/song-type.types";
+import { SongTypeKorean } from "src/types/song/song-type.types";
 
 export default function WorshipSearchCard({
   song,
@@ -109,7 +109,11 @@ export default function WorshipSearchCard({
                   size="sm"
                   onClick={(e) => {
                     e.preventDefault();
-                    shareContent("song", `${process.env.NEXT_PUBLIC_FRONT_URL}/song/detail/${song.id}/${song.songName}`, song);
+                    shareContent(
+                      "song",
+                      song,
+                      `${process.env.NEXT_PUBLIC_FRONT_URL}/song/detail/${song.id}/${song.songName}`
+                    );
                   }}
                 >
                   <Share2 className="w-4 h-4" />

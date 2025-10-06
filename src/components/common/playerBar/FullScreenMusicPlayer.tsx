@@ -28,8 +28,8 @@ import { useCurrentSong } from "src/store/useCurrentSong";
 import { parseSongDuration } from "src/utils/parseSongDuration";
 import shareContent from "src/utils/shareContent";
 import { useScrollLock } from "src/hooks/useScrollLock";
-import {SongKeyKorean} from "src/types/song/song-key.types";
-import {MinimumSongToPlayDto} from "src/dto/common/minimum-song-to-play.dto";
+import { SongKeyKorean } from "src/types/song/song-key.types";
+import { MinimumSongToPlayDto } from "src/dto/common/minimum-song-to-play.dto";
 
 function QueueItem({
   song,
@@ -197,7 +197,13 @@ export default function FullScreenMusicPlayer(props: MusicPlayerPropsDto) {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => shareContent("song", `/song/detail/${currentSong.id}/${currentSong?.songName}`, currentSong)}
+              onClick={() =>
+                shareContent(
+                  "song",
+                  currentSong,
+                  `${process.env.NEXT_PUBLIC_FRONT_URL}/song/detail/${currentSong.id}/${currentSong?.songName}`
+                )
+              }
               className="text-white hover:bg-white/20"
             >
               <Share2 className="w-5 h-5" />

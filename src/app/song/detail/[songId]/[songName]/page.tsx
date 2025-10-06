@@ -1,17 +1,6 @@
 "use client";
 
-import {
-  Play,
-  Share2,
-  Clock,
-  Music,
-  BookOpen,
-  Timer,
-  Users,
-  ArrowLeft,
-  MoreVertical,
-  Plus,
-} from "lucide-react";
+import { Play, Share2, Clock, Music, BookOpen, Timer, Users, ArrowLeft, Plus } from "lucide-react";
 import { Button } from "src/components/ui/button";
 import { Card } from "src/components/ui/card";
 import { ImageWithFallback } from "src/components/common/ImageWithFallback";
@@ -73,7 +62,11 @@ export default function Page({
               </Button>
 
               <div className="flex items-center space-x-2">
-                <Button variant="ghost" size="sm" onClick={() => shareContent("song", window.location.href, song)}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => shareContent("song", song, window.location.href)}
+                >
                   <Share2 className="w-4 h-4" />
                 </Button>
                 {/*<Button variant="ghost" size="sm">*/}
@@ -178,7 +171,11 @@ export default function Page({
                         <BookOpen className="w-4 h-4 text-blue-600" />
                         <span className="text-sm text-blue-800">관련 성경 구절</span>
                       </div>
-                      <p className="text-blue-700">{song?.bible.bibleKoName}{song?.bibleChapter && " " + song?.bibleChapter.chapterNum + "장"}{song?.bibleVerse && " " + song?.bibleVerse.verseNum + "절"}</p>
+                      <p className="text-blue-700">
+                        {song?.bible.bibleKoName}
+                        {song?.bibleChapter && " " + song?.bibleChapter.chapterNum + "장"}
+                        {song?.bibleVerse && " " + song?.bibleVerse.verseNum + "절"}
+                      </p>
                     </div>
                   )}
                 </div>

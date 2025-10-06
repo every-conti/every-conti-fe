@@ -96,7 +96,11 @@ const ContiCard = ({
                       onClick={(e: any) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        shareContent("conti", `${process.env.NEXT_PUBLIC_FRONT_URL}/conti/detail/${conti.id}`, conti);
+                        shareContent(
+                          "conti",
+                          conti,
+                          `${process.env.NEXT_PUBLIC_FRONT_URL}/conti/detail/${conti.id}`
+                        );
                         setMoreOpen(false);
                       }}
                     >
@@ -121,7 +125,9 @@ const ContiCard = ({
                 </DropdownMenu>
               </div>
             </div>
-            <p className="text-sm text-gray-600 line-clamp-2 whitespace-pre-line">{conti.description}</p>
+            <p className="text-sm text-gray-600 line-clamp-2 whitespace-pre-line">
+              {conti.description}
+            </p>
           </div>
 
           {/* 작성자 찬양팀 정보 */}

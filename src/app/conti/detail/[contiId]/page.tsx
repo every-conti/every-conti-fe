@@ -14,7 +14,7 @@ import { MinimumSongToPlayDto } from "src/dto/common/minimum-song-to-play.dto";
 import { useRouter } from "next/navigation";
 import { parseSongDuration } from "src/utils/parseSongDuration";
 import ContiCopyModal from "src/components/conti/ContiCopyModal";
-import {SongKeyKorean} from "src/types/song/song-key.types";
+import { SongKeyKorean } from "src/types/song/song-key.types";
 
 export default function ContiDetailPage({ params }: { params: Promise<{ contiId: string }> }) {
   const router = useRouter();
@@ -77,7 +77,17 @@ export default function ContiDetailPage({ params }: { params: Promise<{ contiId:
             </Button>
 
             <div className="flex items-center space-x-2">
-              <Button variant="ghost" size="sm" onClick={() => shareContent("conti", `${process.env.NEXT_PUBLIC_FRONT_URL}/conti/detail/${conti.id}`, conti)}>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() =>
+                  shareContent(
+                    "conti",
+                    conti,
+                    `${process.env.NEXT_PUBLIC_FRONT_URL}/conti/detail/${conti.id}`
+                  )
+                }
+              >
                 <Share2 className="w-4 h-4" />
               </Button>
               {/*<Button variant="ghost" size="sm">*/}
@@ -223,11 +233,12 @@ export default function ContiDetailPage({ params }: { params: Promise<{ contiId:
                     </div>
 
                     {/* 곡 정보 */}
-                    <div onClick={(e) => {
+                    <div
+                      onClick={(e) => {
                         e.stopPropagation();
                         router.push(`/song/detail/${song.song.id}/${song.song.songName}`);
-                    }}
-                         className="flex flex-1 justify-between"
+                      }}
+                      className="flex flex-1 justify-between"
                     >
                       <div>
                         <h3
@@ -242,9 +253,11 @@ export default function ContiDetailPage({ params }: { params: Promise<{ contiId:
 
                       {/* 키와 시간 */}
                       <div className="flex items-center space-x-3 ml-4">
-                        {song.song.songKey && <Badge variant="outline" className="text-xs">
-                          {SongKeyKorean[song.song.songKey]}
-                        </Badge>}
+                        {song.song.songKey && (
+                          <Badge variant="outline" className="text-xs">
+                            {SongKeyKorean[song.song.songKey]}
+                          </Badge>
+                        )}
                         <span className="text-sm text-gray-500 w-10 text-right">
                           {parseSongDuration(song.song.duration)}
                         </span>
